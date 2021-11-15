@@ -34,7 +34,7 @@ const SliderContainer = (props: IContainerProps) => {
                 }}/>
                 <Menu theme="dark" mode="inline">
                     <Menu.Item key="1" icon={<UserOutlined />}>
-                        <Link href={'/bills'}>
+                        <Link href={'/users'}>
                             Users
                         </Link>
                     </Menu.Item>
@@ -54,8 +54,8 @@ const SliderContainer = (props: IContainerProps) => {
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="5" icon={<AreaChartOutlined />}>
-                        <Link href={'/bills'}>
-                            Bills
+                        <Link href={'/payments'}>
+                            Payments
                         </Link>
                     </Menu.Item>
                 </Menu>
