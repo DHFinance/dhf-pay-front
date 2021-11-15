@@ -15,7 +15,7 @@ import Title from "antd/lib/typography/Title";
 const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
-    children: JSX.Element
+    children: JSX.Element | string
 }
 
 const SliderContainer = (props: IContainerProps) => {
