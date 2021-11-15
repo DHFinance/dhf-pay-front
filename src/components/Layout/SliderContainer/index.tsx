@@ -14,9 +14,11 @@ import Title from "antd/lib/typography/Title";
 
 const { Header, Sider, Content } = Layout;
 
+interface IContainerProps {
+    children: JSX.Element
+}
 
-
-const SliderContainer = ({children}) => {
+const SliderContainer = (props: IContainerProps) => {
 
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
@@ -76,7 +78,7 @@ const SliderContainer = ({children}) => {
                     }}
                 >
                     <Title style={{width: '100%', textAlign: 'center'}}>{title}</Title>
-                    {children}
+                    {props.children}
                 </Content>
             </Layout>
         </Layout>
