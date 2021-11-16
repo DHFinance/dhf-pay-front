@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-
+import { Button } from 'antd';
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
@@ -51,6 +51,11 @@ const Home: NextPage = () => {
             </p>
           </a>
         </div>
+
+        <Button type="primary">Button</Button>
+        <Button type="primary">Button</Button>
+        <Button type="primary">Button</Button>
+        <Button type="primary">Button</Button>
       </main>
 
       <footer className={styles.footer}>
