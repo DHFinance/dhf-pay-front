@@ -8,6 +8,8 @@ interface IUserData {
     lastName: string,
     email: string,
     company: string,
+    password: string,
+    passwordConf: string,
 }
 
 const initialState = {
@@ -15,6 +17,8 @@ const initialState = {
     lastName: '',
     email: '',
     company: '',
+    password: '',
+    passwordConf: '',
 }
 
 const Register = () => {
@@ -38,6 +42,10 @@ const Register = () => {
     };
 
     const onSubmit = async () => {
+        if (userData.passwordConf !== userData.password) {
+            alert('Пароли не совпалают')
+            return false
+        }
         try {
             await axios.post('http://localhost:3001/api/auth/register', userData);
         } catch (e) {
@@ -86,6 +94,22 @@ const Register = () => {
                 rules={[{ required: true, message: 'Please input your company name!' }]}
             >
                 <Input onChange={onUpdateData('company')}/>
+            </Form.Item>
+            <Form.Item
+                label="Password"
+                name="password"
+            >
+                <Input onChange={onUpdateData('password')}/>
+            </Form.Item>
+            <Form.Item
+                label="PasswordConf"
+                name="passwordConf"
+            >
+                <Input onChange={onUpdateData('passwordConf')}/>
+            </Form.Item>
+
+            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 6, span: 12 }}>
+                <Checkbox>Remember me</Checkbox>
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
