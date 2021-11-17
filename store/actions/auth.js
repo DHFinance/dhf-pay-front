@@ -72,7 +72,7 @@ const postLogoutSuccess = (data) => ({
 });
 
 const postLogoutFailed = (error) => ({
-  type: POST_LOGOUT_START,
+  type: POST_LOGOUT_FAILED,
   payload: error
 });
 
@@ -91,12 +91,12 @@ const postRestoreStart = () => ({
 });
 
 const postRestoreSuccess = (data) => ({
-  type: POST_RESTORE_START,
+  type: POST_RESTORE_SUCCESS,
   payload: data
 });
 
 const postRestoreFailed = (error) => ({
-  type: POST_RESTORE_START,
+  type: POST_RESTORE_FAILED,
   payload: error
 });
 
