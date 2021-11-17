@@ -1,7 +1,13 @@
-import {  GET_FAILED,  GET_START,  GET_SUCCESS }  from '../actions/getQuery';
+import {  POST_LOGIN_FAILED, POST_LOGIN_START, POST_RESTORE_START, POST_LOGOUT_SUCCESS, POST_RESTORE_FAILED, POST_RESTORE_SUCCESS, POST_LOGOUT_FAILED, POST_LOGIN_SUCCESS, POST_REGISTRATION_FAILED, POST_LOGOUT_START, POST_REGISTRATION_SUCCESS, POST_REGISTRATION_START }  from '../actions/auth';
 
 const initialState = {
-  data: {},
+  data: {
+    name: "",
+    lastName: "",
+    company: "",
+    email: "",
+    token: "",
+  },
   isLoading: false,
   error: '',
   isChanged: false
@@ -9,20 +15,80 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case  GET_START:
+    case  POST_LOGOUT_START:
       return {
         ...state,
         isLoading: true,
         isChanged: true
       };
-    case  GET_SUCCESS:
+    case  POST_LOGOUT_SUCCESS:
       return {
         ...state,
         data: action.payload,
         isLoading: false,
         isChanged: true
       };
-    case  GET_FAILED:
+    case  POST_LOGOUT_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+        isChanged: true
+      };
+    case  POST_REGISTRATION_START:
+      return {
+        ...state,
+        isLoading: true,
+        isChanged: true
+      };
+    case  POST_REGISTRATION_SUCCESS:
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        isChanged: true
+      };
+    case  POST_REGISTRATION_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+        isChanged: true
+      };
+    case  POST_RESTORE_START:
+      return {
+        ...state,
+        isLoading: true,
+        isChanged: true
+      };
+    case  POST_RESTORE_SUCCESS:
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        isChanged: true
+      };
+    case  POST_RESTORE_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+        isChanged: true
+      };
+    case  POST_LOGIN_START:
+      return {
+        ...state,
+        isLoading: true,
+        isChanged: true
+      };
+    case  POST_LOGIN_SUCCESS:
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        isChanged: true
+      };
+    case  POST_LOGIN_FAILED:
       return {
         ...state,
         isLoading: false,

@@ -27,11 +27,11 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
-export const postRegistration = (url, data, params) => async (dispatch) => {
+export const postRegistration = (data, params) => async (dispatch) => {
   dispatch(postRegistrationStart());
-  const result = await post(url, data, params);
+  const result = await post('/auth/register', data, params);
   try {
-    dispatch(postRegistrationSuccess(result.data.data));
+    dispatch(postRegistrationSuccess());
   } catch (e) {
     dispatch(postRegistrationFailed(e));
   }
@@ -47,7 +47,7 @@ const postLoginSuccess = (data) => ({
 });
 
 const postLoginFailed = (error) => ({
-  type: POST_LOGIN_START,
+  type: POST_LOGIN_FAILED,
   payload: error
 });
 
@@ -67,7 +67,7 @@ const postLogoutStart = () => ({
 });
 
 const postLogoutSuccess = (data) => ({
-  type: POST_LOGOUT_START,
+  type: POST_LOGOUT_SUCCESS,
   payload: data
 });
 

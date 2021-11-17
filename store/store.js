@@ -2,6 +2,9 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { HYDRATE, createWrapper } from 'next-redux-wrapper';
 import thunkMiddleware from 'redux-thunk';
 import getQuery from "./reducers/getQuery";
+import postQuery from "./reducers/postQuery";
+import auth from "./reducers/auth";
+
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -13,6 +16,8 @@ const bindMiddleware = (middleware) => {
 
 const combinedReducer = combineReducers({
   getQuery,
+  postQuery,
+  auth
 });
 
 const reducer = (state, action) => {

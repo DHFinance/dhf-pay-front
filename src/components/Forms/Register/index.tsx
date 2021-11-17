@@ -2,6 +2,8 @@ import { Form, Input, Button, Checkbox } from 'antd';
 import {useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
+import {useDispatch, useSelector} from "react-redux";
+import {postRegistration} from "../../../../store/actions/auth";
 
 interface IUserData {
     name: string,
@@ -22,6 +24,8 @@ const initialState = {
 }
 
 const Register = () => {
+
+    const dispatch = useDispatch();
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
@@ -47,7 +51,7 @@ const Register = () => {
             return false
         }
         try {
-            await axios.post('http://localhost:3001/api/auth/register', userData);
+            await dispatch(postRegistration(userData))
         } catch (e) {
             console.log(e, 'registration error')
         }
