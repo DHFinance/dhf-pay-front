@@ -19,7 +19,9 @@ interface IRestoreDataPassword {
 interface IRestoreForm {
     setForm: Dispatch<SetStateAction<EnumForms>>,
     setCode?: Dispatch<SetStateAction<string>>,
+    setEmail?: Dispatch<SetStateAction<string>>,
     code?: string
+    email?: string
 }
 
 const initialStateEmail = {
@@ -41,7 +43,7 @@ enum EnumForms {
     PASSWORD
 }
 
-const EmailForm = ({setForm}: IRestoreForm) => {
+const EmailForm = ({setForm, setEmail}: IRestoreForm) => {
 
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
 
@@ -63,7 +65,13 @@ const EmailForm = ({setForm}: IRestoreForm) => {
 
     const onSubmit = async () => {
         try {
-            await axios.post('http://localhost:3001/api/auth/send-code', userData).then((res) => setForm(EnumForms.CODE));
+            await axios.post('http://localhost:3001/api/auth/send-code', userData).then((res) =>
+            {
+                setForm(EnumForms.CODE)
+                if (setEmail) {
+                    setEmail(userData.email)
+                }
+            });
         } catch (e) {
             console.log(e, 'registration error')
         }
@@ -95,7 +103,7 @@ const EmailForm = ({setForm}: IRestoreForm) => {
     </Form>
 }
 
-const CodeForm = ({setForm, setCode}: IRestoreForm) => {
+const CodeForm = ({setForm, setCode, email}: IRestoreForm) => {
 
     const [userData, setUserData] = useState<IRestoreDataCode>(initialStateCode)
 
@@ -117,7 +125,7 @@ const CodeForm = ({setForm, setCode}: IRestoreForm) => {
 
     const onSubmit = async () => {
         try {
-            await axios.post('http://localhost:3001/api/auth/check-code', userData).then((res) => {
+            await axios.post('http://localhost:3001/api/auth/check-code', {...userData, email}).then((res) => {
 
                 if (setCode) {
                     setForm(EnumForms.PASSWORD)
@@ -157,7 +165,7 @@ const CodeForm = ({setForm, setCode}: IRestoreForm) => {
     </Form>
 }
 
-const PasswordForm = ({setForm, code}: IRestoreForm) => {
+const PasswordForm = ({setForm, email}: IRestoreForm) => {
 
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
 
@@ -179,7 +187,7 @@ const PasswordForm = ({setForm, code}: IRestoreForm) => {
 
     const onSubmit = async () => {
         try {
-            await axios.post('http://localhost:3001/api/auth/reset-pwd', {password: userData.password, code}).then((res) => {
+            await axios.post('http://localhost:3001/api/auth/reset-pwd', {password: userData.password, email}).then((res) => {
                 setForm(EnumForms.EMAIL)
                 alert('Password changed')
             });
@@ -225,13 +233,13 @@ const PasswordForm = ({setForm, code}: IRestoreForm) => {
 const Restore = () => {
 
     const [form, setForm] = useState<EnumForms>(EnumForms.EMAIL)
-    //temp
     const [code, setCode] = useState<string>('')
+    const [email, setEmail] = useState<string>('')
 
     switch (form) {
-        case EnumForms.CODE: return <CodeForm setForm={setForm} setCode={setCode}/>
-        case EnumForms.EMAIL: return <EmailForm setForm={setForm}/>
-        case EnumForms.PASSWORD: return <PasswordForm setForm={setForm} code={code}/>
+        case EnumForms.EMAIL: return <EmailForm setForm={setForm} setEmail={setEmail}/>
+        case EnumForms.CODE: return <CodeForm setForm={setForm} setCode={setCode} email={email}/>
+        case EnumForms.PASSWORD: return <PasswordForm setForm={setForm} code={code} email={email}/>
         default: return <EmailForm setForm={setForm}/>
     }
 };

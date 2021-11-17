@@ -88,10 +88,6 @@ const Register = () => {
                 <Input onChange={onUpdateData('company')}/>
             </Form.Item>
 
-            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 6, span: 12 }}>
-                <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-
             <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
                 <Button type="primary" htmlType="submit">
                     Submit
