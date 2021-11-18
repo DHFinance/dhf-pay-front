@@ -1,5 +1,6 @@
 import {post} from "../../api"
 import initStore from '../store';
+import {Router} from "next/router";
 
 export const POST_REGISTRATION_START = 'POST_REGISTRATION_START';
 export const POST_REGISTRATION_SUCCESS = 'POST_REGISTRATION_SUCCESS';
@@ -55,17 +56,16 @@ const postLoginFailed = (error) => {
   }
 }
 
-export const postLogin = (data) => async (dispatch) => {
+export const postLogin = (data, goStartPage) => async (dispatch) => {
   dispatch(postLoginStart());
   const result = await post('auth/login', data);
   try {
-    console.log('rusult', result.data)
     dispatch(postLoginSuccess(result.data));
+    goStartPage()
   } catch (e) {
     dispatch(postLoginFailed(e));
   }
 };
-
 
 const postLogoutStart = () => ({
   type: POST_LOGOUT_START
@@ -81,12 +81,14 @@ const postLogoutFailed = (error) => ({
   payload: error
 });
 
-export const postLogout = () => async (dispatch) => {
+export const postLogout = (nextPage) => async (dispatch) => {
   dispatch(postLogoutStart());
   try {
     dispatch(postLogoutSuccess());
+    return true
   } catch (e) {
     dispatch(postLogoutFailed(e));
+    nextPage
   }
 };
 

@@ -7,15 +7,15 @@ import {useRouter} from "next/router";
 import {Spin} from "antd";
 
 
-const WithAuth = ({children}: any) => {
+const WithoutAuth = ({children}: any) => {
 
     const localToken = localStorage.getItem('token')
     const router = useRouter()
 
-    console.log({localToken})
+    console.log(!!localToken)
 
-    if (!localToken) {
-        router.push('/login').then(r => console.log('token not found'))
+    if (!!localToken) {
+        router.push('/').then(r => console.log('first you need to log out'))
         return <Spin style={{
             display: 'flex',
             justifyContent: 'center',
@@ -27,4 +27,4 @@ const WithAuth = ({children}: any) => {
     return children
 }
 
-export default WithAuth
+export default WithoutAuth

@@ -5,6 +5,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import {useDispatch} from "react-redux";
 import {postLogin} from "../../../../store/actions/auth";
 import Link from "next/link";
+import {useRouter} from "next/router";
 
 interface IUserData {
     email: string,
@@ -18,6 +19,11 @@ const initialState = {
 
 const Login = () => {
 
+
+    const router = useRouter();
+    const goStartPage = () => {
+      router.push('/')
+    }
     const dispatch = useDispatch();
 
     const [userData, setUserData] = useState<IUserData>(initialState)
@@ -41,7 +47,7 @@ const Login = () => {
 
     const onSubmit = async () => {
         try {
-            await dispatch(postLogin(userData))
+            await dispatch(postLogin(userData, goStartPage))
         } catch (e) {
             console.log(e, 'registration error')
         }

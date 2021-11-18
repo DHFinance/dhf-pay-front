@@ -24,13 +24,15 @@ const SliderContainer = (props: IContainerProps) => {
 
     const user = useSelector((state) => state.auth);
     const dispatch = useDispatch();
-    const token = user.data.token
+    const router = useRouter();
+    const token = localStorage.getItem('token')
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
     const title = history.route.replace('/', '').toUpperCase()
 
     const onLogout = async () => {
       await dispatch(postLogout())
+        await router.push('/login')
     }
 
     return (

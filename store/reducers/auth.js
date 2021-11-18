@@ -39,7 +39,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_REGISTRATION_SUCCESS:
-      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
+      localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
         data: {
@@ -63,7 +63,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_RESTORE_SUCCESS:
-      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
+      localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
         data: {
@@ -88,7 +88,7 @@ export default function reducer(state = initialState, action) {
       };
     case  POST_LOGIN_SUCCESS:
       console.log(action.payload)
-      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
+      localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
         data: {
