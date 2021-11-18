@@ -1,7 +1,14 @@
 import { Form, Input, Button, Checkbox } from 'antd';
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
+import {
+    postRegistration,
+    postRestoreStepCode,
+    postRestoreStepEmail,
+    postRestoreStepPassword
+} from "../../../../store/actions/auth";
+import {useDispatch, useSelector} from "react-redux";
 
 interface IRestoreDataEmail {
     email: string,
@@ -14,14 +21,6 @@ interface IRestoreDataCode {
 interface IRestoreDataPassword {
     password: string,
     passwordConf: string,
-}
-
-interface IRestoreForm {
-    setForm: Dispatch<SetStateAction<EnumForms>>,
-    setCode?: Dispatch<SetStateAction<string>>,
-    setEmail?: Dispatch<SetStateAction<string>>,
-    code?: string
-    email?: string
 }
 
 const initialStateEmail = {
@@ -43,12 +42,14 @@ enum EnumForms {
     PASSWORD
 }
 
-const EmailForm = ({setForm, setEmail}: IRestoreForm) => {
+const EmailForm = () => {
 
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
+    const dispatch = useDispatch();
 
-    const onUpdateData = (field: string) => (e: any) => {
+    const onUpdateData = (e: any) => {
         const value = e.target.value
+        const field = e.target.name
         setUserData({
             ...userData,
             [field]: value,
@@ -65,15 +66,9 @@ const EmailForm = ({setForm, setEmail}: IRestoreForm) => {
 
     const onSubmit = async () => {
         try {
-            await axios.post('http://localhost:3001/api/auth/send-code', userData).then((res) =>
-            {
-                setForm(EnumForms.CODE)
-                if (setEmail) {
-                    setEmail(userData.email)
-                }
-            });
+            await dispatch(postRestoreStepEmail(userData))
         } catch (e) {
-            console.log(e, 'registration error')
+            console.log(e, 'registration error: Email step')
         }
     }
     return <Form
@@ -92,7 +87,7 @@ const EmailForm = ({setForm, setEmail}: IRestoreForm) => {
             name="email"
             rules={[{ required: true, message: 'Please input your email!' }]}
         >
-            <Input onChange={onUpdateData('email')}/>
+            <Input name="email" onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
@@ -103,12 +98,15 @@ const EmailForm = ({setForm, setEmail}: IRestoreForm) => {
     </Form>
 }
 
-const CodeForm = ({setForm, setCode, email}: IRestoreForm) => {
+const CodeForm = () => {
 
+    const restoreState = useSelector((state) => state.auth);
     const [userData, setUserData] = useState<IRestoreDataCode>(initialStateCode)
+    const dispatch = useDispatch();
 
-    const onUpdateData = (field: string) => (e: any) => {
+    const onUpdateData = (e: any) => {
         const value = e.target.value
+        const field = e.target.name
         setUserData({
             ...userData,
             [field]: value,
@@ -125,17 +123,9 @@ const CodeForm = ({setForm, setCode, email}: IRestoreForm) => {
 
     const onSubmit = async () => {
         try {
-            await axios.post('http://localhost:3001/api/auth/check-code', {...userData, email}).then((res) => {
-
-                if (setCode) {
-                    setForm(EnumForms.PASSWORD)
-                    setCode(res.data.code)
-                } else {
-                    throw new Error()
-                }
-            });
+            await dispatch(postRestoreStepCode({...userData, email: restoreState.data.email}))
         } catch (e) {
-            console.log(e, 'registration error')
+            console.log(e, 'registration error: Code step')
         }
     }
     return <Form
@@ -154,7 +144,7 @@ const CodeForm = ({setForm, setCode, email}: IRestoreForm) => {
             name="code"
             rules={[{ required: true, message: 'Please input your code!' }]}
         >
-            <Input onChange={onUpdateData('code')}/>
+            <Input name="code" onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
@@ -165,12 +155,15 @@ const CodeForm = ({setForm, setCode, email}: IRestoreForm) => {
     </Form>
 }
 
-const PasswordForm = ({setForm, email}: IRestoreForm) => {
+const PasswordForm = () => {
 
+    const restoreState = useSelector((state) => state.auth);
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
+    const dispatch = useDispatch();
 
-    const onUpdateData = (field: string) => (e: any) => {
+    const onUpdateData = (e: any) => {
         const value = e.target.value
+        const field = e.target.name
         setUserData({
             ...userData,
             [field]: value,
@@ -186,11 +179,12 @@ const PasswordForm = ({setForm, email}: IRestoreForm) => {
     };
 
     const onSubmit = async () => {
+        if (userData.password !== userData.passwordConf) {
+            alert('Пароли не совпадают')
+            return false
+        }
         try {
-            await axios.post('http://localhost:3001/api/auth/reset-pwd', {password: userData.password, email}).then((res) => {
-                setForm(EnumForms.EMAIL)
-                alert('Password changed')
-            });
+            await dispatch(postRestoreStepPassword({password: userData.password, email: restoreState.data.email}))
         } catch (e) {
             console.log(e, 'registration error')
         }
@@ -211,7 +205,7 @@ const PasswordForm = ({setForm, email}: IRestoreForm) => {
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
         >
-            <Input onChange={onUpdateData('password')}/>
+            <Input name='password' onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item
@@ -219,7 +213,7 @@ const PasswordForm = ({setForm, email}: IRestoreForm) => {
             name="passwordConf"
             rules={[{ required: true, message: 'Please confirm your password!' }]}
         >
-            <Input onChange={onUpdateData('passwordConf')}/>
+            <Input name="passwordConf" onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
@@ -232,15 +226,26 @@ const PasswordForm = ({setForm, email}: IRestoreForm) => {
 
 const Restore = () => {
 
+    const restoreState = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        console.log(restoreState)
+        if (restoreState.data.resetEnabled) {
+            setForm(EnumForms.PASSWORD)
+        } else if (restoreState.data.email) {
+            setForm(EnumForms.CODE)
+        } else if (restoreState.data.token) {
+            setForm(EnumForms.EMAIL)
+        } else setForm(EnumForms.EMAIL)
+    }, [restoreState])
+
     const [form, setForm] = useState<EnumForms>(EnumForms.EMAIL)
-    const [code, setCode] = useState<string>('')
-    const [email, setEmail] = useState<string>('')
 
     switch (form) {
-        case EnumForms.EMAIL: return <EmailForm setForm={setForm} setEmail={setEmail}/>
-        case EnumForms.CODE: return <CodeForm setForm={setForm} setCode={setCode} email={email}/>
-        case EnumForms.PASSWORD: return <PasswordForm setForm={setForm} code={code} email={email}/>
-        default: return <EmailForm setForm={setForm}/>
+        case EnumForms.EMAIL: return <EmailForm/>
+        case EnumForms.CODE: return <CodeForm/>
+        case EnumForms.PASSWORD: return <PasswordForm/>
+        default: return <EmailForm/>
     }
 };
 

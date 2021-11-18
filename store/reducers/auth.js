@@ -7,6 +7,7 @@ const initialState = {
     company: "",
     email: "",
     token: "",
+    resetEnabled: false,
   },
   isLoading: false,
   error: '',
@@ -22,12 +23,8 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_LOGOUT_SUCCESS:
-      return {
-        ...state,
-        data: action.payload,
-        isLoading: false,
-        isChanged: true
-      };
+      localStorage.removeItem('token');
+      return initialState;
     case  POST_LOGOUT_FAILED:
       return {
         ...state,
@@ -42,9 +39,13 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_REGISTRATION_SUCCESS:
+      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
-        data: action.payload,
+        data: {
+          ...state.data,
+          ...action.payload
+        },
         isLoading: false,
         isChanged: true
       };
@@ -62,9 +63,13 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_RESTORE_SUCCESS:
+      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
-        data: action.payload,
+        data: {
+          ...state.data,
+          ...action.payload
+        },
         isLoading: false,
         isChanged: true
       };
@@ -82,9 +87,14 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_LOGIN_SUCCESS:
+      console.log(action.payload)
+      // localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
-        data: action.payload,
+        data: {
+          ...state.data,
+          ...action.payload
+        },
         isLoading: false,
         isChanged: true
       };

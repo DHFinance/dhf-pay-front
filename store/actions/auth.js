@@ -1,4 +1,5 @@
 import {post} from "../../api"
+import initStore from '../store';
 
 export const POST_REGISTRATION_START = 'POST_REGISTRATION_START';
 export const POST_REGISTRATION_SUCCESS = 'POST_REGISTRATION_SUCCESS';
@@ -46,16 +47,20 @@ const postLoginSuccess = (data) => ({
   payload: data
 });
 
-const postLoginFailed = (error) => ({
-  type: POST_LOGIN_FAILED,
-  payload: error
-});
+const postLoginFailed = (error) => {
+  console.log({error})
+  return {
+    type: POST_LOGIN_FAILED,
+        payload: error
+  }
+}
 
-export const postLogin = (url, data, params) => async (dispatch) => {
+export const postLogin = (data) => async (dispatch) => {
   dispatch(postLoginStart());
-  const result = await post(url, data, params);
+  const result = await post('auth/login', data);
   try {
-    dispatch(postLoginSuccess(result.data.data));
+    console.log('rusult', result.data)
+    dispatch(postLoginSuccess(result.data));
   } catch (e) {
     dispatch(postLoginFailed(e));
   }
@@ -76,11 +81,10 @@ const postLogoutFailed = (error) => ({
   payload: error
 });
 
-export const postLogout = (url, data, params) => async (dispatch) => {
+export const postLogout = () => async (dispatch) => {
   dispatch(postLogoutStart());
-  const result = await post(url, data, params);
   try {
-    dispatch(postLogoutSuccess(result.data.data));
+    dispatch(postLogoutSuccess());
   } catch (e) {
     dispatch(postLogoutFailed(e));
   }
@@ -100,13 +104,41 @@ const postRestoreFailed = (error) => ({
   payload: error
 });
 
-export const postRestore = (url, data, params) => async (dispatch) => {
+export const postRestoreStepEmail = (data) => async (dispatch) => {
   dispatch(postRestoreStart());
-  const result = await post(url, data, params);
+  const result = await post('/auth/send-code', data);
   try {
-    dispatch(postRestoreSuccess(result.data.data));
+    dispatch(postRestoreSuccess({
+      code: result.data,
+      email: data.email
+    }));
   } catch (e) {
-    dispatch(postRestoreFailed(e));
+    dispatch(postRestoreFailed('Email step error:',e));
+  }
+};
+
+export const postRestoreStepCode = (data) => async (dispatch) => {
+  dispatch(postRestoreStart())
+  const result = await post('/auth/check-code', data);
+  try {
+    dispatch(postRestoreSuccess({
+      resetEnabled: true
+    }));
+  } catch (e) {
+    dispatch(postRestoreFailed('Code step error:',e));
+  }
+};
+
+export const postRestoreStepPassword = (data) => async (dispatch) => {
+  dispatch(postRestoreStart());
+  const result = await post('/auth/reset-pwd', data);
+  try {
+    dispatch(postRestoreSuccess({
+      ...result.data,
+      resetEnabled: false
+    }));
+  } catch (e) {
+    dispatch(postRestoreFailed('Password step error:',e));
   }
 };
 

@@ -1,10 +1,11 @@
 import React from "react";
 import Users from "../../src/components/Tables/Users";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
+import WithAuth from "../../hoc/withAuth";
 
 
 const UsersPage = () => {
-    return <SliderContainer><Users/></SliderContainer>
+    return <WithAuth><SliderContainer><Users/></SliderContainer></WithAuth>
 }
 
 export default UsersPage
