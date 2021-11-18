@@ -29,11 +29,12 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
-export const postRegistration = (data, params) => async (dispatch) => {
+export const postRegistration = (data, goStartPage) => async (dispatch) => {
   dispatch(postRegistrationStart());
-  const result = await post('/auth/register', data, params);
+  const result = await post('/auth/register', data);
   try {
-    dispatch(postRegistrationSuccess());
+    dispatch(postRegistrationSuccess(result));
+    goStartPage()
   } catch (e) {
     dispatch(postRegistrationFailed(e));
   }
@@ -81,14 +82,13 @@ const postLogoutFailed = (error) => ({
   payload: error
 });
 
-export const postLogout = (nextPage) => async (dispatch) => {
+export const postLogout = (goLoginPage) => async (dispatch) => {
   dispatch(postLogoutStart());
   try {
     dispatch(postLogoutSuccess());
-    return true
+    goLoginPage()
   } catch (e) {
     dispatch(postLogoutFailed(e));
-    nextPage
   }
 };
 
@@ -131,7 +131,7 @@ export const postRestoreStepCode = (data) => async (dispatch) => {
   }
 };
 
-export const postRestoreStepPassword = (data) => async (dispatch) => {
+export const postRestoreStepPassword = (data, goStartPage) => async (dispatch) => {
   dispatch(postRestoreStart());
   const result = await post('/auth/reset-pwd', data);
   try {
@@ -139,6 +139,7 @@ export const postRestoreStepPassword = (data) => async (dispatch) => {
       ...result.data,
       resetEnabled: false
     }));
+    goStartPage();
   } catch (e) {
     dispatch(postRestoreFailed('Password step error:',e));
   }

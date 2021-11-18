@@ -9,6 +9,7 @@ import {
     postRestoreStepPassword
 } from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
+import {useRouter} from "next/router";
 
 interface IRestoreDataEmail {
     email: string,
@@ -159,6 +160,11 @@ const PasswordForm = () => {
 
     const restoreState = useSelector((state) => state.auth);
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
+    const router = useRouter();
+    const goStartPage = () => {
+        router.push('/')
+    }
+
     const dispatch = useDispatch();
 
     const onUpdateData = (e: any) => {
@@ -184,7 +190,7 @@ const PasswordForm = () => {
             return false
         }
         try {
-            await dispatch(postRestoreStepPassword({password: userData.password, email: restoreState.data.email}))
+            await dispatch(postRestoreStepPassword({password: userData.password, email: restoreState.data.email}, goStartPage))
         } catch (e) {
             console.log(e, 'registration error')
         }
@@ -229,7 +235,6 @@ const Restore = () => {
     const restoreState = useSelector((state) => state.auth);
 
     useEffect(() => {
-        console.log(restoreState)
         if (restoreState.data.resetEnabled) {
             setForm(EnumForms.PASSWORD)
         } else if (restoreState.data.email) {

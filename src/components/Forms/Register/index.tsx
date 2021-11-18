@@ -4,6 +4,7 @@ import "antd/dist/antd.css";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {postRegistration} from "../../../../store/actions/auth";
+import {useRouter} from "next/router";
 
 interface IUserData {
     name: string,
@@ -26,6 +27,10 @@ const initialState = {
 const Register = () => {
 
     const dispatch = useDispatch();
+    const router = useRouter();
+    const goStartPage = () => {
+        router.push('/')
+    }
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
@@ -51,7 +56,7 @@ const Register = () => {
             return false
         }
         try {
-            await dispatch(postRegistration(userData))
+            await dispatch(postRegistration(userData, goStartPage))
         } catch (e) {
             console.log(e, 'registration error')
         }

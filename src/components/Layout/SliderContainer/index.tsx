@@ -30,9 +30,12 @@ const SliderContainer = (props: IContainerProps) => {
     const history = useRouter()
     const title = history.route.replace('/', '').toUpperCase()
 
+    const goLoginPage = () => {
+        router.push('/login')
+    }
+
     const onLogout = async () => {
-      await dispatch(postLogout())
-        await router.push('/login')
+      await dispatch(postLogout(goLoginPage))
     }
 
     return (
