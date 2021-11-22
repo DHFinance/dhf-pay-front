@@ -1,15 +1,16 @@
 import React from "react";
-import Restore from "../../src/components/Forms/Restore";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
+import Login from "../../src/components/Forms/Login";
 import WithoutAuth from "../../hoc/withoutAuth";
 
 
-const RestorePage = () => {
+const AuthPage = () => {
     return <WithoutAuth>
         <SliderContainer>
-            <Restore/>
+            <Login/>
         </SliderContainer>
     </WithoutAuth>
+
 }
 
-export default RestorePage
+export default AuthPage

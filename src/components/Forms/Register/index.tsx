@@ -2,12 +2,17 @@ import { Form, Input, Button, Checkbox } from 'antd';
 import {useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
+import {useDispatch, useSelector} from "react-redux";
+import {postRegistration} from "../../../../store/actions/auth";
+import {useRouter} from "next/router";
 
 interface IUserData {
     name: string,
     lastName: string,
     email: string,
     company: string,
+    password: string,
+    passwordConf: string,
 }
 
 const initialState = {
@@ -15,9 +20,17 @@ const initialState = {
     lastName: '',
     email: '',
     company: '',
+    password: '',
+    passwordConf: '',
 }
 
 const Register = () => {
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const goStartPage = () => {
+        router.push('/')
+    }
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
@@ -38,8 +51,12 @@ const Register = () => {
     };
 
     const onSubmit = async () => {
+        if (userData.passwordConf !== userData.password) {
+            alert('Пароли не совпалают')
+            return false
+        }
         try {
-            await axios.post('http://localhost:3001/api/auth/register', userData);
+            await dispatch(postRegistration(userData, goStartPage))
         } catch (e) {
             console.log(e, 'registration error')
         }
@@ -86,6 +103,18 @@ const Register = () => {
                 rules={[{ required: true, message: 'Please input your company name!' }]}
             >
                 <Input onChange={onUpdateData('company')}/>
+            </Form.Item>
+            <Form.Item
+                label="Password"
+                name="password"
+            >
+                <Input onChange={onUpdateData('password')}/>
+            </Form.Item>
+            <Form.Item
+                label="PasswordConf"
+                name="passwordConf"
+            >
+                <Input onChange={onUpdateData('passwordConf')}/>
             </Form.Item>
 
             <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 6, span: 12 }}>

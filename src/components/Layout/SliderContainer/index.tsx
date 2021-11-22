@@ -5,12 +5,14 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     VideoCameraOutlined,
-    UploadOutlined, AreaChartOutlined,
+    UploadOutlined, AreaChartOutlined, ApiOutlined
 } from '@ant-design/icons';
 import "antd/dist/antd.css";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import Title from "antd/lib/typography/Title";
+import {postLogout} from "../../../../store/actions/auth";
+import {useDispatch, useSelector} from "react-redux";
 
 const { Header, Sider, Content } = Layout;
 
@@ -20,9 +22,21 @@ interface IContainerProps {
 
 const SliderContainer = (props: IContainerProps) => {
 
+    const user = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const token = localStorage.getItem('token')
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
     const title = history.route.replace('/', '').toUpperCase()
+
+    const goLoginPage = () => {
+        router.push('/login')
+    }
+
+    const onLogout = async () => {
+      await dispatch(postLogout(goLoginPage))
+    }
 
     return (
         <Layout style={{height: '100vh'}}>
@@ -33,31 +47,34 @@ const SliderContainer = (props: IContainerProps) => {
                     background: 'rgba(255, 255, 255, 0.3)',
                 }}/>
                 <Menu theme="dark" mode="inline">
-                    <Menu.Item key="1" icon={<UserOutlined />}>
-                        <Link href={'/users'}>
-                            Users
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="2" icon={<UserOutlined />}>
-                        <Link href={'/register'}>
-                            Register
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="3" icon={<UserOutlined />}>
-                        <Link href={'/restore'}>
-                            Restore
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="4" icon={<VideoCameraOutlined />}>
-                        <Link href={'/transactions'}>
-                            Transactions
-                        </Link>
-                    </Menu.Item>
-                    <Menu.Item key="5" icon={<AreaChartOutlined />}>
-                        <Link href={'/payments'}>
-                            Payments
-                        </Link>
-                    </Menu.Item>
+
+                    {token
+                        ? (<>
+                        <Menu.Item key="users" icon={<UserOutlined />}>
+                            <Link href={'/users'}>
+                                Users
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="transactions" icon={<VideoCameraOutlined />}>
+                            <Link href={'/transactions'}>
+                                Transactions
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="payments" icon={<AreaChartOutlined />}>
+                            <Link href={'/payments'}>
+                                Payments
+                            </Link>
+                        </Menu.Item>
+                        <Menu.Item key="logout" onClick={onLogout} icon={<ApiOutlined />}>
+                            Logout
+                        </Menu.Item>
+                    </>)
+                        : <Menu.Item key="login" icon={<UserOutlined />}>
+                            <Link href={'/login'}>
+                                Login
+                            </Link>
+                        </Menu.Item>}
+
                 </Menu>
             </Sider>
             <Layout className="site-layout">
