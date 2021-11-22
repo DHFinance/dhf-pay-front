@@ -30,7 +30,7 @@ const Balance = () => {
     const [connected, setConnected] = useState(false)
     const [balance, setBalance] = useState('')
 
-    const apiUrl = 'http://54.183.43.215:35000:7777/rpc';
+    const apiUrl = '/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
 
