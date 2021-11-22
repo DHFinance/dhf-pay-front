@@ -4,6 +4,7 @@ const path = require('path')
 
 
 let nextConfig = {
+  presets: ["next/babel"],
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },

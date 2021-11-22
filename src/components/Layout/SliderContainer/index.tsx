@@ -50,6 +50,11 @@ const SliderContainer = (props: IContainerProps) => {
 
                     {token
                         ? (<>
+                            <Menu.Item key="payments" icon={<AreaChartOutlined />}>
+                                <Link href={'/balance'}>
+                                    Payments
+                                </Link>
+                            </Menu.Item>
                         <Menu.Item key="users" icon={<UserOutlined />}>
                             <Link href={'/users'}>
                                 Users
