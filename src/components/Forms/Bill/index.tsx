@@ -71,6 +71,8 @@ const Bill = () => {
 
     let payment = DeployUtil.standardPayment(paymentAmount);
     let deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+    deploy = DeployUtil.signDeploy(deploy, senderKey);
+    deploy = DeployUtil.signDeploy(deploy, recipientKey);
 
     let transferInfo = DeployUtil.deployToJson(deploy);
 

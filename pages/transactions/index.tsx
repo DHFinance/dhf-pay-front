@@ -17,7 +17,7 @@ const TransactionsPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
     async ({req, res, query,  ...etc}) => {
-        await store.dispatch(getTransactions());
+        await store.dispatch(getTransactions()).catch(e => console.log(e));
     }
 );
 
