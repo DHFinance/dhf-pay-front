@@ -48,23 +48,31 @@ const Bill = () => {
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
 
-    const senderKey = Keys.Ed25519.new();
-    const recipientKey = Keys.Ed25519.new();
+
+
+    //приватный ключ отправителя
+    const fromPriv = 'b5e556e1f42582a9e3083ec44c9b6aa467a679d89f74cf1ceb5b35c0bf044620';
+    //публичный ключ получателя
+    const toAddr = '016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee';
+
+    let privUintArray = casperClientSDK.decodeBase64(fromPriv);
     const networkName = 'test-network';
     const paymentAmount = 10000000000000;
     const transferAmount = 10;
     const ID = 34;
-
-    console.log({senderKey, recipientKey})
+    let privKey = casperClientSDK.Keys.Ed25519.parsePrivateKey(privUintArray);
+    let pubKey = casperClientSDK.Keys.Ed25519.privateToPublicKey(privKey);
+    let fromKeyPair = casperClientSDK.Keys.Ed25519.parseKeyPair(pubKey, privKey);
+    const toPubKey = casperClientSDK.CLPublicKey.fromHex(toAddr);
 
     let deployParams = new DeployUtil.DeployParams(
-        CLPublicKey.fromHex('010eee1078c906942cf609cf01b73dfc6551bc79bb3ab06ee80f912a641bbdd666'),
+        fromKeyPair.publicKey,
         networkName
     );
 
     let session = DeployUtil.ExecutableDeployItem.newTransfer(
         transferAmount,
-        CLPublicKey.fromHex('016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee'),
+        toPubKey,
         undefined,
         ID
     );
@@ -72,7 +80,12 @@ const Bill = () => {
     let payment = DeployUtil.standardPayment(paymentAmount);
     let deploy = DeployUtil.makeDeploy(deployParams, session, payment);
 
+    deploy = DeployUtil.signDeploy(deploy, fromKeyPair);
+
     let transferInfo = DeployUtil.deployToJson(deploy);
+
+
+
 
     const onCasperConnect = async () => await window?.casperlabsHelper?.requestConnection().then(async () => {
         await window.casperlabsHelper.isConnected().then(res => setConnected(res)).then()
