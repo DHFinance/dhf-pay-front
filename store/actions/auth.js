@@ -50,7 +50,6 @@ const postLoginSuccess = (data) => ({
 });
 
 const postLoginFailed = (error) => {
-  console.log({error})
   return {
     type: POST_LOGIN_FAILED,
         payload: error

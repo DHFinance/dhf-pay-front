@@ -1,7 +1,7 @@
-import {  GET_PAYMENTS_START, GET_PAYMENTS_SUCCESS, GET_PAYMENTS_FAILED }  from '../actions/payments';
+import {  GET_PAYMENT_START, GET_PAYMENT_SUCCESS, GET_PAYMENT_FAILED }  from '../actions/PAYMENT';
 
 const initialState = {
-  data: [],
+  data: {},
   isLoading: false,
   error: '',
   isChanged: false
@@ -9,20 +9,22 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case  GET_PAYMENTS_START:
+    case  GET_PAYMENT_START:
       return {
         ...state,
+        start: true,
         isLoading: true,
         isChanged: true
       };
-    case  GET_PAYMENTS_SUCCESS:
+    case  GET_PAYMENT_SUCCESS:
       return {
         ...state,
         data: action.payload,
+        start: false,
         isLoading: false,
         isChanged: true
       };
-    case  GET_PAYMENTS_FAILED:
+    case  GET_PAYMENT_FAILED:
       return {
         ...state,
         isLoading: false,

@@ -3,17 +3,19 @@ import Bill from "../../../src/components/Forms/Bill";
 import NoSidebarContainer from "../../../src/components/Layout/NoSidebarContainer";
 import {wrapper} from "../../../store/store";
 import {getPayments} from "../../../store/actions/payments";
-import {getPayment} from "../../../store/actions/payment";
+import Transaction from "../../../src/components/Forms/Transaction";
+import WithAuth from "../../../hoc/withAuth";
+import SliderContainer from "../../../src/components/Layout/SliderContainer";
 
-const BillPage = () => {
+const TransactionPage = () => {
 
-    return <NoSidebarContainer><Bill/></NoSidebarContainer>
+    return <WithAuth><SliderContainer><Transaction/></SliderContainer></WithAuth>
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
   async ({req, res, query,  ...etc}) => {
-      await store.dispatch(getPayment(query?.slug));
+       await store.dispatch(getPayments());
     }
 );
 
-export default wrapper.withRedux(BillPage)
+export default wrapper.withRedux(TransactionPage)

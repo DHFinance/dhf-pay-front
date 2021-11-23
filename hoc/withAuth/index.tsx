@@ -12,7 +12,6 @@ const WithAuth = ({children}: any) => {
     const localToken = localStorage.getItem('token')
     const router = useRouter()
 
-    console.log({localToken})
 
     if (!localToken) {
         router.push('/login').then(r => console.log('token not found'))

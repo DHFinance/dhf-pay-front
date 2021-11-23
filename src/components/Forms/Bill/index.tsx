@@ -1,11 +1,13 @@
 import { Statistic, Row, Col, Button } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient,CasperServiceByJsonRPC, PublicKey, DeployUtil } from "casper-js-sdk";
 const casperClientSDK = require("casper-js-sdk");
 import {useEffect, useState} from "react";
+import {wrapper} from "../../../../store/store";
+import {getPayments} from "../../../../store/actions/payments";
 
 interface IUserData {
     name: string,
@@ -29,6 +31,18 @@ const Bill = () => {
     const [billData, setBillData] = useState(initialState)
     const [connected, setConnected] = useState(false)
     const [balance, setBalance] = useState('')
+
+    const payments = useSelector((state) => state.payment.data);
+
+    const {
+        id,
+        datetime,
+        amount,
+        comment,
+        wallet
+    } = payments
+
+    const date = new Date(datetime).toDateString()
 
     const apiUrl = '/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
@@ -74,6 +88,7 @@ const Bill = () => {
         // setBalance(bill.toString())
     }
 
+
     // useEffect(() => {
     //     get('/payment/1')
     // }, [])
@@ -81,13 +96,13 @@ const Bill = () => {
     return (
         <>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Datetime" value={1128} prefix={<ClockCircleOutlined />} />
+                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={93} prefix={<AreaChartOutlined />} />
+                <Statistic title="Amount" value={amount} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Comment" value={93} prefix={<CommentOutlined />} />
+                <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
 
             {
@@ -103,5 +118,6 @@ const Bill = () => {
         </>
     );
 };
+
 
 export default Bill

@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Tag, Space } from 'antd';
 import "antd/dist/antd.css";
+import {useSelector} from "react-redux";
 
 const columns = [
     {
@@ -26,32 +27,10 @@ const columns = [
 
 ];
 
-const data = [
-    {
-        key: '1',
-        name: 'John',
-        lastName: 'Brown',
-        company: 'Google',
-        email: 'google@gmail.com',
-    },
-    {
-        key: '2',
-        name: 'John',
-        lastName: 'Brown',
-        company: 'Google',
-        email: 'google@gmail.com',
-    },
-    {
-        key: '3',
-        name: 'John',
-        lastName: 'Brown',
-        company: 'Google',
-        email: 'google@gmail.com',
-    },
-];
 
 const Users = () => {
-    return <Table columns={columns} dataSource={data} />
+    const users = useSelector((state) => state.users.data);
+    return <Table columns={columns} dataSource={users} />
 }
 
 export default Users

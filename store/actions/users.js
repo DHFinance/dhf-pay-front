@@ -1,29 +1,29 @@
 import {get} from "../../api"
 
-export const GET_START = 'GET_START';
-export const GET_SUCCESS = 'GET_SUCCESS';
-export const GET_FAILED = 'GET_FAILED';
+export const GET_USERS_START = 'GET_USERS_START';
+export const GET_USERS_SUCCESS = 'GET_USERS_SUCCESS';
+export const GET_USERS_FAILED = 'GET_USERS_FAILED';
 
-const getDataStart = () => ({
-  type: GET_START
+const getUsersStart = () => ({
+  type: GET_USERS_START
 });
 
-const getDataSuccess = (data) => ({
-  type: GET_SUCCESS,
+const getUsersSuccess = (data) => ({
+  type: GET_USERS_SUCCESS,
   payload: data
 });
 
-const getDataFailed = (error) => ({
-  type: GET_FAILED,
+const getUsersFailed = (error) => ({
+  type: GET_USERS_FAILED,
   payload: error
 });
 
-export const getQuery = (url) => async (dispatch) => {
-  dispatch(getDataStart());
-  const result = await get(url);
+export const getUsers = () => async (dispatch) => {
+  dispatch(getUsersStart());
+  const result = await get('/user');
   try {
-    dispatch(getDataSuccess(result.data.data));
+    dispatch(getUsersSuccess(result.data));
   } catch (e) {
-    dispatch(getDataFailed(e));
+    dispatch(getUsersFailed(e));
   }
 };

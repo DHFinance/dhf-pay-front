@@ -37,14 +37,6 @@ const Login = () => {
         })
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
-
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
-
     const onSubmit = async () => {
         try {
             await dispatch(postLogin(userData, goStartPage))
@@ -58,8 +50,6 @@ const Login = () => {
             style={{ padding: '0 50px', marginTop: 64 }}
             name="login"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 12 }}
             onSubmitCapture={onSubmit}

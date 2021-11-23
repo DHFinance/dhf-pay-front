@@ -1,7 +1,7 @@
-import {  GET_FAILED,  GET_START,  GET_SUCCESS }  from '../actions/getQuery';
+import {  GET_USERS_FAILED, GET_USERS_SUCCESS, GET_USERS_START }  from '../actions/users';
 
 const initialState = {
-  data: {},
+  data: [],
   isLoading: false,
   error: '',
   isChanged: false
@@ -9,20 +9,20 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case  GET_START:
+    case  GET_USERS_START:
       return {
         ...state,
         isLoading: true,
         isChanged: true
       };
-    case  GET_SUCCESS:
+    case  GET_USERS_SUCCESS:
       return {
         ...state,
         data: action.payload,
         isLoading: false,
         isChanged: true
       };
-    case  GET_FAILED:
+    case  GET_USERS_FAILED:
       return {
         ...state,
         isLoading: false,
