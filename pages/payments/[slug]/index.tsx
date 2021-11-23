@@ -14,7 +14,7 @@ const PaymentPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
   async ({req, res, query,  ...etc}) => {
-       await store.dispatch(getPayment(query?.slug));
+       await store.dispatch(getPayment(query?.slug)).catch(e => console.log(e));
     }
 );
 

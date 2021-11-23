@@ -12,7 +12,7 @@ const UsersPage = () => {
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
     async ({req, res, query,  ...etc}) => {
-        await store.dispatch(getUsers());
+        await store.dispatch(getUsers()).catch(e => console.log(e));
     }
 );
 
