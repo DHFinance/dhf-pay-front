@@ -21,6 +21,7 @@ const getPaymentsFailed = (error) => ({
 export const getPayments = () => async (dispatch) => {
   dispatch(getPaymentsStart());
   const result = await get(`/payment`);
+
   try {
     dispatch(getPaymentsSuccess(result.data));
   } catch (e) {

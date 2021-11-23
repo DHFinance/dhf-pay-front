@@ -3,7 +3,7 @@ import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} f
 import {useDispatch, useSelector} from "react-redux";
 import {get} from "../../../../api"
 import {useRouter} from "next/router";
-import {CasperClient,CasperServiceByJsonRPC, PublicKey, DeployUtil } from "casper-js-sdk";
+import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 const casperClientSDK = require("casper-js-sdk");
 import {useEffect, useState} from "react";
 import {wrapper} from "../../../../store/store";
@@ -44,9 +44,35 @@ const Bill = () => {
 
     const date = new Date(datetime).toDateString()
 
-    const apiUrl = '/rpc';
+    const apiUrl = 'https://event-store-api-clarity-testnet.make.services/';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
+
+    const senderKey = Keys.Ed25519.new();
+    const recipientKey = Keys.Ed25519.new();
+    const networkName = 'test-network';
+    const paymentAmount = 10000000000000;
+    const transferAmount = 10;
+    const ID = 34;
+
+    console.log({senderKey, recipientKey})
+
+    let deployParams = new DeployUtil.DeployParams(
+        CLPublicKey.fromHex('010eee1078c906942cf609cf01b73dfc6551bc79bb3ab06ee80f912a641bbdd666'),
+        networkName
+    );
+
+    let session = DeployUtil.ExecutableDeployItem.newTransfer(
+        transferAmount,
+        CLPublicKey.fromHex('016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee'),
+        undefined,
+        ID
+    );
+
+    let payment = DeployUtil.standardPayment(paymentAmount);
+    let deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+
+    let transferInfo = DeployUtil.deployToJson(deploy);
 
     const onCasperConnect = async () => await window?.casperlabsHelper?.requestConnection().then(async () => {
         await window.casperlabsHelper.isConnected().then(res => setConnected(res)).then()
@@ -65,18 +91,18 @@ const Bill = () => {
         const latestBlock = await casperService.getLatestBlockInfo();
         const root = await casperService.getStateRootHash(latestBlock.block.hash);
 
-        console.log({publicKey, latestBlock, root, casperClientSDK: casperClientSDK.CLTypedAndToBytes})
+        console.log({publicKey, latestBlock, root, casperClientSDK: CLPublicKey})
 
         console.log({
             root,
             publicKey,
-            hex: casperClientSDK.PublicKey.fromHex(publicKey)
+            hex: CLPublicKey.fromHex(publicKey)
         })
 
         const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
             root,
-            casperClientSDK.PublicKey.fromHex(publicKey)
-        )
+            CLPublicKey.fromHex(publicKey)
+        ).then(r => console.log(r)).catch(e => console.log('error', e))
         console.log({balanceUref})
         // const bill = await casperService.getAccountBalance(
         //     latestBlock.block.header.state_root_hash,
@@ -105,16 +131,19 @@ const Bill = () => {
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
 
-            {
-                !connected ?
-                    <Button onClick={onCasperConnect} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
-                        Sign in Signer
-                    </Button>
-                    :
-                    <Button onClick={getBalanceState} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
-                        Update
-                    </Button>
-            }
+            <Button onClick={() => console.log(transferInfo)} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                Transfer
+            </Button>
+            {/*{*/}
+            {/*    !connected ?*/}
+            {/*        <Button onClick={onCasperConnect} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>*/}
+            {/*            Sign in Signer*/}
+            {/*        </Button>*/}
+            {/*        :*/}
+            {/*        <Button onClick={getBalanceState} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>*/}
+            {/*            Update*/}
+            {/*        </Button>*/}
+            {/*}*/}
         </>
     );
 };
