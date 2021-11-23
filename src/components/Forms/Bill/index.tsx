@@ -67,7 +67,9 @@ const Bill = () => {
 
     let deployParams = new DeployUtil.DeployParams(
         fromKeyPair.publicKey,
-        networkName
+        networkName,
+        1,
+        18000,
     );
 
     let session = DeployUtil.ExecutableDeployItem.newTransfer(
@@ -79,8 +81,6 @@ const Bill = () => {
 
     let payment = DeployUtil.standardPayment(paymentAmount);
     let deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-    deploy = DeployUtil.signDeploy(deploy, senderKey);
-    deploy = DeployUtil.signDeploy(deploy, recipientKey);
 
     deploy = DeployUtil.signDeploy(deploy, fromKeyPair);
 
