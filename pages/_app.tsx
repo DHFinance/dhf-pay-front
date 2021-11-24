@@ -4,6 +4,7 @@ import { wrapper } from '../store/store';
 import WithLoading from "../hoc/withLoading";
 
 function MyApp({ Component, pageProps }: AppProps) {
+
   return <WithLoading><Component {...pageProps} /></WithLoading>
 }
 

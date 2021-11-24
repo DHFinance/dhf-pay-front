@@ -30,7 +30,7 @@ const columns = [
 
 const Users = () => {
     const users = useSelector((state) => state.users.data);
-    return <Table columns={columns} dataSource={users} />
+    return <Table columns={columns} dataSource={users.reverse()} />
 }
 
 export default Users

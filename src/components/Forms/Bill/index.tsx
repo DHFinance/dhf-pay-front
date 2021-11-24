@@ -4,10 +4,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
-const casperClientSDK = require("casper-js-sdk");
 import {useEffect, useState} from "react";
-import {wrapper} from "../../../../store/store";
-import {getPayments} from "../../../../store/actions/payments";
+import {pay} from "../../../../store/actions/pay";
+
 
 interface IUserData {
     name: string,
@@ -28,11 +27,70 @@ const Bill = () => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-    const [billData, setBillData] = useState(initialState)
-    const [connected, setConnected] = useState(false)
     const [balance, setBalance] = useState('')
 
     const payments = useSelector((state) => state.payment.data);
+
+    const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
+    const casperService = new CasperServiceByJsonRPC(apiUrl);
+    const casperClient = new CasperClient(apiUrl);
+
+    const singInSigner = async () => {
+        await window.casperlabsHelper.requestConnection().then(r => getBalance().catch(e => console.log(e)));
+    };
+
+    const deploy = async ()=> {
+
+        const to = wallet;
+        const amountStr = amount.toString()
+        const amountNum = amount;
+        const id = 287821;
+        const gasPrice = 1;
+        const ttl = 1800000;
+        const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
+        const publicKey = CLPublicKey.fromHex(publicKeyHex)
+        let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
+        const toPublicKey = CLPublicKey.fromHex(to);
+        const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
+        const payment = DeployUtil.standardPayment(amountNum);
+        const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+        const json = DeployUtil.deployToJson(deploy)
+        const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
+        const deployObject = DeployUtil.deployFromJson(signature)
+
+        // @ts-ignore
+        const signed = await casperClient.putDeploy(deployObject.val);
+
+
+
+        await dispatch(pay({
+            txHash: signed,
+            status: "processing",
+            amount,
+            updated: new Date(),
+            sender: publicKeyHex,
+            receiver: to
+        }))
+
+    };
+
+    console.log(new Date())
+
+    const getBalance = async () => {
+        const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
+        const latestBlock = await casperService.getLatestBlockInfo();
+        const root = await casperService.getStateRootHash(latestBlock.block.hash);
+        const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
+            root,
+            CLPublicKey.fromHex(publicKeyHex)
+        )
+        const balance = await casperService.getAccountBalance(
+            latestBlock.block.header.state_root_hash,
+            balanceUref
+        );
+
+        setBalance(balance.toString())
+    };
 
     const {
         id,
@@ -41,88 +99,18 @@ const Bill = () => {
         comment,
         wallet
     } = payments
-
     const date = new Date(datetime).toDateString()
 
-    const apiUrl = 'https://event-store-api-clarity-testnet.make.services/';
-    const casperService = new CasperServiceByJsonRPC(apiUrl);
-    const casperClient = new CasperClient(apiUrl);
-
-    const senderKey = Keys.Ed25519.new();
-    const recipientKey = Keys.Ed25519.new();
-    const networkName = 'test-network';
-    const paymentAmount = 10000000000000;
-    const transferAmount = 10;
-    const ID = 34;
-
-    console.log({senderKey, recipientKey})
-
-    let deployParams = new DeployUtil.DeployParams(
-        CLPublicKey.fromHex('010eee1078c906942cf609cf01b73dfc6551bc79bb3ab06ee80f912a641bbdd666'),
-        networkName
-    );
-
-    let session = DeployUtil.ExecutableDeployItem.newTransfer(
-        transferAmount,
-        CLPublicKey.fromHex('016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee'),
-        undefined,
-        ID
-    );
-
-    let payment = DeployUtil.standardPayment(paymentAmount);
-    let deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-    deploy = DeployUtil.signDeploy(deploy, senderKey);
-    deploy = DeployUtil.signDeploy(deploy, recipientKey);
-
-    let transferInfo = DeployUtil.deployToJson(deploy);
-
-    const onCasperConnect = async () => await window?.casperlabsHelper?.requestConnection().then(async () => {
-        await window.casperlabsHelper.isConnected().then(res => setConnected(res)).then()
-    });
-    const onCasperDisconnect = async () => await window?.casperlabsHelper?.disconnectFromSite();
-
-    async function getConnectedState() {
-        await window.casperlabsHelper.isConnected().then(res => {
-            console.log(res, 'onGetConnection')
-            setConnected(res)
-        })
-    }
-
-    async function getBalanceState() {
-        const publicKey = await window.casperlabsHelper.getActivePublicKey();
-        const latestBlock = await casperService.getLatestBlockInfo();
-        const root = await casperService.getStateRootHash(latestBlock.block.hash);
-
-        console.log({publicKey, latestBlock, root, casperClientSDK: CLPublicKey})
-
-        console.log({
-            root,
-            publicKey,
-            hex: CLPublicKey.fromHex(publicKey)
-        })
-
-        const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
-            root,
-            CLPublicKey.fromHex(publicKey)
-        ).then(r => console.log(r)).catch(e => console.log('error', e))
-        console.log({balanceUref})
-        // const bill = await casperService.getAccountBalance(
-        //     latestBlock.block.header.state_root_hash,
-        //     balanceUref
-        // );
-
-        console.log(balanceUref)
-
-        // setBalance(bill.toString())
-    }
-
-
-    // useEffect(() => {
-    //     get('/payment/1')
-    // }, [])
+    console.log({balance})
 
     return (
         <>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Your Balance" value={balance || 'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Recipient" value={wallet} prefix={<AreaChartOutlined />} />
+            </Col>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
@@ -132,20 +120,16 @@ const Bill = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
-
-            <Button onClick={() => console.log(transferInfo)} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
-                Transfer
-            </Button>
-            {/*{*/}
-            {/*    !connected ?*/}
-            {/*        <Button onClick={onCasperConnect} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>*/}
-            {/*            Sign in Signer*/}
-            {/*        </Button>*/}
-            {/*        :*/}
-            {/*        <Button onClick={getBalanceState} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>*/}
-            {/*            Update*/}
-            {/*        </Button>*/}
-            {/*}*/}
+            {
+                !balance ?
+                <Button onClick={singInSigner} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                    Sign in Signer
+                </Button>
+                :
+                <Button onClick={deploy} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                    Pay
+                </Button>
+            }
         </>
     );
 };

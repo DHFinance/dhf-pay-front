@@ -21,14 +21,14 @@ const columns = [
         key: 'status',
     },
     {
-        title: 'updated',
-        key: 'updated',
-        dataIndex: 'updated',
+        title: 'sender',
+        key: 'sender',
+        dataIndex: 'sender',
     },
     {
-        title: 'wallet',
-        key: 'wallet',
-        dataIndex: 'wallet',
+        title: 'receiver',
+        key: 'receiver',
+        dataIndex: 'receiver',
     },
 ];
 
@@ -44,7 +44,7 @@ const Transactions = () => {
         };
     }
 
-    return <Table columns={columns} onRow={onRow} dataSource={transactions} />
+    return <Table columns={columns} onRow={onRow} dataSource={transactions.reverse()} />
 }
 
 export default Transactions

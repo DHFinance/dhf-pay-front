@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import NoSidebarContainer from "../../../src/components/Layout/NoSidebarContainer";
 import {wrapper} from "../../../store/store";
 import {getPayment} from "../../../store/actions/payment";
-import Payment from "../../../src/components/Forms/Payment";
+import Payment from "../../../src/components/Info/Payment";
 import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
 

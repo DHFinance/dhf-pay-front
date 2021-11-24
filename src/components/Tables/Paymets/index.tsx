@@ -49,7 +49,9 @@ const Payments = () => {
         };
     }
 
-    return <Table columns={columns} onRow={onRow} dataSource={payments} />
+    console.log(payments.reverse())
+
+    return <Table columns={columns} onRow={onRow} dataSource={payments.reverse()} />
 }
 
 export default Payments

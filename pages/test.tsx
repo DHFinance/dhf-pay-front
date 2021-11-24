@@ -11,51 +11,7 @@ const testPage = () => {
 
     const transfer = async ()=>{
 
-        // const prKey = Keys.Ed25519.parsePrivateKey(Uint8Array.from(Buffer.from("MC4CAQAwBQYDK2VwBCIEICskzyRNMeBLjaZ4vRI4pRPlhWI/+jvW0PYDcQIDfzYm", "hex")));
-        // const pbKey = Keys.Ed25519.parsePublicKey(Uint8Array.from(Buffer.from("MCowBQYDK2VwAyEAbs+KZPmzQdeAXWvFBBvEITlURWHwen31odZg2PJhn+4=", "hex")))
-
-        // const pare = Keys.Ed25519.parseKeyPair(Uint8Array.from(Buffer.from("MC4CAQAwBQYDK2VwBCIEICskzyRNMeBLjaZ4vRI4pRPlhWI/+jvW0PYDcQIDfzYm", "hex")),
-        //     Uint8Array.from(Buffer.from("MCowBQYDK2VwAyEAbs+KZPmzQdeAXWvFBBvEITlURWHwen31odZg2PJhn+4=", "hex")))
-
-
-        // const publicKey = await window.casperlabsHelper.getActivePublicKey();
-        // const casper = await window.casperlabsHelper;
-        // debugger
-        //
-        //
-        // const clPK = CLPublicKey.fromHex('016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee')
-        //
-        // const id = 187821;
-        // const gasPrice = 1;
-        // const ttl = 1800000;
-        //
-        // const paymentAmount = 10000000000;
-        //
-        // let deployParams = new DeployUtil.DeployParams(
-        //     clPK,
-        //     'test-network',
-        //     gasPrice,
-        //     ttl
-        // );
-        //
-        // const session = DeployUtil.ExecutableDeployItem.newTransfer(
-        //     paymentAmount,
-        //     CLPublicKey.fromHex('010eee1078c906942cf609cf01b73dfc6551bc79bb3ab06ee80f912a641bbdd666'),
-        //     null,
-        //     id
-        // );
-        //
-        //
-        // const payment = DeployUtil.standardPayment(paymentAmount);
-        // const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-        // const signedDeploy = DeployUtil.signDeploy(deploy, pare);
-        //
-        // console.log(signedDeploy)
-        //
-
-
-
-        const to = '010eee1078c906942cf609cf01b73dfc6551bc79bb3ab06ee80f912a641bbdd666';
+        const to = '016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee';
 // get amount to send from input.
         const amount = '2500000000'
 // For native-transfers the payment price is fixed.
@@ -102,7 +58,8 @@ const testPage = () => {
         e.preventDefault()
         await transfer()
     }
-    }>Transfer</a></div>
+    }>Transfer</a>
+    </div>
 }
 
 
