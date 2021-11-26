@@ -23,7 +23,7 @@ const columns = [
     {
         title: 'sender',
         key: 'sender',
-        dataIndex: 'sender',
+        dataIndex: 'sender'
     },
     {
         title: 'receiver',
@@ -40,11 +40,11 @@ const Transactions = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onClick: event => router.push(`transactions/${record.id}`), // click row
+            onDoubleClick: event => router.push(`transactions/${record.id}`), // click row
         };
     }
 
-    return <Table columns={columns} onRow={onRow} dataSource={transactions.reverse()} />
+    return <Table columns={columns} scroll={{x: 0 }} onRow={onRow} dataSource={transactions.reverse()} />
 }
 
 export default Transactions

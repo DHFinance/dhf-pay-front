@@ -6,15 +6,22 @@ import {getPayments} from "../../../store/actions/payments";
 import Transaction from "../../../src/components/Info/Transaction";
 import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
+import Error from "next/error";
+import {getTransaction} from "../../../store/actions/transaction";
 
-const TransactionPage = () => {
+const TransactionPage = ({transaction}) => {
 
-    return <WithAuth><SliderContainer><Transaction/></SliderContainer></WithAuth>
+    return transaction ? <WithAuth><SliderContainer><Transaction/></SliderContainer></WithAuth> : <Error title={'Transaction does not exist'} statusCode={500}/>
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
   async ({req, res, query,  ...etc}) => {
-       await store.dispatch(getPayments()).catch(e => console.log(e));
+       const transaction = await store.dispatch(getTransaction(query?.slug)).catch(e => console.log(e));
+      return {
+          props: {
+              transaction: !!transaction
+          }
+      }
     }
 );
 

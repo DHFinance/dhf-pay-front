@@ -6,6 +6,7 @@ import postQuery from "./reducers/postQuery";
 import payments from "./reducers/payments"
 import payment from "./reducers/payment"
 import transactions from "./reducers/transactions"
+import transaction from "./reducers/transaction";
 import users from "./reducers/users"
 import auth from "./reducers/auth";
 import pay from "./reducers/pay";
@@ -28,6 +29,7 @@ const combinedReducer = combineReducers({
   transactions,
   users,
   pay,
+  transaction
 });
 
 const reducer = (state, action) => {

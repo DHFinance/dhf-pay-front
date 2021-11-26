@@ -16,4 +16,4 @@ export const getServerSideProps = wrapper.getServerSideProps(store =>
     }
 );
 
-export default BillsPage
+export default wrapper.withRedux(BillsPage)

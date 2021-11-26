@@ -10,8 +10,6 @@ const testPage = () => {
     const casperClient = new CasperClient(apiUrl);
 
     const transfer = async ()=>{
-
-
         const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
         const latestBlock = await casperService.getLatestBlockInfo();
         const root = await casperService.getStateRootHash(latestBlock.block.hash);

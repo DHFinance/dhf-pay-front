@@ -33,18 +33,21 @@ const Transaction = () => {
     const [connected, setConnected] = useState(false)
     const [balance, setBalance] = useState('')
 
-    const payments = useSelector((state) => state.payment.data);
+    const transaction = useSelector((state) => state.transaction.data);
+
+
 
     const {
         txHash,
         status,
         updated,
-        wallet,
-    } = payments
+        sender,
+        receiver,
+    } = transaction
 
     const date = new Date(updated).toDateString()
 
-    console.log(payments)
+    console.log(transaction)
 
     return (
         <>
@@ -55,7 +58,10 @@ const Transaction = () => {
                 <Statistic title="Updated" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Wallet" value={wallet} prefix={<AreaChartOutlined />} />
+                <Statistic title="Receiver" value={receiver} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Sender" value={sender} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />

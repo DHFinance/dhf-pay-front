@@ -1,10 +1,12 @@
 import React, {ReactElement, useEffect, useState} from "react";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import Login from "../../src/components/Forms/Login";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AuthPage from "../../pages/login";
 import {useRouter} from "next/router";
 import {Spin} from "antd";
+import {reAuth} from "../../store/actions/auth";
+import {wrapper} from "../../store/store";
 
 
 const WithAuth = ({children}: any) => {
@@ -12,6 +14,9 @@ const WithAuth = ({children}: any) => {
     const localToken = localStorage.getItem('token')
     const router = useRouter()
 
+    const auth = useSelector((state) => state.auth.token);
+
+    const dispatch = useDispatch()
 
     if (!localToken) {
         router.push('/login').then(r => console.log('token not found'))
@@ -26,4 +31,4 @@ const WithAuth = ({children}: any) => {
     return children
 }
 
-export default WithAuth
+export default wrapper.withRedux(WithAuth)

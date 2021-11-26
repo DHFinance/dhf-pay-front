@@ -1,4 +1,4 @@
-import { Statistic, Row, Col, Button } from 'antd';
+import { Statistic, Row, Col, Button, notification } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
 import {get} from "../../../../api"
@@ -17,17 +17,61 @@ interface IUserData {
     passwordConf: string,
 }
 
-const initialState = {
-    datetime: '',
-    amount: '',
-    comment: '',
-}
+const signerErrors = [
+    //иногда расширение ломается и перестает вызываться. Помогает только переустановка
+    {
+        message: 'Cannot read properties of undefined (reading \'error\')',
+        title: 'Signer error',
+        desc: 'Please reinstall Signer'
+    },
+    //если не введен пароль в vault
+    {
+        message: 'Please unlock the Signer to read key',
+        title: 'Signer in locked',
+        desc: 'Please unlock the Signer to read key'
+    },
+    //если расширение не скачано
+    {
+        message: 'Please download CasperLabs Signer',
+        title: 'Signer not found',
+        desc: 'Please download CasperLabs Signer'
+    },
+    //при отклонении запроса на транзакцию
+    {
+        message: 'User Cancelled Signing',
+        title: 'Payment cancelled',
+        desc: 'You are cancelled payment in Signer'
+    },
+    //при несозданном хранилище, при несозданном аккаунте, при disconnect
+    {
+        message: 'Please connect to the Signer to read key',
+        title: 'Signer vault not found',
+        desc: 'Please connect to the Signer to read key'
+    },
+]
 
 const Bill = () => {
 
     const dispatch = useDispatch();
-    const router = useRouter();
     const [balance, setBalance] = useState('')
+
+    const showError = (message: string) => {
+        console.log('Signer connection:', message)
+        const errors = signerErrors.filter(error => error.message === message)
+        if (errors.length) {
+            return openNotification(errors[0].title, errors[0].desc)
+        } else {
+            return openNotification()
+        }
+    }
+
+    const openNotification = (title = 'Unknown error', desc = 'Unknown error') => {
+
+        notification.open({
+            message: title,
+            description: desc,
+        });
+    };
 
     const payments = useSelector((state) => state.payment.data);
 
@@ -36,7 +80,11 @@ const Bill = () => {
     const casperClient = new CasperClient(apiUrl);
 
     const singInSigner = async () => {
-        await window.casperlabsHelper.requestConnection().then(r => getBalance().catch(e => console.log(e)));
+        if (window.casperlabsHelper) {
+            await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
+        } else {
+            showError('Please download CasperLabs Signer')
+        }
     };
 
     const deploy = async ()=> {
@@ -47,39 +95,49 @@ const Bill = () => {
         const id = 287821;
         const gasPrice = 1;
         const ttl = 1800000;
-        const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
-        const publicKey = CLPublicKey.fromHex(publicKeyHex)
-        let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
-        const toPublicKey = CLPublicKey.fromHex(to);
-        const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
-        const payment = DeployUtil.standardPayment(amountNum);
-        const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-        const json = DeployUtil.deployToJson(deploy)
-        const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
-        const deployObject = DeployUtil.deployFromJson(signature)
+        try {
+            const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
+            const publicKey = CLPublicKey.fromHex(publicKeyHex)
+            let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
+            const toPublicKey = CLPublicKey.fromHex(to);
+            const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
+            const payment = DeployUtil.standardPayment(amountNum);
+            const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+            const json = DeployUtil.deployToJson(deploy)
+            const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
+            const deployObject = DeployUtil.deployFromJson(signature)
 
-        // @ts-ignore
-        const signed = await casperClient.putDeploy(deployObject.val);
-
-
-
-        await dispatch(pay({
-            txHash: signed,
-            status: "processing",
-            amount,
-            updated: new Date(),
-            sender: publicKeyHex,
-            receiver: to
-        }))
+            // @ts-ignore
+            const signed = await casperClient.putDeploy(deployObject.val).catch(e => showError(e.message));
+            if (signed) {
+                openNotification('Transaction completed', 'The transaction will be processed as soon as possible')
+            } else {
+                openNotification('Transaction error', 'Your transaction has not been completed, please try again')
+            }
+            await dispatch(pay({
+                txHash: signed,
+                status: "processing",
+                amount,
+                updated: new Date(),
+                sender: publicKeyHex,
+                receiver: to
+            }))
+            await getBalance()
+        } catch (e: any) {
+            showError(e.message)
+        }
 
     };
 
-    console.log(new Date())
-
     const getBalance = async () => {
         const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
+
+        console.log({publicKeyHex})
+
         const latestBlock = await casperService.getLatestBlockInfo();
+
         const root = await casperService.getStateRootHash(latestBlock.block.hash);
+
         const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
             root,
             CLPublicKey.fromHex(publicKeyHex)
@@ -88,6 +146,8 @@ const Bill = () => {
             latestBlock.block.header.state_root_hash,
             balanceUref
         );
+
+        console.log({balance: balance.toString()})
 
         setBalance(balance.toString())
     };
@@ -100,8 +160,6 @@ const Bill = () => {
         wallet
     } = payments
     const date = new Date(datetime).toDateString()
-
-    console.log({balance})
 
     return (
         <>

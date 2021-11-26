@@ -5,16 +5,23 @@ import {getPayment} from "../../../store/actions/payment";
 import Payment from "../../../src/components/Info/Payment";
 import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
+import Error from "next/error";
 
 
-const PaymentPage = () => {
+const PaymentPage = ({payment}) => {
 
-    return <WithAuth><SliderContainer><Payment/></SliderContainer></WithAuth>
+    return payment ? <WithAuth><SliderContainer><Payment/></SliderContainer></WithAuth> : <Error title={'Payment does not exist'} statusCode={500}/>
 }
 
 export const getServerSideProps = wrapper.getServerSideProps(store =>
   async ({req, res, query,  ...etc}) => {
-       await store.dispatch(getPayment(query?.slug)).catch(e => console.log(e));
+       const payment = await store.dispatch(getPayment(query?.slug)).catch(e => console.log(e));
+
+      return {
+          props: {
+              payment: !!payment
+          }
+      }
     }
 );
 

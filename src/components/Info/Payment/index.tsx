@@ -1,6 +1,8 @@
 import { Statistic, Row, Col, Button } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined} from '@ant-design/icons';
 import {useSelector} from "react-redux";
+import React from "react";
+import {useRouter} from "next/router";
 
 
 const Payment = () => {
@@ -15,6 +17,14 @@ const Payment = () => {
         wallet
     } = payments
 
+    const router = useRouter()
+
+    const toBill = () => {
+        router.push({
+            pathname: `/bill/${id}`
+        })
+    }
+
     const date = new Date(datetime).toDateString()
 
     return (
@@ -28,7 +38,9 @@ const Payment = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
-
+            <Button type="primary" onClick={toBill} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                Pay
+            </Button>
         </>
     );
 };

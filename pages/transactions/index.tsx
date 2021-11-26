@@ -21,4 +21,4 @@ export const getServerSideProps = wrapper.getServerSideProps(store =>
     }
 );
 
-export default TransactionsPage
+export default wrapper.withRedux(TransactionsPage)
