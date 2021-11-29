@@ -42,14 +42,6 @@ const Register = () => {
         })
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
-
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
-
     const onSubmit = async () => {
         if (userData.passwordConf !== userData.password) {
             alert('Пароли не совпалают')
@@ -69,8 +61,6 @@ const Register = () => {
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 12 }}
             initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             onSubmitCapture={onSubmit}
             autoComplete="off"
         >

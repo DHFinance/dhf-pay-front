@@ -12,8 +12,6 @@ const WithoutAuth = ({children}: any) => {
     const localToken = localStorage.getItem('token')
     const router = useRouter()
 
-    console.log(!!localToken)
-
     if (!!localToken) {
         router.push('/').then(r => console.log('first you need to log out'))
         return <Spin style={{

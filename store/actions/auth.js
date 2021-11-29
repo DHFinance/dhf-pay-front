@@ -1,4 +1,4 @@
-import {post} from "../../api"
+import {get, post} from "../../api"
 import initStore from '../store';
 import {Router} from "next/router";
 
@@ -50,12 +50,21 @@ const postLoginSuccess = (data) => ({
 });
 
 const postLoginFailed = (error) => {
-  console.log({error})
   return {
     type: POST_LOGIN_FAILED,
         payload: error
   }
 }
+
+export const reAuth = (token) => async (dispatch) => {
+  dispatch(postLoginStart());
+  const result = await get(`auth/reAuth?token=${token}`);
+  try {
+    dispatch(postLoginSuccess(result.data));
+  } catch (e) {
+    dispatch(postLoginFailed(e));
+  }
+};
 
 export const postLogin = (data, goStartPage) => async (dispatch) => {
   dispatch(postLoginStart());

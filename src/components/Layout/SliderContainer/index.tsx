@@ -28,7 +28,7 @@ const SliderContainer = (props: IContainerProps) => {
     const token = localStorage.getItem('token')
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
-    const title = history.route.replace('/', '').toUpperCase()
+    const title = history.asPath.replace(/\//g, ' ').toUpperCase()
 
     const goLoginPage = () => {
         router.push('/login')
@@ -39,7 +39,7 @@ const SliderContainer = (props: IContainerProps) => {
     }
 
     return (
-        <Layout style={{height: '100vh'}}>
+        <Layout style={{minHeight: '100vh'}}>
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="logo" style={{
                     height: 32,

@@ -3,7 +3,13 @@ import { HYDRATE, createWrapper } from 'next-redux-wrapper';
 import thunkMiddleware from 'redux-thunk';
 import getQuery from "./reducers/getQuery";
 import postQuery from "./reducers/postQuery";
+import payments from "./reducers/payments"
+import payment from "./reducers/payment"
+import transactions from "./reducers/transactions"
+import transaction from "./reducers/transaction";
+import users from "./reducers/users"
 import auth from "./reducers/auth";
+import pay from "./reducers/pay";
 
 
 const bindMiddleware = (middleware) => {
@@ -17,7 +23,13 @@ const bindMiddleware = (middleware) => {
 const combinedReducer = combineReducers({
   getQuery,
   postQuery,
-  auth
+  auth,
+  payments,
+  payment,
+  transactions,
+  users,
+  pay,
+  transaction
 });
 
 const reducer = (state, action) => {
@@ -37,8 +49,10 @@ const reducer = (state, action) => {
   }
 };
 
-export const initStore = () => {
-  return createStore(reducer, bindMiddleware([thunkMiddleware]));
+const store = createStore(reducer, bindMiddleware([thunkMiddleware]));
+
+const initStore = () => {
+  return store
 };
 
 export const wrapper = createWrapper(initStore);

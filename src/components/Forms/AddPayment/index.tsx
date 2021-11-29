@@ -8,18 +8,22 @@ import Link from "next/link";
 import {useRouter} from "next/router";
 
 interface IUserData {
-    email: string,
-    password: string,
+    wallet: string,
+    amount: string,
+    comment: string,
+    datetime: string,
+    user: string,
 }
 
 const initialState = {
-    email: '',
-    password: '',
+    wallet: '',
+    amount: '',
+    comment: '',
+    datetime: '',
+    user: '',
 }
 
-const Login = () => {
-
-
+const AddPayment = () => {
     const router = useRouter();
     const goStartPage = () => {
       router.push('/')
@@ -94,4 +98,4 @@ const Login = () => {
     );
 };
 
-export default Login
+export default AddPayment

@@ -1,6 +1,8 @@
 import React from "react";
 import { Table, Tag, Space } from 'antd';
 import "antd/dist/antd.css";
+import {useSelector} from "react-redux";
+import {useRouter} from "next/router";
 
 const columns = [
     {
@@ -19,64 +21,30 @@ const columns = [
         key: 'status',
     },
     {
-        title: 'updated',
-        key: 'updated',
-        dataIndex: 'updated',
+        title: 'sender',
+        key: 'sender',
+        dataIndex: 'sender'
     },
     {
-        title: 'wallet',
-        key: 'wallet',
-        dataIndex: 'wallet',
+        title: 'receiver',
+        key: 'receiver',
+        dataIndex: 'receiver',
     },
 ];
 
-const data = [
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-    {
-        id: 1,
-        txHash: '0xb4bc263278d3f77a652a8d73a6bfd8ec0ba1a63923bbb4f38147fb8a943da26d',
-        status: 'processing',
-        updated: '2014-12-24 23:12:00',
-        wallet: '8d73a6bfd8ec0ba1a639',
-    },
-];
+
 
 const Transactions = () => {
-    return <Table columns={columns} dataSource={data} />
+    const transactions = useSelector((state) => state.transactions.data);
+    const router = useRouter()
+
+    const onRow=(record, rowIndex) => {
+        return {
+            onDoubleClick: event => router.push(`transactions/${record.id}`), // click row
+        };
+    }
+
+    return <Table columns={columns} scroll={{x: 0 }} onRow={onRow} dataSource={transactions.reverse()} />
 }
 
 export default Transactions

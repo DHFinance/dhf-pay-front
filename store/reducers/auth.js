@@ -87,7 +87,6 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_LOGIN_SUCCESS:
-      console.log(action.payload)
       localStorage.setItem('token', action.payload.token ?? action.payload.token);
       return {
         ...state,
