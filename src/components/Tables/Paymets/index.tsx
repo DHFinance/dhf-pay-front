@@ -66,6 +66,7 @@ const Payments = () => {
     const paymentsTable = payments.map((payment) => {
         return {
             ...payment,
+            user: payment.user.email,
             datetime: new Date(payment.datetime).toDateString()
         }
     }).reverse()
