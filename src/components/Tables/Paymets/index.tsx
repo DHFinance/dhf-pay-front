@@ -102,6 +102,7 @@ const Payments = () => {
         }
         await dispatch(addPayment({
             ...payment,
+            status: 'Not_paid',
             user,
             datetime: new Date()
         }))
