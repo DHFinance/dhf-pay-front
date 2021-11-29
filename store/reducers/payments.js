@@ -1,4 +1,4 @@
-import {  GET_PAYMENTS_START, GET_PAYMENTS_SUCCESS, GET_PAYMENTS_FAILED }  from '../actions/payments';
+import {GET_PAYMENTS_START, GET_PAYMENTS_SUCCESS, GET_PAYMENTS_FAILED, PUSH_PAYMENT} from '../actions/payments';
 
 const initialState = {
   data: [],
@@ -19,6 +19,16 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         data: action.payload,
+        isLoading: false,
+        isChanged: true
+      };
+    case  PUSH_PAYMENT:
+      return {
+        ...state,
+        data: [
+            ...state.data,
+          action.payload
+        ],
         isLoading: false,
         isChanged: true
       };

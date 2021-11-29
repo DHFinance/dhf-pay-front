@@ -3,6 +3,7 @@ import {get} from "../../api"
 export const GET_PAYMENTS_START = 'GET_PAYMENTS_START';
 export const GET_PAYMENTS_SUCCESS = 'GET_PAYMENTS_SUCCESS';
 export const GET_PAYMENTS_FAILED = 'GET_PAYMENTS_FAILED';
+export const PUSH_PAYMENT = 'PUSH_PAYMENT';
 
 const getPaymentsStart = () => ({
   type: GET_PAYMENTS_START,
@@ -17,6 +18,8 @@ const getPaymentsFailed = (error) => ({
   type: GET_PAYMENTS_FAILED,
   payload: error
 });
+
+
 
 export const getPayments = () => async (dispatch) => {
   dispatch(getPaymentsStart());

@@ -48,16 +48,31 @@ const signerErrors = [
         title: 'Signer vault not found',
         desc: 'Please connect to the Signer to read key'
     },
+    //Возникает если пользователь не совершал транзакций либо имеет пустой счет
+    {
+        message: 'state query failed: ValueNotFound("Failed to find base key at path: Key',
+        title: 'User not found',
+        desc: 'Try to find a top-up on your wallet and repeat the action'
+    },
+    //Ключ, который выдает само расширение неправильный
+    {
+        message: 'Invalid public key',
+        title: 'Invalid public key',
+        desc: 'Invalid public key'
+    },
 ]
 
 const Bill = () => {
 
     const dispatch = useDispatch();
+    const router = useRouter()
     const [balance, setBalance] = useState('')
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
-        const errors = signerErrors.filter(error => error.message === message)
+        const errors = signerErrors.filter(error => {
+            return message.includes(error.message)
+        })
         if (errors.length) {
             return openNotification(errors[0].title, errors[0].desc)
         } else {
@@ -73,7 +88,7 @@ const Bill = () => {
         });
     };
 
-    const payments = useSelector((state) => state.payment.data);
+    const billInfo = useSelector((state) => state.payment.data);
 
     const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
@@ -118,11 +133,11 @@ const Bill = () => {
                 txHash: signed,
                 status: "processing",
                 amount,
+                payment: billInfo.id,
                 updated: new Date(),
                 sender: publicKeyHex,
                 receiver: to
             }))
-            await getBalance()
         } catch (e: any) {
             showError(e.message)
         }
@@ -131,8 +146,6 @@ const Bill = () => {
 
     const getBalance = async () => {
         const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
-
-        console.log({publicKeyHex})
 
         const latestBlock = await casperService.getLatestBlockInfo();
 
@@ -147,8 +160,6 @@ const Bill = () => {
             balanceUref
         );
 
-        console.log({balance: balance.toString()})
-
         setBalance(balance.toString())
     };
 
@@ -157,8 +168,10 @@ const Bill = () => {
         datetime,
         amount,
         comment,
-        wallet
-    } = payments
+        wallet,
+        status,
+        payment
+    } = billInfo
     const date = new Date(datetime).toDateString()
 
     return (
@@ -178,16 +191,21 @@ const Bill = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
-            {
-                !balance ?
+
+            {   status !== 'Paid' ?
+                (!balance ?
                 <Button onClick={singInSigner} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
                     Sign in Signer
                 </Button>
                 :
                 <Button onClick={deploy} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
                     Pay
-                </Button>
+                </Button>) : null
             }
+
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 20px'}} type="primary" size={'large'}>
+                Back
+            </Button>
         </>
     );
 };

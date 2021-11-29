@@ -7,6 +7,7 @@ import Text from "antd/lib/typography/Text";
 import {addPayment} from "../../../../store/actions/payment";
 import {reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
+import {getPayments} from "../../../../store/actions/payments";
 
 const columns = [
     {
@@ -40,6 +41,11 @@ const columns = [
         key: 'wallet',
         dataIndex: 'wallet',
     },
+    {
+        title: 'status',
+        key: 'status',
+        dataIndex: 'status',
+    },
 ];
 
 interface IPayment {
@@ -66,6 +72,7 @@ const Payments = () => {
     const paymentsTable = payments.map((payment) => {
         return {
             ...payment,
+            status: payment.status.replace('_', ' '),
             user: payment.user.email,
             datetime: new Date(payment.datetime).toDateString()
         }
@@ -106,6 +113,7 @@ const Payments = () => {
             user,
             datetime: new Date()
         }))
+        await dispatch(getPayments())
         setIsModalVisible(false);
     };
 
@@ -117,7 +125,7 @@ const Payments = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`payments/${record.id}`), // click row
+            onDoubleClick: event => router.push(`payments/${record.id}`),
         };
     }
 

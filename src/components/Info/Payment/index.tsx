@@ -38,9 +38,12 @@ const Payment = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
+            {payments.status !== 'Paid' ?
             <Button type="primary" onClick={toBill} style={{margin: '20px 0 0 0'}} className="login-form-button">
                 Pay
             </Button>
+            : null
+            }
         </>
     );
 };
