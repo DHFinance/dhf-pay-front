@@ -1,6 +1,7 @@
 
 import { Form, Input, Button, Checkbox } from 'antd';
-
+import styles from './login.module.scss'
+import {useRouter} from "next/router";
 const Login = () => {
     const onFinish = (values: any) => {
         console.log('Success:', values);
@@ -9,6 +10,8 @@ const Login = () => {
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
     };
+
+    const router = useRouter();
 
     return (
         <Form
@@ -19,33 +22,38 @@ const Login = () => {
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
+            className={styles.Form}
             // style={{
             //     maxHeight: 500
             // }}
         >
             <Form.Item
-                label="Username"
+                label="Email"
                 name="username"
-                rules={[{ required: true, message: 'Please input your username!' }]}
+                rules={[{ required: true, message: 'Введите почтовый адрес' }]}
             >
                 <Input />
             </Form.Item>
 
             <Form.Item
-                label="Password"
+                label="Пароль"
                 name="password"
-                rules={[{ required: true, message: 'Please input your password!' }]}
+                rules={[{ required: true, message: 'Введите пароль' }]}
             >
                 <Input.Password />
             </Form.Item>
 
             <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox>Запомнить меня</Checkbox>
             </Form.Item>
 
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button type="primary" htmlType="submit">
-                    Submit
+            <Form.Item wrapperCol={{ offset:8,  }}>
+                <Button onClick={()=>{
+                    router.push('/')
+                }} style={{
+                    width: '100%'
+                }} type="primary" htmlType="submit">
+                    Войти
                 </Button>
             </Form.Item>
         </Form>

@@ -11,7 +11,8 @@ const LoginPage = ()=>{
         justifyContent: 'center',
         // maxWidth: 500,
         height: '100vh',
-        width: '100vw'
+        width: '100vw',
+        background: 'url(https://source.unsplash.com/1600x900/?building)'
     }}>
         <Login />
     </div>
