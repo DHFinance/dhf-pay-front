@@ -8,6 +8,7 @@ import {addPayment} from "../../../../store/actions/payment";
 import {reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
+import {CLPublicKey} from "casper-js-sdk";
 
 const columns = [
     {
@@ -102,6 +103,26 @@ const Payments = () => {
         setIsModalVisible(true);
     };
 
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        callback("This wallet not exist!");
+        try {
+            CLPublicKey.fromHex(value)
+            callback();
+        } catch (e) {
+            callback("This wallet not exist!");
+        }
+    };
+
+    const validateAmount = (rule: any, value: any, callback: any) => {
+        if (value < 2500000000) {
+            console.log(value)
+            callback("Must be more than 2500000000");
+        } else {
+            console.log(value)
+            callback();
+        }
+    };
+
     const handleOk = async () => {
         if (payment.amount < 2500000000) {
             alert('сумма должна быть больше 2500000000')
@@ -141,17 +162,17 @@ const Payments = () => {
                 <Form.Item
                     label="Wallet"
                     name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }]}
+                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
                 >
                     <Input onChange={onChangePayment('wallet')}/>
                 </Form.Item>
                 <Form.Item
                     label="Amount"
                     name="amount"
-                    rules={[{ required: true, message: 'Please input amount!' }]}
+                    rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                 >
                     <Input onChange={onChangePayment('amount')}/>
-                    <Text>Minimum 2500000000</Text>
+
                 </Form.Item>
                 <Form.Item
                     label="Comment"

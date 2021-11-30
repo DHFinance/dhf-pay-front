@@ -1,10 +1,11 @@
 import { Form, Input, Button, Checkbox } from 'antd';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {postRegistration} from "../../../../store/actions/auth";
 import {useRouter} from "next/router";
+import {getFormFields} from "../../../../utils/getFormFields";
 
 interface IUserData {
     name: string,
@@ -28,6 +29,9 @@ const Register = () => {
 
     const dispatch = useDispatch();
     const router = useRouter();
+    const fields = getFormFields(initialState)
+    const [form] = Form.useForm();
+    const [checkNick, setCheckNick] = useState(false);
     const goStartPage = () => {
         router.push('/')
     }
@@ -41,6 +45,20 @@ const Register = () => {
             [field]: value,
         })
     }
+
+    console.log()
+
+    useEffect(() => {
+        form.validateFields(fields);
+    }, [checkNick]);
+
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (value !== userData.password) {
+            callback("Passwords do not match");
+        } else {
+            callback();
+        }
+    };
 
     const onSubmit = async () => {
         if (userData.passwordConf !== userData.password) {
@@ -82,7 +100,7 @@ const Register = () => {
             <Form.Item
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please input your email!' }]}
+                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
             >
                 <Input onChange={onUpdateData('email')}/>
             </Form.Item>
@@ -97,18 +115,16 @@ const Register = () => {
             <Form.Item
                 label="Password"
                 name="password"
+                rules={[{ required: true, message: 'Please enter password!' }]}
             >
-                <Input onChange={onUpdateData('password')}/>
+                <Input.Password type="password" onChange={onUpdateData('password')}/>
             </Form.Item>
             <Form.Item
                 label="PasswordConf"
                 name="passwordConf"
+                rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
             >
-                <Input onChange={onUpdateData('passwordConf')}/>
-            </Form.Item>
-
-            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 6, span: 12 }}>
-                <Checkbox>Remember me</Checkbox>
+                <Input.Password onChange={onUpdateData('passwordConf')}/>
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 6, span: 12 }}>

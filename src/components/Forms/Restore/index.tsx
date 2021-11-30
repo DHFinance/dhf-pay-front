@@ -86,7 +86,7 @@ const EmailForm = () => {
         <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: 'Please input your email!' }]}
+            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
         >
             <Input name="email" onChange={onUpdateData}/>
         </Form.Item>
@@ -195,6 +195,15 @@ const PasswordForm = () => {
             console.log(e, 'registration error')
         }
     }
+
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (value !== userData.password) {
+            callback("Passwords do not match");
+        } else {
+            callback();
+        }
+    };
+
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         name="restore"
@@ -209,17 +218,16 @@ const PasswordForm = () => {
         <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: 'Please enter password!' }]}
         >
-            <Input name='password' onChange={onUpdateData}/>
+            <Input.Password type="password" onChange={onUpdateData}/>
         </Form.Item>
-
         <Form.Item
-            label="Password confirm"
+            label="PasswordConf"
             name="passwordConf"
-            rules={[{ required: true, message: 'Please confirm your password!' }]}
+            rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
         >
-            <Input name="passwordConf" onChange={onUpdateData}/>
+            <Input.Password onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
