@@ -2,6 +2,7 @@ import React from "react";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import Login from "../../src/components/Forms/Login";
 import WithoutAuth from "../../hoc/withoutAuth";
+import {wrapper} from "../../store/store";
 
 
 const AuthPage = () => {
@@ -13,4 +14,4 @@ const AuthPage = () => {
 
 }
 
-export default AuthPage
+export default wrapper.withRedux(AuthPage)

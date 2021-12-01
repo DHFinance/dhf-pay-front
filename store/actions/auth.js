@@ -58,12 +58,13 @@ const postLoginFailed = (error) => {
 
 export const reAuth = (token) => async (dispatch) => {
   dispatch(postLoginStart());
-  const result = await get(`auth/reAuth?token=${token}`);
-  try {
+  await get(`auth/reAuth?token=${token}`).then((result) => {
+    console.log('succ')
     dispatch(postLoginSuccess(result.data));
-  } catch (e) {
+  }).catch(e => {
+    console.log('error')
     dispatch(postLoginFailed(e));
-  }
+  });
 };
 
 export const postLogin = (data, goStartPage) => async (dispatch) => {

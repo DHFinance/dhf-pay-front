@@ -2,7 +2,7 @@ import {useState} from "react";
 import "antd/dist/antd.css";
 import { Form, Input, Button} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {postLogin} from "../../../../store/actions/auth";
 import Link from "next/link";
 import {useRouter} from "next/router";
@@ -28,6 +28,14 @@ const Login = () => {
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
+    const auth = useSelector((state) => state.auth);
+
+    console.log(auth)
+
+    // useSelector(() => {
+    //     console.log(auth)
+    // }, [auth])
+
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -41,7 +49,7 @@ const Login = () => {
         try {
             await dispatch(postLogin(userData, goStartPage))
         } catch (e) {
-            console.log(e, 'registration error')
+            // console.log(e, 'registration error')
         }
     }
 
