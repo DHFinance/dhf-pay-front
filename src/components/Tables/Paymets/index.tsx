@@ -104,7 +104,6 @@ const Payments = () => {
     };
 
     const validateWallet = (rule: any, value: any, callback: any) => {
-        callback("This wallet not exist!");
         try {
             CLPublicKey.fromHex(value)
             callback();
@@ -115,34 +114,31 @@ const Payments = () => {
 
     const validateAmount = (rule: any, value: any, callback: any) => {
         if (value < 2500000000) {
-            console.log(value)
             callback("Must be more than 2500000000");
         } else {
-            console.log(value)
             callback();
         }
     };
 
     const handleOk = async () => {
-        if (payment.amount < 2500000000) {
-            alert('сумма должна быть больше 2500000000')
-            return false
+        console.log(form.getFieldError("amount").length === 0, form.getFieldError("wallet").length === 0)
+        if (+payment.amount > 2500000000  && payment.wallet) {
+            await dispatch(addPayment({
+                ...payment,
+                status: 'Not_paid',
+                user,
+                datetime: new Date()
+            }))
+            await dispatch(getPayments())
+            setIsModalVisible(false);
         }
-        await dispatch(addPayment({
-            ...payment,
-            status: 'Not_paid',
-            user,
-            datetime: new Date()
-        }))
-        await dispatch(getPayments())
-        setIsModalVisible(false);
     };
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-
+    const [form] = Form.useForm();
 
     const onRow=(record, rowIndex) => {
         return {
@@ -158,11 +154,12 @@ const Payments = () => {
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
                 autoComplete="off"
+                form={form}
             >
                 <Form.Item
                     label="Wallet"
                     name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }, { type: 'number', message: 'Only numbers!' }]}
                 >
                     <Input onChange={onChangePayment('wallet')}/>
                 </Form.Item>

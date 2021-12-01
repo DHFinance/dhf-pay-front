@@ -59,23 +59,20 @@ const postLoginFailed = (error) => {
 export const reAuth = (token) => async (dispatch) => {
   dispatch(postLoginStart());
   await get(`auth/reAuth?token=${token}`).then((result) => {
-    console.log('succ')
     dispatch(postLoginSuccess(result.data));
   }).catch(e => {
-    console.log('error')
     dispatch(postLoginFailed(e));
   });
 };
 
 export const postLogin = (data, goStartPage) => async (dispatch) => {
   dispatch(postLoginStart());
-  const result = await post('auth/login', data);
-  try {
-    dispatch(postLoginSuccess(result.data));
+  await post(`auth/login`, data).then((result) => {
     goStartPage()
-  } catch (e) {
+    dispatch(postLoginSuccess(result.data));
+  }).catch(e => {
     dispatch(postLoginFailed(e));
-  }
+  });
 };
 
 const postLogoutStart = () => ({
@@ -118,40 +115,37 @@ const postRestoreFailed = (error) => ({
 
 export const postRestoreStepEmail = (data) => async (dispatch) => {
   dispatch(postRestoreStart());
-  const result = await post('/auth/send-code', data);
-  try {
+  await post('/auth/send-code', data).then((result) => {
     dispatch(postRestoreSuccess({
       code: result.data,
       email: data.email
     }));
-  } catch (e) {
-    dispatch(postRestoreFailed('Email step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 
 export const postRestoreStepCode = (data) => async (dispatch) => {
   dispatch(postRestoreStart())
-  const result = await post('/auth/check-code', data);
-  try {
+  await post('/auth/check-code', data).then((result) => {
     dispatch(postRestoreSuccess({
       resetEnabled: true
     }));
-  } catch (e) {
-    dispatch(postRestoreFailed('Code step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 
 export const postRestoreStepPassword = (data, goStartPage) => async (dispatch) => {
   dispatch(postRestoreStart());
-  const result = await post('/auth/reset-pwd', data);
-  try {
+  await post('/auth/reset-pwd', data).then((result) => {
     dispatch(postRestoreSuccess({
       ...result.data,
       resetEnabled: false
     }));
     goStartPage();
-  } catch (e) {
-    dispatch(postRestoreFailed('Password step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 

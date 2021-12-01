@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
-import {postRegistration} from "../../../../store/actions/auth";
+import {postLogin, postRegistration} from "../../../../store/actions/auth";
 import {useRouter} from "next/router";
 import {getFormFields} from "../../../../utils/getFormFields";
 
@@ -40,17 +40,12 @@ const Register = () => {
 
     const onUpdateData = (field: string) => (e: any) => {
         const value = e.target.value
+        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
         })
     }
-
-    console.log()
-
-    useEffect(() => {
-        form.validateFields(fields);
-    }, [checkNick]);
 
     const validatePassword = (rule: any, value: any, callback: any) => {
         if (value !== userData.password) {
@@ -60,15 +55,36 @@ const Register = () => {
         }
     };
 
-    const onSubmit = async () => {
-        if (userData.passwordConf !== userData.password) {
-            alert('Пароли не совпалают')
-            return false
+    const [validate, setValidate] = useState(false)
+
+    const auth = useSelector((state) => state.auth);
+
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
+
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["email"])
         }
-        try {
-            await dispatch(postRegistration(userData, goStartPage))
-        } catch (e) {
-            console.log(e, 'registration error')
+    }, [fieldError])
+
+    const validateEmail = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'email' && validate) {
+            callback(errorMessage);
+        } else {
+            callback();
+        }
+    };
+
+    const onSubmit = async () => {
+        setValidate(true)
+        const emailValid = form.getFieldsError(fields).filter((err) => err.errors.length > 0).length === 0 || (form.getFieldError("email").includes(errorMessage) && form.getFieldError("email").length === 1)
+        if (emailValid) {
+            try {
+                await dispatch(postRegistration(userData, goStartPage))
+            } catch (e) {
+                console.log(e, 'registration error')
+            }
         }
     }
 
@@ -100,7 +116,7 @@ const Register = () => {
             <Form.Item
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}, {validator: validateEmail}]}
             >
                 <Input onChange={onUpdateData('email')}/>
             </Form.Item>
