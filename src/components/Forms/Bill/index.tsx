@@ -72,6 +72,12 @@ const signerErrors = [
         title: 'Network error',
         desc: 'Check your internet connection'
     },
+    {
+        message: 'Request failed with status code 500',
+        title: 'Server error',
+        desc: 'Error connecting to the Signer server'
+    },
+
 ]
 
 const Bill = () => {
