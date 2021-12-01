@@ -121,7 +121,6 @@ const Payments = () => {
     };
 
     const handleOk = async () => {
-        console.log(form.getFieldError("amount").length === 0, form.getFieldError("wallet").length === 0)
         if (+payment.amount > 2500000000  && payment.wallet) {
             await dispatch(addPayment({
                 ...payment,

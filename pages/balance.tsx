@@ -22,7 +22,6 @@ const testPage = () => {
             balanceUref
         );
 
-        console.log(balance.toString())
 
     };
 

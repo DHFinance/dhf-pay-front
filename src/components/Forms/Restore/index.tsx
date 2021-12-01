@@ -143,7 +143,6 @@ const CodeForm = ({auth}: any) => {
     }, [auth])
 
     const validateCode = (rule: any, value: any, callback: any) => {
-        console.log(fieldError === 'code', validate)
         if (fieldError === 'code' && validate) {
             callback(errorMessage);
         } else {
