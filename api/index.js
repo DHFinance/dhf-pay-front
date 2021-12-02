@@ -1,9 +1,10 @@
 import axios from 'axios';
-
 class Api {
   constructor() {
+    export const API_HOST = process.env.NEXT_PUBLIC_API_HOST
+
     this.client = axios.create({
-      baseURL: 'http://localhost:3001/api',
+      baseURL: API_HOST || 'http://localhost:3001/api',
     });
   }
 
