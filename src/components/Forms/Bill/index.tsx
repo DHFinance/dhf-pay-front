@@ -3,17 +3,13 @@ import {
     AreaChartOutlined,
     ClockCircleOutlined,
     CommentOutlined,
-    LikeOutlined,
-    LockOutlined,
     UserOutlined
 } from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
-import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
-import Link from "next/link";
 
 
 interface IUserData {
