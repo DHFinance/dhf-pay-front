@@ -205,7 +205,7 @@ const Bill = () => {
                 <Form.Item
                     label="Email (optional)"
                     name="email"
-                    rules={[{type: 'email', message: 'Please input valid email!'}]}
+                    style={{width: '300px'}}
                 >
                     <Input name="email" value={email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
                 </Form.Item>

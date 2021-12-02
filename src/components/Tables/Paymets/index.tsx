@@ -94,11 +94,8 @@ const Payments = () => {
         })
     }
 
-    useEffect(() => {
-        dispatch(reAuth(localToken))
-    }, [])
-
     const showModal = () => {
+        dispatch(reAuth(localToken))
         setIsModalVisible(true);
     };
 
