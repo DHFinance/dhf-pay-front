@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Statistic, Row, Col, Button } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined} from '@ant-design/icons';
 import {useSelector} from "react-redux";

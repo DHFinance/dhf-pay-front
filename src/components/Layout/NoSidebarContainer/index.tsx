@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Layout, Menu, Breadcrumb } from 'antd';
 import "antd/dist/antd.css";
 import {useEffect, useState} from "react";

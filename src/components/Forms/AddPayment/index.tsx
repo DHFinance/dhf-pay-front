@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {useState} from "react";
 import "antd/dist/antd.css";
 import { Form, Input, Button} from 'antd';
