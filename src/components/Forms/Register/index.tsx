@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Form, Input, Button, Checkbox } from 'antd';
 import {useEffect, useState} from "react";
 import "antd/dist/antd.css";

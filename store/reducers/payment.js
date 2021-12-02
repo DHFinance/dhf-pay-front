@@ -4,7 +4,7 @@ import {
   GET_PAYMENT_FAILED,
   ADD_PAYMENT_START,
   ADD_PAYMENT_SUCCESS, ADD_PAYMENT_FAILED
-} from '../actions/PAYMENT';
+} from '../actions/payment';
 
 const initialState = {
   data: {},

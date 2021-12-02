@@ -1,9 +1,11 @@
+// @ts-nocheck
 import React, {useEffect, useState} from "react";
 import {Table, Tag, Space, Button, Modal, Form, Input, Checkbox} from 'antd';
 import "antd/dist/antd.css";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import Text from "antd/lib/typography/Text";
+// @ts-ignore
 import {addPayment} from "../../../../store/actions/payment";
 import {reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
