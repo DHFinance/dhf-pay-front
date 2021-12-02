@@ -1,11 +1,19 @@
-import { Statistic, Row, Col, Button, notification } from 'antd';
-import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
+import {Statistic, Row, Col, Button, notification, Form, Input} from 'antd';
+import {
+    AreaChartOutlined,
+    ClockCircleOutlined,
+    CommentOutlined,
+    LikeOutlined,
+    LockOutlined,
+    UserOutlined
+} from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
 import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
+import Link from "next/link";
 
 
 interface IUserData {
@@ -65,7 +73,8 @@ const signerErrors = [
 const Bill = () => {
 
     const dispatch = useDispatch();
-    const router = useRouter()
+    const router = useRouter();
+    const [email, setEmail] = useState('')
     const [balance, setBalance] = useState('')
 
     const showError = (message: string) => {
@@ -133,6 +142,7 @@ const Bill = () => {
                 txHash: signed,
                 status: "processing",
                 amount,
+                email,
                 payment: billInfo.id,
                 updated: new Date(),
                 sender: publicKeyHex,
@@ -190,6 +200,15 @@ const Bill = () => {
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                <Form.Item
+                    label="Email (optional)"
+                    name="email"
+                    rules={[{type: 'email', message: 'Please input valid email!'}]}
+                >
+                    <Input name="email" value={email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+                </Form.Item>
             </Col>
 
             {   status !== 'Paid' ?
