@@ -61,6 +61,24 @@ const signerErrors = [
         title: 'Invalid public key',
         desc: 'Invalid public key'
     },
+    //Возникает при отключении интернета
+    {
+        message: 'Failed to fetch',
+        title: 'Network error',
+        desc: 'Check your internet connection'
+    },
+    //Возникает при отключении интернета
+    {
+        message: 'Network error',
+        title: 'Network error',
+        desc: 'Check your internet connection'
+    },
+    {
+        message: 'Request failed with status code 500',
+        title: 'Server error',
+        desc: 'Error connecting to the Signer server'
+    },
+
 ]
 
 const Bill = () => {
@@ -97,8 +115,12 @@ const Bill = () => {
 
     const singInSigner = async () => {
         if (window.casperlabsHelper) {
-            await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
-        } else {
+            try {
+                await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
+            } catch (e: any) {
+                showError(e.message)
+            }
+            } else {
             showError('Please download CasperLabs Signer')
         }
     };
