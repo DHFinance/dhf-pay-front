@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { Statistic, Row, Col, Button, notification } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
+import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
-import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import {useEffect, useState} from "react";
@@ -86,6 +86,7 @@ const Bill = () => {
     const dispatch = useDispatch();
     const router = useRouter()
     const [balance, setBalance] = useState('')
+    const [transactionExplorer, setTransactionExplorer] = useState('')
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
@@ -161,6 +162,7 @@ const Bill = () => {
                 sender: publicKeyHex,
                 receiver: to
             }))
+            setTransactionExplorer(signed || '')
         } catch (e: any) {
             showError(e.message)
         }
@@ -215,18 +217,28 @@ const Bill = () => {
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
 
+
+            {transactionExplorer ?
+                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                    <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                        Check last transaction
+                    </Button>
+                </Link>
+                : null
+            }
+
             {   status !== 'Paid' ?
                 (!balance ?
-                <Button onClick={singInSigner} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                     Sign in Signer
                 </Button>
                 :
-                <Button onClick={deploy} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                     Pay
                 </Button>) : null
             }
 
-            <Button onClick={() => router.back()} style={{margin: '20px 0 0 20px'}} type="primary" size={'large'}>
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
                 Back
             </Button>
         </>

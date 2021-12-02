@@ -9,6 +9,7 @@ const casperClientSDK = require("casper-js-sdk");
 import {useEffect, useState} from "react";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
+import Link from "next/link";
 
 interface IUserData {
     name: string,
@@ -65,7 +66,14 @@ const Transaction = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
             </Col>
-
+            {txHash ?
+                <Link href={`https://testnet.cspr.live/deploy/${txHash}`}>
+                    <Button style={{margin: '20px 0 20px 0'}} type="primary" size={'large'}>
+                        Check transaction
+                    </Button>
+                </Link>
+                : null
+            }
         </>
     );
 };
