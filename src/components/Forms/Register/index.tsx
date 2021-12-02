@@ -1,11 +1,12 @@
 // @ts-nocheck
 import { Form, Input, Button, Checkbox } from 'antd';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
-import {postRegistration} from "../../../../store/actions/auth";
+import {postLogin, postRegistration} from "../../../../store/actions/auth";
 import {useRouter} from "next/router";
+import {getFormFields} from "../../../../utils/getFormFields";
 
 interface IUserData {
     name: string,
@@ -29,6 +30,9 @@ const Register = () => {
 
     const dispatch = useDispatch();
     const router = useRouter();
+    const fields = getFormFields(initialState)
+    const [form] = Form.useForm();
+    const [checkNick, setCheckNick] = useState(false);
     const goStartPage = () => {
         router.push('/')
     }
@@ -37,21 +41,51 @@ const Register = () => {
 
     const onUpdateData = (field: string) => (e: any) => {
         const value = e.target.value
+        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
         })
     }
 
-    const onSubmit = async () => {
-        if (userData.passwordConf !== userData.password) {
-            alert('Пароли не совпалают')
-            return false
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (value !== userData.password) {
+            callback("Passwords do not match");
+        } else {
+            callback();
         }
-        try {
-            await dispatch(postRegistration(userData, goStartPage))
-        } catch (e) {
-            console.log(e, 'registration error')
+    };
+
+    const [validate, setValidate] = useState(false)
+
+    const auth = useSelector((state) => state.auth);
+
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
+
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["email"])
+        }
+    }, [fieldError])
+
+    const validateEmail = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'email' && validate) {
+            callback(errorMessage);
+        } else {
+            callback();
+        }
+    };
+
+    const onSubmit = async () => {
+        setValidate(true)
+        const emailValid = form.getFieldsError(fields).filter((err) => err.errors.length > 0).length === 0 || (form.getFieldError("email").includes(errorMessage) && form.getFieldError("email").length === 1)
+        if (emailValid) {
+            try {
+                await dispatch(postRegistration(userData, goStartPage))
+            } catch (e) {
+                console.log(e, 'registration error')
+            }
         }
     }
 
@@ -83,7 +117,7 @@ const Register = () => {
             <Form.Item
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please input your email!' }]}
+                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}, {validator: validateEmail}]}
             >
                 <Input onChange={onUpdateData('email')}/>
             </Form.Item>
@@ -98,18 +132,16 @@ const Register = () => {
             <Form.Item
                 label="Password"
                 name="password"
+                rules={[{ required: true, message: 'Please enter password!' }]}
             >
-                <Input onChange={onUpdateData('password')}/>
+                <Input.Password type="password" onChange={onUpdateData('password')}/>
             </Form.Item>
             <Form.Item
                 label="PasswordConf"
                 name="passwordConf"
+                rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
             >
-                <Input onChange={onUpdateData('passwordConf')}/>
-            </Form.Item>
-
-            <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 6, span: 12 }}>
-                <Checkbox>Remember me</Checkbox>
+                <Input.Password onChange={onUpdateData('passwordConf')}/>
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 6, span: 12 }}>

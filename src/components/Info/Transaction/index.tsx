@@ -48,8 +48,6 @@ const Transaction = () => {
 
     const date = new Date(updated).toDateString()
 
-    console.log(transaction)
-
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>

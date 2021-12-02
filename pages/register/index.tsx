@@ -2,6 +2,7 @@ import React from "react";
 import Register from "../../src/components/Forms/Register";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import WithoutAuth from "../../hoc/withoutAuth";
+import {wrapper} from "../../store/store";
 
 
 const RegisterPage = () => {
@@ -10,4 +11,4 @@ const RegisterPage = () => {
     </SliderContainer></WithoutAuth>
 }
 
-export default RegisterPage
+export default wrapper.withRedux(RegisterPage)

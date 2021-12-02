@@ -10,6 +10,7 @@ import {addPayment} from "../../../../store/actions/payment";
 import {reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
+import {CLPublicKey} from "casper-js-sdk";
 
 const columns = [
     {
@@ -104,26 +105,41 @@ const Payments = () => {
         setIsModalVisible(true);
     };
 
-    const handleOk = async () => {
-        if (payment.amount < 2500000000) {
-            alert('сумма должна быть больше 2500000000')
-            return false
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        try {
+            CLPublicKey.fromHex(value)
+            callback();
+        } catch (e) {
+            callback("This wallet not exist!");
         }
-        await dispatch(addPayment({
-            ...payment,
-            status: 'Not_paid',
-            user,
-            datetime: new Date()
-        }))
-        await dispatch(getPayments())
-        setIsModalVisible(false);
+    };
+
+    const validateAmount = (rule: any, value: any, callback: any) => {
+        if (value < 2500000000) {
+            callback("Must be more than 2500000000");
+        } else {
+            callback();
+        }
+    };
+
+    const handleOk = async () => {
+        if (+payment.amount > 2500000000  && payment.wallet) {
+            await dispatch(addPayment({
+                ...payment,
+                status: 'Not_paid',
+                user,
+                datetime: new Date()
+            }))
+            await dispatch(getPayments())
+            setIsModalVisible(false);
+        }
     };
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-
+    const [form] = Form.useForm();
 
     const onRow=(record, rowIndex) => {
         return {
@@ -139,21 +155,22 @@ const Payments = () => {
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
                 autoComplete="off"
+                form={form}
             >
                 <Form.Item
                     label="Wallet"
                     name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }]}
+                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }, { type: 'number', message: 'Only numbers!' }]}
                 >
                     <Input onChange={onChangePayment('wallet')}/>
                 </Form.Item>
                 <Form.Item
                     label="Amount"
                     name="amount"
-                    rules={[{ required: true, message: 'Please input amount!' }]}
+                    rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                 >
                     <Input onChange={onChangePayment('amount')}/>
-                    <Text>Minimum 2500000000</Text>
+
                 </Form.Item>
                 <Form.Item
                     label="Comment"

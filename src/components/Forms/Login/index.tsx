@@ -1,9 +1,9 @@
 // @ts-nocheck
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import "antd/dist/antd.css";
 import { Form, Input, Button} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {postLogin} from "../../../../store/actions/auth";
 import Link from "next/link";
 import {useRouter} from "next/router";
@@ -20,7 +20,6 @@ const initialState = {
 
 const Login = () => {
 
-
     const router = useRouter();
     const goStartPage = () => {
       router.push('/')
@@ -28,23 +27,59 @@ const Login = () => {
     const dispatch = useDispatch();
 
     const [userData, setUserData] = useState<IUserData>(initialState)
+    const [validate, setValidate] = useState(false)
+
+    const auth = useSelector((state) => state.auth);
+
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
 
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
+        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
         })
     }
 
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["email", 'password'])
+        }
+    }, [fieldError])
+
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'password' && validate) {
+            callback(errorMessage);
+        } else {
+            callback();
+        }
+    };
+
+    const validateEmail = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'email' && validate) {
+            callback(errorMessage);
+        } else {
+            callback();
+        }
+    };
+
     const onSubmit = async () => {
-        try {
-            await dispatch(postLogin(userData, goStartPage))
-        } catch (e) {
-            console.log(e, 'registration error')
+        setValidate(true)
+        const emailValid = form.getFieldError("email").length === 0 || (form.getFieldError("email").includes(errorMessage) && form.getFieldError("email").length === 1)
+        const passwordValid = form.getFieldError("password").length === 0 || (form.getFieldError("password").includes(errorMessage) && form.getFieldError("password").length === 1)
+        if (passwordValid && emailValid) {
+            try {
+                await dispatch(postLogin(userData, goStartPage))
+            } catch (e) {
+                console.log(e, 'registration error')
+            }
         }
     }
+
+    const [form] = Form.useForm();
 
     return (
         <Form
@@ -54,24 +89,24 @@ const Login = () => {
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 12 }}
             onSubmitCapture={onSubmit}
+            form={form}
         >
             <Form.Item
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please input your email!' }]}
+                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}, {validator: validateEmail}]}
             >
                 <Input name="email" value={userData.email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={onUpdateData} placeholder="Email" />
             </Form.Item>
             <Form.Item
                 label="Password"
                 name="password"
-                rules={[{ required: true, message: 'Please input your Password!' }]}
+                rules={[{ required: true, message: 'Please input your Password!' }, {validator: validatePassword}]}
             >
-                <Input
+                <Input.Password
                     prefix={<LockOutlined className="site-form-item-icon" />}
                     value={userData.password}
                     name="password"
-                    type="password"
                     placeholder="Password"
                     onChange={onUpdateData}
                 />
