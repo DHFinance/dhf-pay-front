@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Layout, Menu } from 'antd';
 import Link from 'next/link'
 import {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {ReactElement, useEffect, useState} from "react";
 import Router from "next/router";
 import SliderContainer from "../../src/components/Layout/SliderContainer";

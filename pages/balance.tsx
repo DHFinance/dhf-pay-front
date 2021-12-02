@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import {Buffer} from "buffer";
 
