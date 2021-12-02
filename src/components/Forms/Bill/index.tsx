@@ -184,6 +184,8 @@ const Bill = () => {
     } = billInfo
     const date = new Date(datetime).toDateString()
 
+    const [form] = Form.useForm();
+
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -202,13 +204,23 @@ const Bill = () => {
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Form.Item
-                    label="Email (optional)"
-                    name="email"
-                    style={{width: '300px'}}
+                <Form
+                    name="basic"
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 16 }}
+                    initialValues={{ remember: true }}
+                    autoComplete="off"
+                    form={form}
+                    style={{width: '400px'}}
                 >
-                    <Input name="email" value={email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-                </Form.Item>
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your email!' }, { type: 'email', message: 'Please input valid email!' }]}
+                    >
+                        <Input name="email" value={email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+                    </Form.Item>
+                </Form>
             </Col>
 
             {   status !== 'Paid' ?
