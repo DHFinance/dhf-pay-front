@@ -78,7 +78,11 @@ const signerErrors = [
         title: 'Server error',
         desc: 'Error connecting to the Signer server'
     },
-
+    {
+        message: 'Transaction aborted',
+        title: 'Transaction aborted',
+        desc: 'Check your internet connection'
+    },
 ]
 
 const Bill = () => {
@@ -109,6 +113,7 @@ const Bill = () => {
     };
 
     const billInfo = useSelector((state) => state.payment.data);
+    const transactions = useSelector((state) => state.transactions.data);
 
     const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
@@ -153,15 +158,19 @@ const Bill = () => {
             } else {
                 openNotification('Transaction error', 'Your transaction has not been completed, please try again')
             }
-            await dispatch(pay({
-                txHash: signed,
-                status: "processing",
-                amount,
-                payment: billInfo.id,
-                updated: new Date(),
-                sender: publicKeyHex,
-                receiver: to
-            }))
+            try {
+                await dispatch(pay({
+                    txHash: signed,
+                    status: "processing",
+                    amount,
+                    payment: billInfo.id,
+                    updated: new Date(),
+                    sender: publicKeyHex,
+                    receiver: to
+                }))
+            } catch (e) {
+                showError('Transaction aborted')
+            }
             setTransactionExplorer(signed || '')
         } catch (e: any) {
             showError(e.message)
@@ -199,6 +208,8 @@ const Bill = () => {
     } = billInfo
     const date = new Date(datetime).toDateString()
 
+    const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
+
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -218,11 +229,21 @@ const Bill = () => {
             </Col>
 
 
-            {transactionExplorer ?
-                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+            {lastTransaction.length ?
+                <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : null
+            }
+            {payment?.transaction?.txHash ?
+                <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                            Check last transaction
                         </Button>
                     </a>
                 </Link>
