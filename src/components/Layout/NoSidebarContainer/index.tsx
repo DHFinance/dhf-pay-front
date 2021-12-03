@@ -15,7 +15,7 @@ interface IContainerProps {
 const NoSidebarContainer = (props: IContainerProps) => {
 
     return (
-        <Layout style={{height: '100vh'}}>
+        <Layout style={{minHeight: '100vh'}}>
             <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64 }}>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
                     {props.children}

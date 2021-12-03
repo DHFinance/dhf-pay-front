@@ -1,12 +1,13 @@
 // @ts-nocheck
-import { Statistic, Row, Col, Button, notification } from 'antd';
-import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
+import {Statistic, Row, Col, Button, notification, Form, Input} from 'antd';
+import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined, UserOutlined} from '@ant-design/icons';
 import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
+import {postLogin} from "../../../../store/actions/auth";
 
 
 interface IUserData {
@@ -91,6 +92,8 @@ const Bill = () => {
     const router = useRouter()
     const [balance, setBalance] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
+    const [email, setEmail] = useState('')
+    const [form] = Form.useForm();
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
@@ -139,43 +142,48 @@ const Bill = () => {
         const id = 287821;
         const gasPrice = 1;
         const ttl = 1800000;
-        try {
-            const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
-            const publicKey = CLPublicKey.fromHex(publicKeyHex)
-            let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
-            const toPublicKey = CLPublicKey.fromHex(to);
-            const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
-            const payment = DeployUtil.standardPayment(amountNum);
-            const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-            const json = DeployUtil.deployToJson(deploy)
-            const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
-            const deployObject = DeployUtil.deployFromJson(signature)
+        await form.validateFields()
+            .then(async () => {
+                try {
+                    const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
+                    const publicKey = CLPublicKey.fromHex(publicKeyHex)
+                    let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
+                    const toPublicKey = CLPublicKey.fromHex(to);
+                    const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
+                    const payment = DeployUtil.standardPayment(amountNum);
+                    const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
+                    const json = DeployUtil.deployToJson(deploy)
+                    const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
+                    const deployObject = DeployUtil.deployFromJson(signature)
 
-            // @ts-ignore
-            const signed = await casperClient.putDeploy(deployObject.val).catch(e => showError(e.message));
-            if (signed) {
-                openNotification('Transaction completed', 'The transaction will be processed as soon as possible')
-            } else {
-                openNotification('Transaction error', 'Your transaction has not been completed, please try again')
-            }
-            try {
-                await dispatch(pay({
-                    txHash: signed,
-                    status: "processing",
-                    amount,
-                    payment: billInfo.id,
-                    updated: new Date(),
-                    sender: publicKeyHex,
-                    receiver: to
-                }))
-            } catch (e) {
-                showError('Transaction aborted')
-            }
-            setTransactionExplorer(signed || '')
-        } catch (e: any) {
-            showError(e.message)
-        }
-
+                    // @ts-ignore
+                    const signed = await casperClient.putDeploy(deployObject.val).catch(e => showError(e.message));
+                    if (signed) {
+                        openNotification('Transaction completed', 'The transaction will be processed as soon as possible')
+                    } else {
+                        openNotification('Transaction error', 'Your transaction has not been completed, please try again')
+                    }
+                    try {
+                        await dispatch(pay({
+                            txHash: signed,
+                            status: "processing",
+                            amount,
+                            email,
+                            payment: billInfo.id,
+                            updated: new Date(),
+                            sender: publicKeyHex,
+                            receiver: to
+                        }))
+                    } catch (e) {
+                        showError('Transaction aborted')
+                    }
+                    setTransactionExplorer(signed || '')
+                } catch (e: any) {
+                    showError(e.message)
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     };
 
     const getBalance = async () => {
@@ -210,6 +218,7 @@ const Bill = () => {
 
     const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
 
+
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -227,6 +236,24 @@ const Bill = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
+            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                <Form
+                    name="email"
+                    initialValues={{ remember: true }}
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 12 }}
+                    validateTrigger={'onSubmit'}
+                    form={form}
+                >
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                    >
+                        <Input name="email" style={{width: 400}} onChange={(e) => setEmail(e.target.value)} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
+                    </Form.Item>
+                </Form>
+            </Col>
 
 
             {lastTransaction.length ?
@@ -241,6 +268,17 @@ const Bill = () => {
             }
             {payment?.transaction?.txHash ?
                 <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                            Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : null
+            }
+
+            {transactionExplorer ?
+                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                             Check last transaction
