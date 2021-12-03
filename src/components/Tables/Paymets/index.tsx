@@ -142,6 +142,8 @@ const Payments = () => {
                         datetime: new Date()
                     }))
                     await dispatch(getPayments())
+                    setPayment(initialState)
+                    form.resetFields();
                     setIsModalVisible(false);
                 } catch (e) {
                     console.log(e, 'registration error')
