@@ -236,24 +236,28 @@ const Bill = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
-            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Form
-                    name="email"
-                    initialValues={{ remember: true }}
-                    labelCol={{ span: 0 }}
-                    wrapperCol={{ span: 12 }}
-                    validateTrigger={'onSubmit'}
-                    form={form}
-                >
-                    <Form.Item
-                        label="Email"
+            {status !== 'Paid' ?
+                <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                    <Form
                         name="email"
-                        rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                        initialValues={{ remember: true }}
+                        labelCol={{ span: 0 }}
+                        wrapperCol={{ span: 12 }}
+                        validateTrigger={'onSubmit'}
+                        form={form}
                     >
-                        <Input name="email" style={{width: 400}} onChange={(e) => setEmail(e.target.value)} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
-                    </Form.Item>
-                </Form>
-            </Col>
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                        >
+                            <Input name="email" style={{width: 400}} onChange={(e) => setEmail(e.target.value)} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
+                        </Form.Item>
+                    </Form>
+                </Col>
+                : null
+            }
+
 
 
             {lastTransaction.length ?
