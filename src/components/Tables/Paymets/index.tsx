@@ -7,7 +7,7 @@ import {useRouter} from "next/router";
 import Text from "antd/lib/typography/Text";
 // @ts-ignore
 import {addPayment} from "../../../../store/actions/payment";
-import {reAuth} from "../../../../store/actions/auth";
+import {postLogin, reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
 import {CLPublicKey} from "casper-js-sdk";
@@ -89,6 +89,8 @@ const Payments = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
 
+    const [form] = Form.useForm();
+
     const onChangePayment = (field: string) => (e: any) => {
         const value = e.target.value
         setPayment({
@@ -97,20 +99,27 @@ const Payments = () => {
         })
     }
 
-    useEffect(() => {
-        dispatch(reAuth(localToken))
-    }, [])
-
-    const showModal = () => {
+    const showModal = async () => {
+        try {
+            if (!user) {
+                await dispatch(reAuth(localToken))
+            }
+        } catch (e) {
+            console.log('error getting user')
+        }
         setIsModalVisible(true);
     };
 
     const validateWallet = (rule: any, value: any, callback: any) => {
-        try {
-            CLPublicKey.fromHex(value)
+        if (value) {
+            try {
+                CLPublicKey.fromHex(value)
+                callback();
+            } catch (e) {
+                callback("This wallet not exist!");
+            }
+        } else {
             callback();
-        } catch (e) {
-            callback("This wallet not exist!");
         }
     };
 
@@ -123,23 +132,28 @@ const Payments = () => {
     };
 
     const handleOk = async () => {
-        if (+payment.amount > 2500000000  && payment.wallet) {
-            await dispatch(addPayment({
-                ...payment,
-                status: 'Not_paid',
-                user,
-                datetime: new Date()
-            }))
-            await dispatch(getPayments())
-            setIsModalVisible(false);
-        }
-    };
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(addPayment({
+                        ...payment,
+                        status: 'Not_paid',
+                        user,
+                        datetime: new Date()
+                    }))
+                    await dispatch(getPayments())
+                    setIsModalVisible(false);
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
+    }
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
-
-    const [form] = Form.useForm();
 
     const onRow=(record, rowIndex) => {
         return {
@@ -155,12 +169,13 @@ const Payments = () => {
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
                 autoComplete="off"
+                validateTrigger={'onSubmit'}
                 form={form}
             >
                 <Form.Item
                     label="Wallet"
                     name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }, { type: 'number', message: 'Only numbers!' }]}
+                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
                 >
                     <Input onChange={onChangePayment('wallet')}/>
                 </Form.Item>
