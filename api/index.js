@@ -4,7 +4,7 @@ class Api {
   constructor() {
 
     this.client = axios.create({
-      baseURL: API_HOST || 'http://localhost:3001/api',
+      baseURL: API_HOST + '/api' || 'http://localhost:3001/api',
     });
   }
 
