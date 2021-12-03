@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Statistic, Row, Col, Button } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
@@ -8,6 +9,7 @@ const casperClientSDK = require("casper-js-sdk");
 import {useEffect, useState} from "react";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
+import Link from "next/link";
 
 interface IUserData {
     name: string,
@@ -64,7 +66,16 @@ const Transaction = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
             </Col>
-
+            {txHash ?
+                <Link href={`https://testnet.cspr.live/deploy/${txHash}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 0 20px 0'}} type="primary" size={'large'}>
+                            Check transaction
+                        </Button>
+                    </a>
+                </Link>
+                : null
+            }
         </>
     );
 };

@@ -14,6 +14,8 @@ export const POST_LOGOUT_FAILED = 'POST_LOGOUT_FAILED';
 export const POST_RESTORE_START = 'POST_RESTORE_START';
 export const POST_RESTORE_SUCCESS = 'POST_RESTORE_SUCCESS';
 export const POST_RESTORE_FAILED = 'POST_RESTORE_FAILED';
+export const CLEAR_AUTH = 'CLEAR_AUTH';
+export const CLEAR_AUTH_ERROR = 'CLEAR_AUTH_ERROR';
 
 const postRegistrationStart = () => ({
   type: POST_REGISTRATION_START
@@ -29,15 +31,22 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
+export const clearAuth = () => ({
+  type: CLEAR_AUTH
+});
+
+export const clearAuthError = () => ({
+  type: CLEAR_AUTH_ERROR
+});
+
 export const postRegistration = (data, goStartPage) => async (dispatch) => {
   dispatch(postRegistrationStart());
-  const result = await post('/auth/register', data);
-  try {
-    dispatch(postRegistrationSuccess(result));
+  await post(`/auth/register`, data).then((result) => {
+    dispatch(postRegistrationSuccess(result.data));
     goStartPage()
-  } catch (e) {
+  }).catch(e => {
     dispatch(postRegistrationFailed(e));
-  }
+  });
 };
 
 const postLoginStart = () => ({
@@ -58,23 +67,21 @@ const postLoginFailed = (error) => {
 
 export const reAuth = (token) => async (dispatch) => {
   dispatch(postLoginStart());
-  const result = await get(`auth/reAuth?token=${token}`);
-  try {
+  await get(`auth/reAuth?token=${token}`).then((result) => {
     dispatch(postLoginSuccess(result.data));
-  } catch (e) {
+  }).catch(e => {
     dispatch(postLoginFailed(e));
-  }
+  });
 };
 
 export const postLogin = (data, goStartPage) => async (dispatch) => {
   dispatch(postLoginStart());
-  const result = await post('auth/login', data);
-  try {
-    dispatch(postLoginSuccess(result.data));
+  await post(`auth/login`, data).then((result) => {
     goStartPage()
-  } catch (e) {
+    dispatch(postLoginSuccess(result.data));
+  }).catch(e => {
     dispatch(postLoginFailed(e));
-  }
+  });
 };
 
 const postLogoutStart = () => ({
@@ -117,40 +124,37 @@ const postRestoreFailed = (error) => ({
 
 export const postRestoreStepEmail = (data) => async (dispatch) => {
   dispatch(postRestoreStart());
-  const result = await post('/auth/send-code', data);
-  try {
+  await post('/auth/send-code', data).then((result) => {
     dispatch(postRestoreSuccess({
       code: result.data,
       email: data.email
     }));
-  } catch (e) {
-    dispatch(postRestoreFailed('Email step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 
 export const postRestoreStepCode = (data) => async (dispatch) => {
   dispatch(postRestoreStart())
-  const result = await post('/auth/check-code', data);
-  try {
+  await post('/auth/check-code', data).then((result) => {
     dispatch(postRestoreSuccess({
       resetEnabled: true
     }));
-  } catch (e) {
-    dispatch(postRestoreFailed('Code step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 
 export const postRestoreStepPassword = (data, goStartPage) => async (dispatch) => {
   dispatch(postRestoreStart());
-  const result = await post('/auth/reset-pwd', data);
-  try {
+  await post('/auth/reset-pwd', data).then((result) => {
     dispatch(postRestoreSuccess({
       ...result.data,
       resetEnabled: false
     }));
     goStartPage();
-  } catch (e) {
-    dispatch(postRestoreFailed('Password step error:',e));
-  }
+  }).catch(e => {
+    dispatch(postRestoreFailed(e));
+  });
 };
 

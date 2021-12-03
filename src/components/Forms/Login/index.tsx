@@ -1,9 +1,10 @@
-import {useState} from "react";
+// @ts-nocheck
+import {useEffect, useRef, useState} from "react";
 import "antd/dist/antd.css";
 import { Form, Input, Button} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {useDispatch} from "react-redux";
-import {postLogin} from "../../../../store/actions/auth";
+import {useDispatch, useSelector} from "react-redux";
+import {clearAuth, postLogin, postRestoreStepEmail} from "../../../../store/actions/auth";
 import Link from "next/link";
 import {useRouter} from "next/router";
 
@@ -19,7 +20,6 @@ const initialState = {
 
 const Login = () => {
 
-
     const router = useRouter();
     const goStartPage = () => {
       router.push('/')
@@ -27,6 +27,11 @@ const Login = () => {
     const dispatch = useDispatch();
 
     const [userData, setUserData] = useState<IUserData>(initialState)
+
+    const auth = useSelector((state) => state.auth);
+
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
 
     const onUpdateData = (e: any) => {
         const value = e.target.value
@@ -37,13 +42,44 @@ const Login = () => {
         })
     }
 
-    const onSubmit = async () => {
-        try {
-            await dispatch(postLogin(userData, goStartPage))
-        } catch (e) {
-            console.log(e, 'registration error')
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["email", 'password'])
         }
+    }, [fieldError])
+
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'password') {
+            callback(errorMessage);
+            dispatch(clearAuth())
+        } else {
+            callback();
+        }
+    };
+
+    const validateEmail = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'email') {
+            callback(errorMessage);
+            dispatch(clearAuth())
+        } else {
+            callback();
+        }
+    };
+
+    const onSubmit = async () => {
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postLogin(userData, goStartPage))
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
+
+    const [form] = Form.useForm();
 
     return (
         <Form
@@ -53,24 +89,25 @@ const Login = () => {
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 12 }}
             onSubmitCapture={onSubmit}
+            validateTrigger={'onSubmit'}
+            form={form}
         >
             <Form.Item
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please input your email!' }]}
+                rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}, {validator: validateEmail}]}
             >
                 <Input name="email" value={userData.email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={onUpdateData} placeholder="Email" />
             </Form.Item>
             <Form.Item
                 label="Password"
                 name="password"
-                rules={[{ required: true, message: 'Please input your Password!' }]}
+                rules={[{ required: true, message: 'Please input your Password!' }, {validator: validatePassword}]}
             >
-                <Input
+                <Input.Password
                     prefix={<LockOutlined className="site-form-item-icon" />}
                     value={userData.password}
                     name="password"
-                    type="password"
                     placeholder="Password"
                     onChange={onUpdateData}
                 />

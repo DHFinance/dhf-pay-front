@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {ReactElement, useEffect, useState} from "react";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import Login from "../../src/components/Forms/Login";

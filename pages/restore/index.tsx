@@ -2,6 +2,7 @@ import React from "react";
 import Restore from "../../src/components/Forms/Restore";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import WithoutAuth from "../../hoc/withoutAuth";
+import {wrapper} from "../../store/store";
 
 
 const RestorePage = () => {
@@ -12,4 +13,4 @@ const RestorePage = () => {
     </WithoutAuth>
 }
 
-export default RestorePage
+export default wrapper.withRedux(RestorePage)

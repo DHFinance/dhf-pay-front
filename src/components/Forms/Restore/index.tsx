@@ -1,12 +1,14 @@
+// @ts-nocheck
 import { Form, Input, Button, Checkbox } from 'antd';
 import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {
+    clearAuth, clearAuthError,
     postRegistration,
     postRestoreStepCode,
     postRestoreStepEmail,
-    postRestoreStepPassword
+    postRestoreStepPassword,
 } from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
@@ -43,7 +45,7 @@ enum EnumForms {
     PASSWORD
 }
 
-const EmailForm = () => {
+const EmailForm = ({auth}: any) => {
 
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
     const dispatch = useDispatch();
@@ -57,36 +59,55 @@ const EmailForm = () => {
         })
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+    const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["email"])
+        }
+    }, [fieldError])
+
+    const validateEmail = (rule: any, value: any, callback: any) => {
+        console.log(fieldError)
+        if (fieldError === 'email') {
+            callback(errorMessage);
+            dispatch(clearAuth())
+        } else {
+            callback();
+        }
     };
 
     const onSubmit = async () => {
-        try {
-            await dispatch(postRestoreStepEmail(userData))
-        } catch (e) {
-            console.log(e, 'registration error: Email step')
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepEmail(userData))
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
+
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
+        form={form}
         name="restore"
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         onSubmitCapture={onSubmit}
+        validateTrigger={'onSubmit'}
         autoComplete="off"
     >
         <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, message: 'Please input your email!' }]}
+            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}, {validator: validateEmail}]}
         >
             <Input name="email" onChange={onUpdateData}/>
         </Form.Item>
@@ -99,9 +120,8 @@ const EmailForm = () => {
     </Form>
 }
 
-const CodeForm = () => {
+const CodeForm = ({auth}: any) => {
 
-    const restoreState = useSelector((state) => state.auth);
     const [userData, setUserData] = useState<IRestoreDataCode>(initialStateCode)
     const dispatch = useDispatch();
 
@@ -114,36 +134,54 @@ const CodeForm = () => {
         })
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
+
+    const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["code"])
+        }
+    }, [auth])
+
+    const validateCode = (rule: any, value: any, callback: any) => {
+        if (fieldError === 'code') {
+            callback(errorMessage);
+            dispatch(clearAuthError())
+        } else {
+            callback();
+        }
     };
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
 
     const onSubmit = async () => {
-        try {
-            await dispatch(postRestoreStepCode({...userData, email: restoreState.data.email}))
-        } catch (e) {
-            console.log(e, 'registration error: Code step')
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepCode({...userData, email: auth.data.email}))
+                } catch (e) {
+                    console.log(e, 'registration error: Code step')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         name="restore"
+        form={form}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         onSubmitCapture={onSubmit}
+        validateTrigger={'onSubmit'}
         autoComplete="off"
     >
         <Form.Item
             label="Code"
             name="code"
-            rules={[{ required: true, message: 'Please input your code!' }]}
+            rules={[{ required: true, message: 'Please input your code!' }, { min: 8, max: 8, message: 'The code must be 8 digits!' }, {validator: validateCode}]}
         >
             <Input name="code" onChange={onUpdateData}/>
         </Form.Item>
@@ -156,9 +194,8 @@ const CodeForm = () => {
     </Form>
 }
 
-const PasswordForm = () => {
+const PasswordForm = ({auth}: any) => {
 
-    const restoreState = useSelector((state) => state.auth);
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
     const router = useRouter();
     const goStartPage = () => {
@@ -166,6 +203,7 @@ const PasswordForm = () => {
     }
 
     const dispatch = useDispatch();
+    const [form] = Form.useForm();
 
     const onUpdateData = (e: any) => {
         const value = e.target.value
@@ -176,50 +214,51 @@ const PasswordForm = () => {
         })
     }
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
-
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
-
     const onSubmit = async () => {
-        if (userData.password !== userData.passwordConf) {
-            alert('Пароли не совпадают')
-            return false
-        }
-        try {
-            await dispatch(postRestoreStepPassword({password: userData.password, email: restoreState.data.email}, goStartPage))
-        } catch (e) {
-            console.log(e, 'registration error')
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepPassword({password: userData.password, email: auth.data.email}, goStartPage))
+                } catch (e) {
+                    console.log(e, 'registration error: Code step')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
+
+    const validatePassword = (rule: any, value: any, callback: any) => {
+        if (userData.passwordConf !== userData.password) {
+            callback("Passwords do not match");
+        } else {
+            callback();
+        }
+    };
+
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         name="restore"
+        form={form}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        validateTrigger={'onSubmit'}
         onSubmitCapture={onSubmit}
         autoComplete="off"
     >
         <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: 'Please enter password!' }]}
         >
-            <Input name='password' onChange={onUpdateData}/>
+            <Input.Password name="password" onChange={onUpdateData}/>
         </Form.Item>
-
         <Form.Item
-            label="Password confirm"
+            label="PasswordConf"
             name="passwordConf"
-            rules={[{ required: true, message: 'Please confirm your password!' }]}
+            rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
         >
-            <Input name="passwordConf" onChange={onUpdateData}/>
+            <Input.Password name="passwordConf" onChange={onUpdateData}/>
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
@@ -232,25 +271,25 @@ const PasswordForm = () => {
 
 const Restore = () => {
 
-    const restoreState = useSelector((state) => state.auth);
+    const auth = useSelector((state) => state.auth);
 
     useEffect(() => {
-        if (restoreState.data.resetEnabled) {
+        if (auth.data.resetEnabled) {
             setForm(EnumForms.PASSWORD)
-        } else if (restoreState.data.email) {
+        } else if (auth.data.email) {
             setForm(EnumForms.CODE)
-        } else if (restoreState.data.token) {
+        } else if (auth.data.token) {
             setForm(EnumForms.EMAIL)
         } else setForm(EnumForms.EMAIL)
-    }, [restoreState])
+    }, [auth])
 
     const [form, setForm] = useState<EnumForms>(EnumForms.EMAIL)
 
     switch (form) {
-        case EnumForms.EMAIL: return <EmailForm/>
-        case EnumForms.CODE: return <CodeForm/>
-        case EnumForms.PASSWORD: return <PasswordForm/>
-        default: return <EmailForm/>
+        case EnumForms.EMAIL: return <EmailForm auth={auth}/>
+        case EnumForms.CODE: return <CodeForm auth={auth}/>
+        case EnumForms.PASSWORD: return <PasswordForm auth={auth}/>
+        default: return <EmailForm auth={auth}/>
     }
 };
 

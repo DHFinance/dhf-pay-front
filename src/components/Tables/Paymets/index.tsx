@@ -1,13 +1,16 @@
+// @ts-nocheck
 import React, {useEffect, useState} from "react";
 import {Table, Tag, Space, Button, Modal, Form, Input, Checkbox} from 'antd';
 import "antd/dist/antd.css";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import Text from "antd/lib/typography/Text";
+// @ts-ignore
 import {addPayment} from "../../../../store/actions/payment";
-import {reAuth} from "../../../../store/actions/auth";
+import {postLogin, reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
+import {CLPublicKey} from "casper-js-sdk";
 
 const columns = [
     {
@@ -86,6 +89,8 @@ const Payments = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
 
+    const [form] = Form.useForm();
+
     const onChangePayment = (field: string) => (e: any) => {
         const value = e.target.value
         setPayment({
@@ -94,31 +99,61 @@ const Payments = () => {
         })
     }
 
-    const showModal = () => {
-        dispatch(reAuth(localToken))
+    const showModal = async () => {
+        try {
+            if (!user) {
+                await dispatch(reAuth(localToken))
+            }
+        } catch (e) {
+            console.log('error getting user')
+        }
         setIsModalVisible(true);
     };
 
-    const handleOk = async () => {
-        if (payment.amount < 2500000000) {
-            alert('сумма должна быть больше 2500000000')
-            return false
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        if (value) {
+            try {
+                CLPublicKey.fromHex(value)
+                callback();
+            } catch (e) {
+                callback("This wallet not exist!");
+            }
+        } else {
+            callback();
         }
-        await dispatch(addPayment({
-            ...payment,
-            status: 'Not_paid',
-            user,
-            datetime: new Date()
-        }))
-        await dispatch(getPayments())
-        setIsModalVisible(false);
     };
+
+    const validateAmount = (rule: any, value: any, callback: any) => {
+        if (value < 2500000000) {
+            callback("Must be more than 2500000000");
+        } else {
+            callback();
+        }
+    };
+
+    const handleOk = async () => {
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(addPayment({
+                        ...payment,
+                        status: 'Not_paid',
+                        user,
+                        datetime: new Date()
+                    }))
+                    await dispatch(getPayments())
+                    setIsModalVisible(false);
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
+    }
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
-
-
 
     const onRow=(record, rowIndex) => {
         return {
@@ -134,21 +169,23 @@ const Payments = () => {
                 wrapperCol={{ span: 16 }}
                 initialValues={{ remember: true }}
                 autoComplete="off"
+                validateTrigger={'onSubmit'}
+                form={form}
             >
                 <Form.Item
                     label="Wallet"
                     name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }]}
+                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
                 >
                     <Input onChange={onChangePayment('wallet')}/>
                 </Form.Item>
                 <Form.Item
                     label="Amount"
                     name="amount"
-                    rules={[{ required: true, message: 'Please input amount!' }]}
+                    rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                 >
-                    <Input onChange={onChangePayment('amount')}/>
-                    <Text>Minimum 2500000000</Text>
+                    <Input type='number' onChange={onChangePayment('amount')}/>
+
                 </Form.Item>
                 <Form.Item
                     label="Comment"

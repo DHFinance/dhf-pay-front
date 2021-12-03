@@ -1,10 +1,7 @@
-import {Statistic, Row, Col, Button, notification, Form, Input} from 'antd';
-import {
-    AreaChartOutlined,
-    ClockCircleOutlined,
-    CommentOutlined,
-    UserOutlined
-} from '@ant-design/icons';
+// @ts-nocheck
+import { Statistic, Row, Col, Button, notification, Form, Input } from 'antd';
+import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined, UserOutlined} from '@ant-design/icons';
+import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
@@ -64,6 +61,28 @@ const signerErrors = [
         title: 'Invalid public key',
         desc: 'Invalid public key'
     },
+    //Возникает при отключении интернета
+    {
+        message: 'Failed to fetch',
+        title: 'Network error',
+        desc: 'Check your internet connection'
+    },
+    //Возникает при отключении интернета
+    {
+        message: 'Network error',
+        title: 'Network error',
+        desc: 'Check your internet connection'
+    },
+    {
+        message: 'Request failed with status code 500',
+        title: 'Server error',
+        desc: 'Error connecting to the Signer server'
+    },
+    {
+        message: 'Transaction aborted',
+        title: 'Transaction aborted',
+        desc: 'Check your internet connection'
+    },
 ]
 
 const Bill = () => {
@@ -72,6 +91,7 @@ const Bill = () => {
     const router = useRouter();
     const [email, setEmail] = useState('')
     const [balance, setBalance] = useState('')
+    const [transactionExplorer, setTransactionExplorer] = useState('')
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
@@ -94,6 +114,7 @@ const Bill = () => {
     };
 
     const billInfo = useSelector((state) => state.payment.data);
+    const transactions = useSelector((state) => state.transactions.data);
 
     const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);
@@ -101,8 +122,12 @@ const Bill = () => {
 
     const singInSigner = async () => {
         if (window.casperlabsHelper) {
-            await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
-        } else {
+            try {
+                await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
+            } catch (e: any) {
+                showError(e.message)
+            }
+            } else {
             showError('Please download CasperLabs Signer')
         }
     };
@@ -134,16 +159,21 @@ const Bill = () => {
             } else {
                 openNotification('Transaction error', 'Your transaction has not been completed, please try again')
             }
-            await dispatch(pay({
-                txHash: signed,
-                status: "processing",
-                amount,
-                email,
-                payment: billInfo.id,
-                updated: new Date(),
-                sender: publicKeyHex,
-                receiver: to
-            }))
+            try {
+                await dispatch(pay({
+                    txHash: signed,
+                    status: "processing",
+                    amount,
+                    email,
+                    payment: billInfo.id,
+                    updated: new Date(),
+                    sender: publicKeyHex,
+                    receiver: to
+                }))
+            } catch (e) {
+                showError('Transaction aborted')
+            }
+            setTransactionExplorer(signed || '')
         } catch (e: any) {
             showError(e.message)
         }
@@ -179,6 +209,8 @@ const Bill = () => {
         payment
     } = billInfo
     const date = new Date(datetime).toDateString()
+
+    const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
 
     const [form] = Form.useForm();
 
@@ -219,18 +251,40 @@ const Bill = () => {
                 </Form>
             </Col>
 
+
+            {lastTransaction.length ?
+                <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : null
+            }
+            {payment?.transaction?.txHash ?
+                <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                            Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : null
+            }
+
             {   status !== 'Paid' ?
                 (!balance ?
-                <Button onClick={singInSigner} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                     Sign in Signer
                 </Button>
                 :
-                <Button onClick={deploy} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                     Pay
                 </Button>) : null
             }
 
-            <Button onClick={() => router.back()} style={{margin: '20px 0 0 20px'}} type="primary" size={'large'}>
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
                 Back
             </Button>
         </>

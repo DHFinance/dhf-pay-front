@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import Payments from "../../src/components/Tables/Paymets";
 import SliderContainer from "../../src/components/Layout/SliderContainer";

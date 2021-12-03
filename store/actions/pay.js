@@ -26,11 +26,10 @@ const pushPayment = (data) => ({
 
 export const pay = (data) => async (dispatch) => {
   dispatch(payStart());
-  const result = await post('/transaction', data);
-  try {
+  await post('/transaction', data).then((result => {
     dispatch(paySuccess(result.data.data));
     dispatch(pushPayment(result.data.data));
-  } catch (e) {
+  })).catch(e => {
     dispatch(payFailed(e));
-  }
+  });
 };
