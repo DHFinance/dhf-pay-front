@@ -68,9 +68,11 @@ const Transaction = () => {
             </Col>
             {txHash ?
                 <Link href={`https://testnet.cspr.live/deploy/${txHash}`}>
-                    <Button style={{margin: '20px 0 20px 0'}} type="primary" size={'large'}>
-                        Check transaction
-                    </Button>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 0 20px 0'}} type="primary" size={'large'}>
+                            Check transaction
+                        </Button>
+                    </a>
                 </Link>
                 : null
             }

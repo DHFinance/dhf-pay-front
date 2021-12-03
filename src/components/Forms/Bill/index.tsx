@@ -220,9 +220,11 @@ const Bill = () => {
 
             {transactionExplorer ?
                 <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
-                    <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                        Check last transaction
-                    </Button>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                Check last transaction
+                        </Button>
+                    </a>
                 </Link>
                 : null
             }
