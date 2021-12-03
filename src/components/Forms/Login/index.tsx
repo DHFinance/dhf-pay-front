@@ -4,7 +4,7 @@ import "antd/dist/antd.css";
 import { Form, Input, Button} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
-import {postLogin} from "../../../../store/actions/auth";
+import {clearAuth, postLogin, postRestoreStepEmail} from "../../../../store/actions/auth";
 import Link from "next/link";
 import {useRouter} from "next/router";
 
@@ -27,7 +27,6 @@ const Login = () => {
     const dispatch = useDispatch();
 
     const [userData, setUserData] = useState<IUserData>(initialState)
-    const [validate, setValidate] = useState(false)
 
     const auth = useSelector((state) => state.auth);
 
@@ -37,7 +36,6 @@ const Login = () => {
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
-        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
@@ -51,32 +49,34 @@ const Login = () => {
     }, [fieldError])
 
     const validatePassword = (rule: any, value: any, callback: any) => {
-        if (fieldError === 'password' && validate) {
+        if (fieldError === 'password') {
             callback(errorMessage);
+            dispatch(clearAuth())
         } else {
             callback();
         }
     };
 
     const validateEmail = (rule: any, value: any, callback: any) => {
-        if (fieldError === 'email' && validate) {
+        if (fieldError === 'email') {
             callback(errorMessage);
+            dispatch(clearAuth())
         } else {
             callback();
         }
     };
 
     const onSubmit = async () => {
-        setValidate(true)
-        const emailValid = form.getFieldError("email").length === 0 || (form.getFieldError("email").includes(errorMessage) && form.getFieldError("email").length === 1)
-        const passwordValid = form.getFieldError("password").length === 0 || (form.getFieldError("password").includes(errorMessage) && form.getFieldError("password").length === 1)
-        if (passwordValid && emailValid) {
-            try {
-                await dispatch(postLogin(userData, goStartPage))
-            } catch (e) {
-                console.log(e, 'registration error')
-            }
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postLogin(userData, goStartPage))
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
 
     const [form] = Form.useForm();
@@ -89,6 +89,7 @@ const Login = () => {
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 12 }}
             onSubmitCapture={onSubmit}
+            validateTrigger={'onSubmit'}
             form={form}
         >
             <Form.Item

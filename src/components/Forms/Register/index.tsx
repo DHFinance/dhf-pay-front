@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
-import {postLogin, postRegistration} from "../../../../store/actions/auth";
+import {clearAuth, postLogin, postRegistration} from "../../../../store/actions/auth";
 import {useRouter} from "next/router";
 import {getFormFields} from "../../../../utils/getFormFields";
 
@@ -30,18 +30,16 @@ const Register = () => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-    const fields = getFormFields(initialState)
     const [form] = Form.useForm();
-    const [checkNick, setCheckNick] = useState(false);
     const goStartPage = () => {
         router.push('/')
     }
 
+    const [valid, setValid] = useState(true)
     const [userData, setUserData] = useState<IUserData>(initialState)
 
     const onUpdateData = (field: string) => (e: any) => {
         const value = e.target.value
-        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
@@ -49,14 +47,13 @@ const Register = () => {
     }
 
     const validatePassword = (rule: any, value: any, callback: any) => {
-        if (value !== userData.password) {
+        if (value && value !== userData.password) {
             callback("Passwords do not match");
         } else {
             callback();
         }
     };
 
-    const [validate, setValidate] = useState(false)
 
     const auth = useSelector((state) => state.auth);
 
@@ -70,23 +67,25 @@ const Register = () => {
     }, [fieldError])
 
     const validateEmail = (rule: any, value: any, callback: any) => {
-        if (fieldError === 'email' && validate) {
+        if (fieldError === 'email') {
             callback(errorMessage);
+            dispatch(clearAuth())
         } else {
             callback();
         }
     };
 
     const onSubmit = async () => {
-        setValidate(true)
-        const emailValid = form.getFieldsError(fields).filter((err) => err.errors.length > 0).length === 0 || (form.getFieldError("email").includes(errorMessage) && form.getFieldError("email").length === 1)
-        if (emailValid) {
-            try {
-                await dispatch(postRegistration(userData, goStartPage))
-            } catch (e) {
-                console.log(e, 'registration error')
-            }
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRegistration(userData, goStartPage))
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => setValid(false))
     }
 
     return (
@@ -97,6 +96,8 @@ const Register = () => {
             wrapperCol={{ span: 12 }}
             initialValues={{ remember: true }}
             onSubmitCapture={onSubmit}
+            form={form}
+            validateTrigger={'onSubmit'}
             autoComplete="off"
         >
             <Form.Item

@@ -4,10 +4,11 @@ import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import "antd/dist/antd.css";
 import axios from "axios";
 import {
+    clearAuth, clearAuthError,
     postRegistration,
     postRestoreStepCode,
     postRestoreStepEmail,
-    postRestoreStepPassword
+    postRestoreStepPassword,
 } from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
@@ -52,14 +53,11 @@ const EmailForm = ({auth}: any) => {
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
-        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
         })
     }
-
-    const [validate, setValidate] = useState(false)
 
     const fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
@@ -73,22 +71,28 @@ const EmailForm = ({auth}: any) => {
     }, [fieldError])
 
     const validateEmail = (rule: any, value: any, callback: any) => {
-        if (fieldError === 'email' && validate) {
+        console.log(fieldError)
+        if (fieldError === 'email') {
             callback(errorMessage);
+            dispatch(clearAuth())
         } else {
             callback();
         }
     };
 
     const onSubmit = async () => {
-        try {
-            await dispatch(postRestoreStepEmail(userData))
-            setValidate(true)
-        } catch (e) {
-            console.log(e, 'registration error: Email step')
-            setValidate(true)
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepEmail(userData))
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
+
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         form={form}
@@ -97,6 +101,7 @@ const EmailForm = ({auth}: any) => {
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
         onSubmitCapture={onSubmit}
+        validateTrigger={'onSubmit'}
         autoComplete="off"
     >
         <Form.Item
@@ -123,14 +128,11 @@ const CodeForm = ({auth}: any) => {
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
-        setValidate(false)
         setUserData({
             ...userData,
             [field]: value,
         })
     }
-
-    const [validate, setValidate] = useState(false)
 
     const fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
@@ -144,8 +146,9 @@ const CodeForm = ({auth}: any) => {
     }, [auth])
 
     const validateCode = (rule: any, value: any, callback: any) => {
-        if (fieldError === 'code' && validate) {
+        if (fieldError === 'code') {
             callback(errorMessage);
+            dispatch(clearAuthError())
         } else {
             callback();
         }
@@ -153,20 +156,26 @@ const CodeForm = ({auth}: any) => {
 
 
     const onSubmit = async () => {
-        setValidate(true)
-        try {
-            await dispatch(postRestoreStepCode({...userData, email: auth.data.email}))
-        } catch (e) {
-            console.log(e, 'registration error: Code step')
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepCode({...userData, email: auth.data.email}))
+                } catch (e) {
+                    console.log(e, 'registration error: Code step')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         name="restore"
+        form={form}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
         onSubmitCapture={onSubmit}
+        validateTrigger={'onSubmit'}
         autoComplete="off"
     >
         <Form.Item
@@ -194,6 +203,7 @@ const PasswordForm = ({auth}: any) => {
     }
 
     const dispatch = useDispatch();
+    const [form] = Form.useForm();
 
     const onUpdateData = (e: any) => {
         const value = e.target.value
@@ -203,14 +213,18 @@ const PasswordForm = ({auth}: any) => {
             [field]: value,
         })
     }
+
     const onSubmit = async () => {
-        if (userData.password === userData.passwordConf) {
-            try {
-                await dispatch(postRestoreStepPassword({password: userData.password, email: auth.data.email}, goStartPage))
-            } catch (e) {
-                console.log(e, 'registration error')
-            }
-        }
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(postRestoreStepPassword({password: userData.password, email: auth.data.email}, goStartPage))
+                } catch (e) {
+                    console.log(e, 'registration error: Code step')
+                }
+                console.log(res, 'valid')
+            })
+            .catch(async (err) => console.log(err))
     }
 
     const validatePassword = (rule: any, value: any, callback: any) => {
@@ -224,9 +238,11 @@ const PasswordForm = ({auth}: any) => {
     return <Form
         style={{ padding: '0 50px', marginTop: 64 }}
         name="restore"
+        form={form}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 12 }}
         initialValues={{ remember: true }}
+        validateTrigger={'onSubmit'}
         onSubmitCapture={onSubmit}
         autoComplete="off"
     >

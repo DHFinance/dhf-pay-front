@@ -14,6 +14,8 @@ export const POST_LOGOUT_FAILED = 'POST_LOGOUT_FAILED';
 export const POST_RESTORE_START = 'POST_RESTORE_START';
 export const POST_RESTORE_SUCCESS = 'POST_RESTORE_SUCCESS';
 export const POST_RESTORE_FAILED = 'POST_RESTORE_FAILED';
+export const CLEAR_AUTH = 'CLEAR_AUTH';
+export const CLEAR_AUTH_ERROR = 'CLEAR_AUTH_ERROR';
 
 const postRegistrationStart = () => ({
   type: POST_REGISTRATION_START
@@ -29,15 +31,22 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
+export const clearAuth = () => ({
+  type: CLEAR_AUTH
+});
+
+export const clearAuthError = () => ({
+  type: CLEAR_AUTH_ERROR
+});
+
 export const postRegistration = (data, goStartPage) => async (dispatch) => {
   dispatch(postRegistrationStart());
-  const result = await post('/auth/register', data);
-  try {
-    dispatch(postRegistrationSuccess(result));
+  await post(`/auth/register`, data).then((result) => {
+    dispatch(postRegistrationSuccess(result.data));
     goStartPage()
-  } catch (e) {
+  }).catch(e => {
     dispatch(postRegistrationFailed(e));
-  }
+  });
 };
 
 const postLoginStart = () => ({

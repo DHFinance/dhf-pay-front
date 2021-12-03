@@ -1,4 +1,18 @@
-import {  POST_LOGIN_FAILED, POST_LOGIN_START, POST_RESTORE_START, POST_LOGOUT_SUCCESS, POST_RESTORE_FAILED, POST_RESTORE_SUCCESS, POST_LOGOUT_FAILED, POST_LOGIN_SUCCESS, POST_REGISTRATION_FAILED, POST_LOGOUT_START, POST_REGISTRATION_SUCCESS, POST_REGISTRATION_START }  from '../actions/auth';
+import {
+  POST_LOGIN_FAILED,
+  POST_LOGIN_START,
+  POST_RESTORE_START,
+  POST_LOGOUT_SUCCESS,
+  POST_RESTORE_FAILED,
+  POST_RESTORE_SUCCESS,
+  POST_LOGOUT_FAILED,
+  POST_LOGIN_SUCCESS,
+  POST_REGISTRATION_FAILED,
+  POST_LOGOUT_START,
+  POST_REGISTRATION_SUCCESS,
+  POST_REGISTRATION_START,
+  CLEAR_AUTH, CLEAR_AUTH_ERROR
+} from '../actions/auth';
 
 const initialState = {
   data: {
@@ -16,6 +30,13 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  CLEAR_AUTH:
+      return initialState;
+    case  CLEAR_AUTH_ERROR:
+      return {
+        ...state,
+        error: initialState.error
+      };
     case  POST_LOGOUT_START:
       return {
         ...state,
