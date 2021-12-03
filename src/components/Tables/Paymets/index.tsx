@@ -125,7 +125,7 @@ const Payments = () => {
 
     const validateAmount = (rule: any, value: any, callback: any) => {
         if (value < 2500000000) {
-            callback("Must be more than 2500000000");
+            callback("Must be at least 2500000000");
         } else {
             callback();
         }
