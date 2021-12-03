@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { Statistic, Row, Col, Button, notification } from 'antd';
-import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
+import { Statistic, Row, Col, Button, notification, Form, Input } from 'antd';
+import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined, UserOutlined} from '@ant-design/icons';
 import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
@@ -88,7 +88,8 @@ const signerErrors = [
 const Bill = () => {
 
     const dispatch = useDispatch();
-    const router = useRouter()
+    const router = useRouter();
+    const [email, setEmail] = useState('')
     const [balance, setBalance] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
 
@@ -163,6 +164,7 @@ const Bill = () => {
                     txHash: signed,
                     status: "processing",
                     amount,
+                    email,
                     payment: billInfo.id,
                     updated: new Date(),
                     sender: publicKeyHex,
@@ -210,6 +212,8 @@ const Bill = () => {
 
     const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
 
+    const [form] = Form.useForm();
+
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -226,6 +230,25 @@ const Bill = () => {
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                <Form
+                    name="basic"
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 16 }}
+                    initialValues={{ remember: true }}
+                    autoComplete="off"
+                    form={form}
+                    style={{width: '400px'}}
+                >
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your email!' }, { type: 'email', message: 'Please input valid email!' }]}
+                    >
+                        <Input name="email" value={email} prefix={<UserOutlined className="site-form-item-icon" />} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+                    </Form.Item>
+                </Form>
             </Col>
 
 
