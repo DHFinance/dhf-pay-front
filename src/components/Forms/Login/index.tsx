@@ -43,7 +43,7 @@ const Login = () => {
     }
 
     useEffect(() => {
-        if (fieldError) {
+        if (fieldError && userData.email !== '' && userData.password !== '') {
             form.validateFields(["email", 'password'])
         }
     }, [fieldError])
