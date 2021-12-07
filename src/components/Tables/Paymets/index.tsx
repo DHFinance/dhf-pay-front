@@ -76,7 +76,7 @@ const Payments = () => {
         return {
             ...payment,
             status: payment.status.replace('_', ' '),
-            user: payment.user.email,
+            user: payment?.user?.email,
             datetime: new Date(payment.datetime).toDateString()
         }
     }).reverse()
