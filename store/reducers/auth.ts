@@ -13,8 +13,25 @@ import {
   POST_REGISTRATION_START,
   CLEAR_AUTH, CLEAR_AUTH_ERROR
 } from '../actions/auth';
+import {AnyAction} from "redux";
 
-const initialState = {
+export interface IAuthData {
+  name: string,
+  lastName: string,
+  company: string,
+  email: string,
+  token: string,
+  resetEnabled: boolean,
+}
+
+export interface IAuth {
+  data: IAuthData,
+  isLoading: boolean,
+  error: Error | null,
+  isChanged: boolean
+}
+
+const initialState: IAuth = {
   data: {
     name: "",
     lastName: "",
@@ -24,11 +41,11 @@ const initialState = {
     resetEnabled: false,
   },
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 
-export default function reducer(state = initialState, action) {
+export default function reducer(state = initialState, action: AnyAction) {
   switch (action.type) {
     case  CLEAR_AUTH:
       return initialState;

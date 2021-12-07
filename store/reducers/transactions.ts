@@ -1,13 +1,22 @@
 import {  GET_TRANSACTIONS_FAILED, GET_TRANSACTIONS_START, GET_TRANSACTIONS_SUCCESS }  from '../actions/transacrions';
+import {IAuthData} from "./auth";
+import {AnyAction} from "redux";
 
-const initialState = {
+export interface ITransactions {
+  data: any,
+  isLoading: boolean,
+  error: Error | null,
+  isChanged: boolean
+}
+
+const initialState: ITransactions = {
   data: [],
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 
-export default function reducer(state = initialState, action) {
+export default function reducer(state = initialState, action: AnyAction) {
   switch (action.type) {
     case  GET_TRANSACTIONS_START:
       return {

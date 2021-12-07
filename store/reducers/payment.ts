@@ -5,15 +5,23 @@ import {
   ADD_PAYMENT_START,
   ADD_PAYMENT_SUCCESS, ADD_PAYMENT_FAILED
 } from '../actions/payment';
+import {AnyAction} from "redux";
 
-const initialState = {
+export interface IPayment {
+  data: any,
+  isLoading: boolean,
+  error: Error | null,
+  isChanged: boolean
+}
+
+const initialState: IPayment = {
   data: {},
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 
-export default function reducer(state = initialState, action) {
+export default function reducer(state = initialState, action: AnyAction) {
   switch (action.type) {
     case  GET_PAYMENT_START:
       return {

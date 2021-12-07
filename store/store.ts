@@ -1,18 +1,15 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
+import {createStore, applyMiddleware, combineReducers, Middleware, AnyAction} from 'redux';
 import { HYDRATE, createWrapper } from 'next-redux-wrapper';
 import thunkMiddleware from 'redux-thunk';
-import getQuery from "./reducers/getQuery";
-import postQuery from "./reducers/postQuery";
 import payments from "./reducers/payments"
 import payment from "./reducers/payment"
 import transactions from "./reducers/transactions"
 import transaction from "./reducers/transaction";
 import users from "./reducers/users"
-import auth from "./reducers/auth";
+import auth, {IAuth} from "./reducers/auth";
 import pay from "./reducers/pay";
 
-
-const bindMiddleware = (middleware) => {
+const bindMiddleware = (middleware: Middleware[]) => {
   if (process.env.NODE_ENV !== 'production') {
     const { composeWithDevTools } = require('redux-devtools-extension');
     return composeWithDevTools(applyMiddleware(...middleware));
@@ -21,8 +18,6 @@ const bindMiddleware = (middleware) => {
 };
 
 const combinedReducer = combineReducers({
-  getQuery,
-  postQuery,
   auth,
   payments,
   payment,
@@ -32,7 +27,17 @@ const combinedReducer = combineReducers({
   transaction
 });
 
-const reducer = (state, action) => {
+interface RootState {
+  auth: IAuth,
+  payments,
+  payment,
+  transactions,
+  users,
+  pay,
+  transaction
+}
+
+const reducer = (state: RootState, action: AnyAction) => {
   if (action.type === HYDRATE) {
     const nextState = {
       ...state, // use previous state

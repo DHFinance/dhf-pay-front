@@ -1,4 +1,13 @@
 import {GET_TRANSACTION_START, GET_TRANSACTION_SUCCESS, GET_TRANSACTION_FAILED} from "../actions/transaction";
+import {IAuthData} from "./auth";
+import {AnyAction} from "redux";
+
+export interface IAuth {
+  data: IAuthData,
+  isLoading: boolean,
+  error: Error | null,
+  isChanged: boolean
+}
 
 const initialState = {
   data: {},
@@ -7,7 +16,7 @@ const initialState = {
   isChanged: false
 };
 
-export default function reducer(state = initialState, action) {
+export default function reducer(state = initialState, action: AnyAction) {
   switch (action.type) {
     case  GET_TRANSACTION_START:
       return {
