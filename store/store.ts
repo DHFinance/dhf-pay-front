@@ -1,13 +1,13 @@
 import {createStore, applyMiddleware, combineReducers, Middleware, AnyAction} from 'redux';
 import { HYDRATE, createWrapper } from 'next-redux-wrapper';
 import thunkMiddleware from 'redux-thunk';
-import payments from "./reducers/payments"
-import payment from "./reducers/payment"
-import transactions from "./reducers/transactions"
-import transaction from "./reducers/transaction";
-import users from "./reducers/users"
+import payments, {IPayments} from "./reducers/payments"
+import payment, {IPayment} from "./reducers/payment"
+import transactions, {ITransactions} from "./reducers/transactions"
+import transaction, {ITransaction} from "./reducers/transaction";
+import users, {IUsers} from "./reducers/users"
 import auth, {IAuth} from "./reducers/auth";
-import pay from "./reducers/pay";
+import pay, {IPay} from "./reducers/pay";
 
 const bindMiddleware = (middleware: Middleware[]) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -29,12 +29,12 @@ const combinedReducer = combineReducers({
 
 interface RootState {
   auth: IAuth,
-  payments,
-  payment,
-  transactions,
-  users,
-  pay,
-  transaction
+  payments: IPayments,
+  payment: IPayment,
+  transactions: ITransactions,
+  users: IUsers,
+  pay: IPay,
+  transaction: ITransaction
 }
 
 const reducer = (state: RootState, action: AnyAction) => {

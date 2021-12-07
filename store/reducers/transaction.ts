@@ -2,17 +2,17 @@ import {GET_TRANSACTION_START, GET_TRANSACTION_SUCCESS, GET_TRANSACTION_FAILED} 
 import {IAuthData} from "./auth";
 import {AnyAction} from "redux";
 
-export interface IAuth {
-  data: IAuthData,
+export interface ITransaction {
+  data: any,
   isLoading: boolean,
   error: Error | null,
   isChanged: boolean
 }
 
-const initialState = {
+const initialState: ITransaction = {
   data: {},
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 

@@ -2,17 +2,17 @@ import {GET_PAYMENTS_START, GET_PAYMENTS_SUCCESS, GET_PAYMENTS_FAILED, PUSH_PAYM
 import {IAuthData} from "./auth";
 import {AnyAction} from "redux";
 
-export interface IAuth {
-  data: IAuthData,
+export interface IPayments {
+  data: any,
   isLoading: boolean,
   error: Error | null,
   isChanged: boolean
 }
 
-const initialState = {
+const initialState: IPayments = {
   data: [],
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 

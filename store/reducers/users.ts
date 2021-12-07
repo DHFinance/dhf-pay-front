@@ -2,17 +2,17 @@ import {  GET_USERS_FAILED, GET_USERS_SUCCESS, GET_USERS_START }  from '../actio
 import {AnyAction} from "redux";
 import {IAuthData} from "./auth";
 
-export interface IAuth {
-  data: IAuthData,
+export interface IUsers {
+  data: any,
   isLoading: boolean,
   error: Error | null,
   isChanged: boolean
 }
 
-const initialState = {
+const initialState: IUsers = {
   data: [],
   isLoading: false,
-  error: '',
+  error: null,
   isChanged: false
 };
 
