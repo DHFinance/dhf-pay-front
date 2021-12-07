@@ -125,6 +125,8 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_LOGIN_FAILED:
+      localStorage.removeItem('token');
+      alert('User not exist in database')
       return {
         ...state,
         isLoading: false,

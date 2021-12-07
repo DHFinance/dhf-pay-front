@@ -2,16 +2,19 @@
 import React, {ReactElement, useEffect, useState} from "react";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import Login from "../../src/components/Forms/Login";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AuthPage from "../../pages/login";
 import {useRouter} from "next/router";
 import {Spin} from "antd";
+import {reAuth} from "../../store/actions/auth";
 
 
 const WithoutAuth = ({children}: any) => {
 
     const localToken = localStorage.getItem('token')
     const router = useRouter()
+
+    const auth = useSelector((state) => state.auth);
 
     if (!!localToken) {
         router.push('/').then(r => console.log('first you need to log out'))

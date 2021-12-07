@@ -123,6 +123,7 @@ const Bill = () => {
     const casperClient = new CasperClient(apiUrl);
 
     const singInSigner = async () => {
+        console.log(window)
         if (window.casperlabsHelper) {
             try {
                 await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
