@@ -82,6 +82,12 @@ const signerErrors = [
         title: 'Transaction aborted',
         desc: 'Check your internet connection'
     },
+    {
+        message: 'Insufficient balance',
+        title: 'Insufficient balance',
+        desc: 'Your account does not have sufficient funds for the transaction'
+    },
+
 ]
 
 const Bill = () => {
