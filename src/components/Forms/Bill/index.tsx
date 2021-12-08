@@ -5,18 +5,16 @@ import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
 import {postLogin} from "../../../../store/actions/auth";
+import {addPayment} from "../../../../store/actions/payment";
+import {getPayments} from "../../../../store/actions/payments";
 
 
-interface IUserData {
-    name: string,
-    lastName: string,
-    email: string,
-    company: string,
-    password: string,
-    passwordConf: string,
+const initialState = {
+    email: '',
+    wallet: ''
 }
 
 const signerErrors = [
@@ -87,6 +85,179 @@ const signerErrors = [
 ]
 
 const Bill = () => {
+    const isFake = window.location.hostname === 'localhost'
+    if (isFake) {
+        return <FakeBill/>
+    }
+    return <CasperBill/>
+}
+const FakeBill = () => {
+
+    const dispatch = useDispatch();
+    const [billData, setBillData] = useState(initialState)
+    const [sign, setSign] = useState(false)
+    const [transactionExplorer, setTransactionExplorer] = useState('')
+    const [form] = Form.useForm();
+    const router = useRouter()
+    const defaultTxHash = 'd7DdAC148B97671859946603915175b46ea976e11D3263C28E2A35075D634789'
+    const billInfo = useSelector((state) => state.payment.data);
+    const transactions = useSelector((state) => state.transactions.data);
+
+    const deploy = async ()=> {
+        console.log({
+            txHash: defaultTxHash,
+            status: "fake_processing",
+            amount,
+            email: billData.email,
+            payment: billInfo.id,
+            updated: new Date(),
+            sender: billData.wallet,
+            receiver: billInfo.wallet
+        }, billData)
+        await form.validateFields()
+            .then(async (res) => {
+                await dispatch(pay({
+                    txHash: defaultTxHash,
+                    status: "fake_processing",
+                    amount,
+                    email: billData.email,
+                    payment: billInfo.id,
+                    updated: new Date(),
+                    sender: billData.wallet,
+                    receiver: billInfo.wallet
+                }))
+                setTransactionExplorer(defaultTxHash)
+            })
+            .catch(async (err) => console.log(err))
+
+    };
+
+    const {
+        id,
+        datetime,
+        amount,
+        comment,
+        wallet,
+        status,
+        payment
+    } = billInfo
+    const date = new Date(datetime).toDateString()
+
+    const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
+
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        if (value) {
+            try {
+                CLPublicKey.fromHex(value)
+                callback();
+            } catch (e) {
+                callback("This wallet not exist!");
+            }
+        } else {
+            callback();
+        }
+    };
+
+    const onChangeBillData = (field: string) => (e: any) => {
+        const value = e.target.value
+        setBillData({
+            ...billData,
+            [field]: value,
+        })
+    }
+
+    return (
+        <>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Your Balance" value={'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Recipient" value={wallet} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Amount" value={amount} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+            </Col>
+            {status !== 'Paid' ?
+                <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
+                    <Form
+                        name="email"
+                        initialValues={{ remember: true }}
+                        labelCol={{ span: 1 }}
+                        wrapperCol={{ span: 12 }}
+                        validateTrigger={'onSubmit'}
+                        form={form}
+                    >
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                        >
+                            <Input name="email" style={{width: 400}} onChange={onChangeBillData('email')} placeholder="Email" />
+                        </Form.Item>
+                        <Form.Item
+                            label="Wallet"
+                            name="wallet"
+                            rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }] }
+                        >
+                            <Input style={{width: 400}} onChange={onChangeBillData('wallet')} placeholder="Your wallet"/>
+                        </Form.Item>
+                    </Form>
+                </Col>
+                : null
+            }
+
+            {transactionExplorer ?
+                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                            Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : lastTransaction.length ?
+                    <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+                        <a target="_blank" rel="noreferrer">
+                            <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                Check last transaction
+                            </Button>
+                        </a>
+                    </Link>
+                    : payment?.transaction?.txHash ?
+                        <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                            <a target="_blank" rel="noreferrer">
+                                <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                    Check last transaction
+                                </Button>
+                            </a>
+                        </Link>
+                        : null
+            }
+
+            {   status !== 'Paid' ?
+                (!sign ?
+                    <Button onClick={() => setSign(true)} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                        Sign in Signer
+                    </Button>
+                    :
+                    <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                        Pay
+                    </Button>) : null
+            }
+
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                Back
+            </Button>
+        </>
+    );
+};
+
+const CasperBill = () => {
 
     const dispatch = useDispatch();
     const router = useRouter()
@@ -94,6 +265,8 @@ const Bill = () => {
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
     const [form] = Form.useForm();
+
+
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)

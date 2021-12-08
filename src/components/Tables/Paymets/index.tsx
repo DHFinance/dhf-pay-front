@@ -187,7 +187,6 @@ const Payments = () => {
                     rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                 >
                     <Input type='number' onChange={onChangePayment('amount')}/>
-
                 </Form.Item>
                 <Form.Item
                     label="Comment"
