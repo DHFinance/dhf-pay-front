@@ -34,11 +34,7 @@ export const getPayments = () => async (dispatch) => {
 
 export const getUserPayments = (userId) => async (dispatch) => {
   dispatch(getPaymentsStart());
-  const result = await get(`/payment?filter=user.id||eq||${userId}`);
-
-  try {
+  await get(`/payment?filter=user.id||eq||${userId}`).then((result) => {
     dispatch(getPaymentsSuccess(result.data));
-  } catch (e) {
-    dispatch(getPaymentsFailed(e));
-  }
+  }).catch((e) => dispatch(getPaymentsFailed(e)));
 };
