@@ -31,3 +31,14 @@ export const getPayments = () => async (dispatch) => {
     dispatch(getPaymentsFailed(e));
   }
 };
+
+export const getUserPayments = (userId) => async (dispatch) => {
+  dispatch(getPaymentsStart());
+  const result = await get(`/payment?filter=user.id||eq||${userId}`);
+
+  try {
+    dispatch(getPaymentsSuccess(result.data));
+  } catch (e) {
+    dispatch(getPaymentsFailed(e));
+  }
+};

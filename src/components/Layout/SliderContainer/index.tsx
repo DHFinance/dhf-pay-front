@@ -26,7 +26,6 @@ const SliderContainer = (props: IContainerProps) => {
     const user = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const router = useRouter();
-    const token = localStorage.getItem('token')
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
     const title = history.asPath.replace(/\//g, ' ').toUpperCase()
@@ -49,11 +48,21 @@ const SliderContainer = (props: IContainerProps) => {
                 }}/>
                 <Menu theme="dark" mode="inline">
 
-                    {token
+                    {user.data.token
                         ? (<>
-                        <Menu.Item key="users" icon={<UserOutlined />}>
-                            <Link href={'/users'}>
-                                Users
+                            {user.data.role === 'admin'
+                                ?
+                                <Menu.Item key="users" icon={<UserOutlined />}>
+                                <Link href={'/users'}>
+                                    Users
+                                </Link>
+                            </Menu.Item>
+                                :
+                                null
+                            }
+                        <Menu.Item key="stores" icon={<VideoCameraOutlined />}>
+                            <Link href={'/stores'}>
+                                Stores
                             </Link>
                         </Menu.Item>
                         <Menu.Item key="transactions" icon={<VideoCameraOutlined />}>

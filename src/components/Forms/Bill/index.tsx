@@ -83,7 +83,7 @@ const signerErrors = [
         desc: 'Check your internet connection'
     },
     {
-        message: 'Insufficient balance',
+        message: 'insufficient balance in account',
         title: 'Insufficient balance',
         desc: 'Your account does not have sufficient funds for the transaction'
     },

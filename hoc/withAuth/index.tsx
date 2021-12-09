@@ -11,7 +11,7 @@ import {wrapper} from "../../store/store";
 import {data} from "browserslist";
 
 
-const WithAuth = ({children}: any) => {
+const WithAuth = ({children, isAdmin}: any) => {
 
     const localToken = localStorage.getItem('token')
     const router = useRouter()
@@ -41,6 +41,16 @@ const WithAuth = ({children}: any) => {
             width: '100%',
             height: '100vh'}}/>
     }
+    if (isAdmin && auth.data.role === 'customer') {
+        router.push('/').then(r => console.log('you are not found'))
+        return <Spin style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100vh'}}/>
+    }
+
     return children
 }
 
