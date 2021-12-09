@@ -1,18 +1,15 @@
-// @ts-nocheck
 import React from "react";
-import Transactions from "../../src/components/Tables/Transactions";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
-import WithAuth from "../../hoc/withAuth";
 import {wrapper} from "../../store/store";
+import WithAuth from "../../hoc/withAuth";
 
 
-
-const TransactionsPage = () => {
+const StoresPage = () => {
     return <WithAuth>
         <SliderContainer>
-            <Transactions/>
+            Позже будут добавлена таблица с магазинами
         </SliderContainer>
     </WithAuth>
 }
 
-export default wrapper.withRedux(TransactionsPage)
+export default wrapper.withRedux(StoresPage)

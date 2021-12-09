@@ -9,8 +9,10 @@ import Text from "antd/lib/typography/Text";
 import {addPayment} from "../../../../store/actions/payment";
 import {postLogin, reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
-import {getPayments} from "../../../../store/actions/payments";
+import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CLPublicKey} from "casper-js-sdk";
+import WithLoadingData from "../../../../hoc/withLoadingData";
+import {getTransactions} from "../../../../store/actions/transacrions";
 
 const columns = [
     {
@@ -70,7 +72,16 @@ const initialState = {
 const Payments = () => {
 
     const payments = useSelector((state) => state.payments.data);
-    const user = useSelector((state) => state.auth.data.id);
+    const user = useSelector((state) => state.auth.data);
+
+    useEffect(() => {
+        if (user?.role === 'admin') {
+            dispatch(getPayments())
+        }
+        if (user?.role === 'customer') {
+            dispatch(getUserPayments(user.id))
+        }
+    }, [user])
 
     const paymentsTable = payments.map((payment) => {
         return {
@@ -83,8 +94,6 @@ const Payments = () => {
 
     const router = useRouter()
     const dispatch = useDispatch()
-
-    const localToken = localStorage.getItem('token')
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
@@ -99,14 +108,7 @@ const Payments = () => {
         })
     }
 
-    const showModal = async () => {
-        try {
-            if (!user) {
-                await dispatch(reAuth(localToken))
-            }
-        } catch (e) {
-            console.log('error getting user')
-        }
+    const showModal = () => {
         setIsModalVisible(true);
     };
 
@@ -164,42 +166,44 @@ const Payments = () => {
     }
 
     return <>
-        <Modal title="Add payment" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-            <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                initialValues={{ remember: true }}
-                autoComplete="off"
-                validateTrigger={'onSubmit'}
-                form={form}
-            >
-                <Form.Item
-                    label="Wallet"
-                    name="wallet"
-                    rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+        <WithLoadingData data={paymentsTable}>
+            <Modal title="Add payment" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+                <Form
+                    name="basic"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    initialValues={{ remember: true }}
+                    autoComplete="off"
+                    validateTrigger={'onSubmit'}
+                    form={form}
                 >
-                    <Input onChange={onChangePayment('wallet')}/>
-                </Form.Item>
-                <Form.Item
-                    label="Amount"
-                    name="amount"
-                    rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
-                >
-                    <Input type='number' onChange={onChangePayment('amount')}/>
-                </Form.Item>
-                <Form.Item
-                    label="Comment"
-                    name="comment"
-                >
-                    <Input.TextArea onChange={onChangePayment('comment')}/>
-                </Form.Item>
-            </Form>
-        </Modal>
-        <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
-             Add Payment
-        </Button>
-        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={paymentsTable} />
+                    <Form.Item
+                        label="Wallet"
+                        name="wallet"
+                        rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+                    >
+                        <Input onChange={onChangePayment('wallet')}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="Amount"
+                        name="amount"
+                        rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
+                    >
+                        <Input type='number' onChange={onChangePayment('amount')}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="Comment"
+                        name="comment"
+                    >
+                        <Input.TextArea onChange={onChangePayment('comment')}/>
+                    </Form.Item>
+                </Form>
+            </Modal>
+            <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
+                 Add Payment
+            </Button>
+            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={paymentsTable} />
+        </WithLoadingData>
     </>
 }
 

@@ -11,10 +11,4 @@ const BillsPage = () => {
     return <WithAuth><SliderContainer><Payments/></SliderContainer></WithAuth>
 }
 
-export const getServerSideProps = wrapper.getServerSideProps(store =>
-    async ({req, res, query,  ...etc}) => {
-        await store.dispatch(getPayments());
-    }
-);
-
 export default wrapper.withRedux(BillsPage)

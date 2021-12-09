@@ -11,10 +11,4 @@ const UsersPage = () => {
     return <WithAuth><SliderContainer><Users/></SliderContainer></WithAuth>
 }
 
-export const getServerSideProps = wrapper.getServerSideProps(store =>
-    async ({req, res, query,  ...etc}) => {
-        await store.dispatch(getUsers()).catch(e => console.log(e));
-    }
-);
-
 export default UsersPage

@@ -1,8 +1,11 @@
 // @ts-nocheck
-import React from "react";
+import React, {useEffect} from "react";
 import { Table, Tag, Space } from 'antd';
 import "antd/dist/antd.css";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {getUsers} from "../../../../store/actions/users";
+import {getPayments} from "../../../../store/actions/payments";
+import WithLoadingData from "../../../../hoc/withLoadingData";
 
 const columns = [
     {
@@ -30,8 +33,14 @@ const columns = [
 
 
 const Users = () => {
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(getUsers())
+    }, [])
+
     const users = useSelector((state) => state.users.data);
-    return <Table columns={columns} dataSource={users.reverse()} />
+    return <WithLoadingData data={users}><Table columns={columns} dataSource={users.reverse()} /></WithLoadingData>
 }
 
 export default Users
