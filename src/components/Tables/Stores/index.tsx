@@ -6,20 +6,16 @@ import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import Text from "antd/lib/typography/Text";
 // @ts-ignore
-import {addPayment} from "../../../../store/actions/payment";
-import {postLogin, reAuth} from "../../../../store/actions/auth";
+import {addStore} from "../../../../store/actions/store";
+import {getStores} from "../../../../store/actions/stores";
 import {wrapper} from "../../../../store/store";
-import {getPayments, getUserPayments} from "../../../../store/actions/payments";
-import {CLPublicKey} from "casper-js-sdk";
 import WithLoadingData from "../../../../hoc/withLoadingData";
-import {getTransactions} from "../../../../store/actions/transacrions";
 
 const columns = [
     {
         title: 'id',
         dataIndex: 'id',
         key: 'id',
-
     },
     {
         title: 'name',
@@ -41,46 +37,42 @@ const columns = [
 const initialState = {
     description: '',
     name: '',
-    user: '',
-    comment: '',
-    wallet: ''
+    url: '',
+    apiKey: '',
 }
 
-const Payments = () => {
+const Stores = () => {
 
-    const payments = useSelector((state) => state.payments.data);
+    const stores = useSelector((state) => state.storesData.data);
     const user = useSelector((state) => state.auth.data);
 
-    useEffect(() => {
-        if (user?.role === 'admin') {
-            dispatch(getPayments())
-        }
-        if (user?.role === 'customer') {
-            dispatch(getUserPayments(user.id))
-        }
-    }, [user])
+    console.log({stores})
 
-    const paymentsTable = payments.map((payment) => {
+    const storesTable = stores.map((store) => {
         return {
-            ...payment,
-            status: payment.status.replace('_', ' '),
-            user: payment?.user?.email,
-            datetime: new Date(payment.datetime).toDateString()
+            ...store,
+            user: store?.user?.email
         }
     }).reverse()
 
     const router = useRouter()
     const dispatch = useDispatch()
 
+
+
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [payment, setPayment] = useState(initialState);
+    const [store, setStore] = useState(initialState);
 
     const [form] = Form.useForm();
 
-    const onChangePayment = (field: string) => (e: any) => {
+    useEffect(() => {
+        dispatch(getStores())
+    }, [])
+
+    const onChangeStore = (field: string) => (e: any) => {
         const value = e.target.value
-        setPayment({
-            ...payment,
+        setStore({
+            ...store,
             [field]: value,
         })
     }
@@ -89,43 +81,20 @@ const Payments = () => {
         setIsModalVisible(true);
     };
 
-    const validateWallet = (rule: any, value: any, callback: any) => {
-        if (value) {
-            try {
-                CLPublicKey.fromHex(value)
-                callback();
-            } catch (e) {
-                callback("This wallet not exist!");
-            }
-        } else {
-            callback();
-        }
-    };
-
-    const validateAmount = (rule: any, value: any, callback: any) => {
-        if (value < 2500000000) {
-            callback("Must be at least 2500000000");
-        } else {
-            callback();
-        }
-    };
-
     const handleOk = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-                    await dispatch(addPayment({
-                        ...payment,
-                        status: 'Not_paid',
-                        user,
-                        datetime: new Date()
+                    await dispatch(addStore({
+                        ...store,
+                        user
                     }))
-                    await dispatch(getPayments())
-                    setPayment(initialState)
+                    await dispatch(getStores())
+                    setStore(initialState)
                     form.resetFields();
                     setIsModalVisible(false);
                 } catch (e) {
-                    console.log(e, 'registration error')
+                    console.log(e, 'store creating error')
                 }
                 console.log(res, 'valid')
             })
@@ -136,15 +105,39 @@ const Payments = () => {
         setIsModalVisible(false);
     };
 
+    const generateKey = () => {
+        function randomString(len) {
+            const charSet =
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let randomString = '';
+            for (let i = 0; i < len; i++) {
+                const randomPoz = Math.floor(Math.random() * charSet.length);
+                randomString += charSet.substring(randomPoz, randomPoz + 1);
+            }
+            return randomString;
+        }
+        setStore({
+            ...store,
+            apiKey: randomString(8)
+        })
+    };
+
+    const deleteKey = () => {
+        setStore({
+            ...store,
+            apiKey: ''
+        })
+    };
+
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`payments/${record.id}`),
+            onDoubleClick: event => router.push(`stores/${record.id}`),
         };
     }
 
     return <>
-        <WithLoadingData data={paymentsTable}>
-            <Modal title="Add payment" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <WithLoadingData data={storesTable}>
+            <Modal title="Add store" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
                 <Form
                     name="basic"
                     labelCol={{ span: 8 }}
@@ -155,33 +148,61 @@ const Payments = () => {
                     form={form}
                 >
                     <Form.Item
-                        label="Wallet"
-                        name="wallet"
-                        rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+                        label="Name"
+                        name="name"
+                        rules={[{ required: true, message: 'Please input wallet!' }]}
                     >
-                        <Input onChange={onChangePayment('wallet')}/>
+                        <Input onChange={onChangeStore('name')}/>
                     </Form.Item>
                     <Form.Item
-                        label="Amount"
-                        name="amount"
-                        rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
+                        label="Callback url"
+                        name="url"
+                        rules={[{ required: true, message: 'Please input wallet!' }]}
                     >
-                        <Input type='number' onChange={onChangePayment('amount')}/>
+                        <Input onChange={onChangeStore('url')}/>
                     </Form.Item>
                     <Form.Item
-                        label="Comment"
-                        name="comment"
+                        label="ApiKey"
+                        name="apiKey"
                     >
-                        <Input.TextArea onChange={onChangePayment('comment')}/>
+                        <Input.Group compact>
+                            <Input style={{ width: 'calc(100% - 90px)' }} value={store.apiKey} disabled onChange={onChangeStore('apiKey')}/>
+                            {store.apiKey ?
+                                <Button
+                                    style={{ width: 90}}
+                                    type="primary"
+                                    danger
+                                    onClick={deleteKey}
+                                >
+                                    Delete
+                                </Button>
+                                :
+                                <Button
+                                    style={{ width: 90}}
+                                    type="primary"
+                                    onClick={generateKey}
+                                >
+                                    Generate
+                                </Button>
+                            }
+
+
+                        </Input.Group>
+                    </Form.Item>
+                    <Form.Item
+                        label="Description"
+                        name="description"
+                    >
+                        <Input.TextArea onChange={onChangeStore('description')}/>
                     </Form.Item>
                 </Form>
             </Modal>
             <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
-                 Add Payment
+                 Add Store
             </Button>
-            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={paymentsTable} />
+            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={storesTable} />
         </WithLoadingData>
     </>
 }
 
-export default wrapper.withRedux(Payments)
+export default wrapper.withRedux(Stores)
