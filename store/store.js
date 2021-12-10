@@ -10,6 +10,8 @@ import transaction from "./reducers/transaction";
 import users from "./reducers/users"
 import auth from "./reducers/auth";
 import pay from "./reducers/pay";
+import storeData from "./reducers/store";
+import storesData from "./reducers/stores";
 
 
 const bindMiddleware = (middleware) => {
@@ -29,7 +31,9 @@ const combinedReducer = combineReducers({
   transactions,
   users,
   pay,
-  transaction
+  transaction,
+  storeData,
+  storesData
 });
 
 const reducer = (state, action) => {

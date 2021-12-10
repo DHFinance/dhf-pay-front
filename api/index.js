@@ -20,6 +20,10 @@ class Api {
     return this.client.put(url, data, params);
   };
 
+  patch = async (url, data, params) => {
+    return this.client.patch(url, data, params);
+  };
+
   remove = async (url, params = {}) => {
     return await this.client.delete(url, params);
   };
@@ -31,6 +35,7 @@ export const {
   post,
   get,
   put,
+  patch,
   remove,
 } = api;
 
