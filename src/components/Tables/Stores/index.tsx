@@ -150,14 +150,14 @@ const Stores = () => {
                     <Form.Item
                         label="Name"
                         name="name"
-                        rules={[{ required: true, message: 'Please input wallet!' }]}
+                        rules={[{ required: true, message: 'Please input store name!' }]}
                     >
                         <Input onChange={onChangeStore('name')}/>
                     </Form.Item>
                     <Form.Item
                         label="Callback url"
                         name="url"
-                        rules={[{ required: true, message: 'Please input wallet!' }]}
+                        rules={[{ required: true, message: 'Please input callback url!' }]}
                     >
                         <Input onChange={onChangeStore('url')}/>
                     </Form.Item>

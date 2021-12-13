@@ -86,9 +86,9 @@ const Payments = () => {
     const paymentsTable = payments.map((payment) => {
         return {
             ...payment,
-            status: payment.status.replace('_', ' '),
+            status: payment?.status?.replace('_', ' '),
             user: payment?.user?.email,
-            datetime: new Date(payment.datetime).toDateString()
+            datetime: new Date(payment?.datetime).toDateString()
         }
     }).reverse()
 
