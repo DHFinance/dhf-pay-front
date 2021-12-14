@@ -47,7 +47,6 @@ const getStoreFailed = (error) => ({
 
 export const getStore = (id = '') => async (dispatch) => {
   dispatch(getStoreStart());
-  console.log({id})
   await get(`/store/${id}`).then(result => dispatch(getStoreSuccess(result.data))).catch(e => dispatch(getStoreFailed(e)));
 
 };

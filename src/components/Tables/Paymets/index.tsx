@@ -1,18 +1,17 @@
 // @ts-nocheck
 import React, {useEffect, useState} from "react";
-import {Table, Tag, Space, Button, Modal, Form, Input, Checkbox} from 'antd';
+import {Table, Tag, Space, Button, Modal, Form, Input, Checkbox, Select} from 'antd';
 import "antd/dist/antd.css";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
-import Text from "antd/lib/typography/Text";
-// @ts-ignore
 import {addPayment} from "../../../../store/actions/payment";
-import {postLogin, reAuth} from "../../../../store/actions/auth";
 import {wrapper} from "../../../../store/store";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CLPublicKey} from "casper-js-sdk";
 import WithLoadingData from "../../../../hoc/withLoadingData";
-import {getTransactions} from "../../../../store/actions/transacrions";
+import {getUserTransactions} from "../../../../store/actions/transacrions";
+import {getUserStores} from "../../../../store/actions/stores";
+const { Option } = Select;
 
 const columns = [
     {
@@ -30,11 +29,6 @@ const columns = [
         title: 'amount',
         dataIndex: 'amount',
         key: 'amount',
-    },
-    {
-        title: 'user',
-        key: 'user',
-        dataIndex: 'user',
     },
     {
         title: 'comment',
@@ -64,7 +58,6 @@ interface IPayment {
 const initialState = {
     datetime: '',
     amount: '',
-    user: '',
     comment: '',
     wallet: ''
 }
@@ -73,21 +66,28 @@ const Payments = () => {
 
     const payments = useSelector((state) => state.payments.data);
     const user = useSelector((state) => state.auth.data);
+    const stores = useSelector((state) => state.storesData.data);
 
     useEffect(() => {
         if (user?.role === 'admin') {
             dispatch(getPayments())
         }
         if (user?.role === 'customer') {
-            dispatch(getUserPayments(user.id))
+            dispatch(getUserStores(user.id))
         }
-    }, [user])
+    }, [])
+
+    useEffect(() => {
+        if (stores.length) {
+            dispatch(getUserPayments(stores[0]?.apiKey))
+        }
+    }, [stores.length])
 
     const paymentsTable = payments.map((payment) => {
         return {
             ...payment,
             status: payment?.status?.replace('_', ' '),
-            user: payment?.user?.email,
+            store: payment?.store?.name,
             datetime: new Date(payment?.datetime).toDateString()
         }
     }).reverse()
@@ -97,6 +97,7 @@ const Payments = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
+    const [currentStore, setCurrentStore] = useState(stores[0]);
 
     const [form] = Form.useForm();
 
@@ -133,17 +134,28 @@ const Payments = () => {
         }
     };
 
+    useEffect(() => {
+        if (stores.length) {
+            dispatch(getUserPayments(stores[0]?.apiKey))
+        }
+    }, [stores.length])
+
     const handleOk = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    console.log(currentStore)
                     await dispatch(addPayment({
                         ...payment,
                         status: 'Not_paid',
-                        user,
                         datetime: new Date()
-                    }))
-                    await dispatch(getPayments())
+                    }, currentStore.apiKey))
+                    if (user?.role === 'admin') {
+                        dispatch(getPayments())
+                    }
+                    if (user?.role === 'customer') {
+                        dispatch(getUserPayments(currentStore.apiKey))
+                    }
                     setPayment(initialState)
                     form.resetFields();
                     setIsModalVisible(false);
@@ -165,8 +177,14 @@ const Payments = () => {
         };
     }
 
+    function handleChange(value) {
+        const current = stores.filter((store) => store.apiKey === value)[0]
+        setCurrentStore(current)
+        dispatch(getUserPayments(value))
+    }
+
     return <>
-        <WithLoadingData data={paymentsTable}>
+        <WithLoadingData data={user.role === 'admin' ? payments.length : stores.length}>
             <Modal title="Add payment" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
                 <Form
                     name="basic"
@@ -199,9 +217,22 @@ const Payments = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-            <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
-                 Add Payment
-            </Button>
+            {user.role !== 'admin' ?
+                <>
+                    <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
+                        Add Payment
+                    </Button>
+                    <br/>
+
+                    <Select defaultValue={stores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
+                        {
+                            stores.filter((store) => store.apiKey).map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
+                        }
+
+                    </Select>
+                </>
+            : null
+            }
             <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={paymentsTable} />
         </WithLoadingData>
     </>

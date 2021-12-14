@@ -7,7 +7,7 @@ import {useRouter} from "next/router";
 import Text from "antd/lib/typography/Text";
 // @ts-ignore
 import {addStore} from "../../../../store/actions/store";
-import {getStores} from "../../../../store/actions/stores";
+import {getStores, getUserStores} from "../../../../store/actions/stores";
 import {wrapper} from "../../../../store/store";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 
@@ -46,8 +46,6 @@ const Stores = () => {
     const stores = useSelector((state) => state.storesData.data);
     const user = useSelector((state) => state.auth.data);
 
-    console.log({stores})
-
     const storesTable = stores.map((store) => {
         return {
             ...store,
@@ -66,8 +64,14 @@ const Stores = () => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        dispatch(getStores())
-    }, [])
+        console.log(user)
+        if (user.role === 'admin') {
+            dispatch(getStores())
+        }
+        if (user.role === 'customer') {
+            dispatch(getUserStores(user.id))
+        }
+    }, [user.role])
 
     const onChangeStore = (field: string) => (e: any) => {
         const value = e.target.value
@@ -89,7 +93,12 @@ const Stores = () => {
                         ...store,
                         user
                     }))
-                    await dispatch(getStores())
+                    if (user.role === 'admin') {
+                        dispatch(getStores())
+                    }
+                    if (user.role === 'customer') {
+                        dispatch(getUserStores(user.id))
+                    }
                     setStore(initialState)
                     form.resetFields();
                     setIsModalVisible(false);
@@ -197,9 +206,13 @@ const Stores = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-            <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
-                 Add Store
-            </Button>
+            {
+                user.role !== 'admin' ?
+                    <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
+                        Add Store
+                    </Button>
+                    : null
+            }
             <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={storesTable} />
         </WithLoadingData>
     </>

@@ -9,6 +9,7 @@ import {useRouter} from "next/router";
 const Payment = () => {
 
     const payments = useSelector((state) => state.payment.data);
+    const user = useSelector((state) => state.auth.data);
 
     const {
         id,
@@ -39,9 +40,9 @@ const Payment = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
             </Col>
-            {payments.status !== 'Paid' ?
+            {payments.status !== 'Paid' && user?.role !== 'admin' ?
             <Button type="primary" onClick={toBill} style={{margin: '20px 0 0 0'}} className="login-form-button">
-                Pay
+                Create bill
             </Button>
             : null
             }

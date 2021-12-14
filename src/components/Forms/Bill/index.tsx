@@ -110,16 +110,6 @@ const FakeBill = () => {
     const transactions = useSelector((state) => state.transactions.data);
 
     const deploy = async ()=> {
-        console.log({
-            txHash: defaultTxHash,
-            status: "fake_processing",
-            amount,
-            email: billData.email,
-            payment: billInfo.id,
-            updated: new Date(),
-            sender: billData.wallet,
-            receiver: billInfo.wallet
-        }, billData)
         await form.validateFields()
             .then(async (res) => {
                 await dispatch(pay({

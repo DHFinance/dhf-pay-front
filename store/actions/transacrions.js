@@ -28,20 +28,9 @@ export const getTransactions = () => async (dispatch) => {
   }
 };
 
-export const getUserTransactions = (userId) => async (dispatch) => {
+export const getUserTransactions = (store) => async (dispatch) => {
   dispatch(getTransactionsStart());
-  await get(`/payment?filter=user.id||eq||${userId}`).then(async (payments) => {
-    await Promise.all(payments.data.map(async (payment) => {
-      let transactions = []
-      await get(`/transaction?filter=payment.id||eq||${payment.id}`).then((result) => {
-        transactions = [...transactions, ...result.data]
-      }).catch(e => dispatch(getTransactionsFailed(e)))
-      return transactions
-    })).then(result => {
-      let transactions = []
-      result.forEach((arr) => transactions = [...transactions, ...arr])
-      dispatch(getTransactionsSuccess(transactions))
-    }).catch(e => dispatch(getTransactionsFailed(e)))
+  await get(`${store}/transaction`).then(async (transactions) => {
+    dispatch(getTransactionsSuccess(transactions.data))
   }).catch(e => dispatch(getTransactionsFailed(e)));
-
 };

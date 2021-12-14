@@ -48,9 +48,9 @@ const addPaymentFailed = (error) => ({
   payload: error
 });
 
-export const addPayment = (data) => async (dispatch) => {
+export const addPayment = (data, apiKey) => async (dispatch) => {
   dispatch(addPaymentStart());
-  const result = await post(`/payment`, data);
+  const result = await post(`${apiKey}/payment`, data);
   try {
     dispatch(addPaymentSuccess(result.data));
   } catch (e) {

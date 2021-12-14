@@ -32,9 +32,9 @@ export const getPayments = () => async (dispatch) => {
   }
 };
 
-export const getUserPayments = (userId) => async (dispatch) => {
+export const getUserPayments = (store) => async (dispatch) => {
   dispatch(getPaymentsStart());
-  await get(`/payment?filter=user.id||eq||${userId}`).then((result) => {
+  await get(`${store}/payment`).then((result) => {
     dispatch(getPaymentsSuccess(result.data));
   }).catch((e) => dispatch(getPaymentsFailed(e)));
 };

@@ -15,6 +15,7 @@ const Store = () => {
 
     const [edit, setEdit] = useState(false)
     const store = useSelector((state) => state.storeData.data);
+    const user = useSelector((state) => state.auth.data);
     const [storeEdit, setStoreEdit] = useState(store);
     const dispatch = useDispatch()
     const router = useRouter()
@@ -64,14 +65,12 @@ const Store = () => {
     } = store
 
     const onEdit = () => {
-        console.log({storeEdit})
         setEdit(true)
     }
 
     const handleOk = async () => {
         await form.validateFields()
             .then(async (res) => {
-                console.log({storeEdit})
                 try {
                     await dispatch(editStore(router.query.slug, storeEdit))
                     form.resetFields();
@@ -90,7 +89,6 @@ const Store = () => {
     };
 
     useEffect(() => {
-        console.log({store})
         setStoreEdit(store)
     }, [store])
 
@@ -171,9 +169,20 @@ const Store = () => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="description" value={description} prefix={<CommentOutlined />} />
             </Col>
-            <Button type="primary" onClick={onEdit} style={{margin: '20px 0 0 0'}} className="login-form-button">
-                Edit
-            </Button>
+            {user?.id === store?.user?.id ?
+                <Button type="primary" onClick={onEdit} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                    Edit
+                </Button>
+                :
+                null
+            }
+            {user?.role === 'admin' ?
+                <Button danger type="primary" onClick={onEdit} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                    Block store
+                </Button>
+                :
+                null
+            }
         </WithLoadingData>
     );
 };
