@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getUsers} from "../../../../store/actions/users";
 import {getPayments} from "../../../../store/actions/payments";
 import WithLoadingData from "../../../../hoc/withLoadingData";
+import {useRouter} from "next/router";
 
 const columns = [
     {
@@ -34,13 +35,20 @@ const columns = [
 
 const Users = () => {
     const dispatch = useDispatch()
+    const router = useRouter()
 
     useEffect(() => {
         dispatch(getUsers())
     }, [])
 
+    const onRow=(record, rowIndex) => {
+        return {
+            onDoubleClick: event => router.push(`users/${record.id}`),
+        };
+    }
+
     const users = useSelector((state) => state.users.data);
-    return <WithLoadingData data={users}><Table columns={columns} dataSource={users.reverse()} /></WithLoadingData>
+    return <WithLoadingData data={users}><Table columns={columns} onRow={onRow}  dataSource={users.reverse()} /></WithLoadingData>
 }
 
 export default Users
