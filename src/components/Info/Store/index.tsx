@@ -5,10 +5,12 @@ import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {getStores} from "../../../../store/actions/stores";
-import {editStore, getStore} from "../../../../store/actions/store";
+import {blockStore, editStore, getStore} from "../../../../store/actions/store";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {addPayment} from "../../../../store/actions/payment";
 import {getPayments} from "../../../../store/actions/payments";
+import {blockUser} from "../../../../store/actions/user";
+import Title from "antd/lib/typography/Title";
 
 
 const Store = () => {
@@ -58,10 +60,12 @@ const Store = () => {
     }, [])
 
     const {
+        storeId,
         description,
         name,
         url,
         apiKey,
+        blocked
     } = store
 
     const onEdit = () => {
@@ -87,6 +91,11 @@ const Store = () => {
     const handleCancel = () => {
         setEdit(false);
     };
+
+    const onChangeBlock = (block) => () => {
+        console.log(block)
+        dispatch(blockStore(storeId, block))
+    }
 
     useEffect(() => {
         setStoreEdit(store)
@@ -157,6 +166,11 @@ const Store = () => {
                     </Form.Item>
                 </Form>
             </Modal>
+            {blocked ?
+                <Title style={{width: '100%', textAlign: 'center', color: 'red'}}>Blocked</Title>
+                :
+                null
+            }
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="name" value={name} prefix={<ClockCircleOutlined />} />
             </Col>
@@ -164,7 +178,7 @@ const Store = () => {
                 <Statistic title="url" value={url} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
-                <Statistic title="apiKey" value={apiKey} prefix={<CommentOutlined />} />
+                <Statistic title="api key" value={apiKey || 'None (generate an api key to perform actions)'} prefix={<CommentOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="description" value={description} prefix={<CommentOutlined />} />
@@ -176,12 +190,14 @@ const Store = () => {
                 :
                 null
             }
-            {user?.role === 'admin' ?
-                <Button danger type="primary" onClick={onEdit} style={{margin: '20px 0 0 0'}} className="login-form-button">
-                    Block store
+            {blocked && user?.role === 'admin' ?
+                <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                    Unblock
                 </Button>
                 :
-                null
+                <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                    Block
+                </Button>
             }
         </WithLoadingData>
     );

@@ -41,7 +41,7 @@ export const clearAuthError = () => ({
 
 export const postRegistration = (data, goStartPage) => async (dispatch) => {
   dispatch(postRegistrationStart());
-  await post(`/auth/register`, data).then((result) => {
+  await post(`/auth/register`, {...data, blocked: false}).then((result) => {
     dispatch(postRegistrationSuccess(result.data));
     goStartPage()
   }).catch(e => {
