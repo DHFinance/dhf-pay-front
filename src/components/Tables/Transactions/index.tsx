@@ -73,19 +73,21 @@ const Transactions = () => {
         dispatch(getUserTransactions(value))
     }
 
+    const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
+
     return <WithLoadingData data={(user.role === 'admin' ? transactionsLoaded : storesLoaded)}>
-        { !stores.length && user.role !== 'admin'  ?
+        { !activeStores.length && user.role !== 'admin'  ?
             <p>
                 Create a store to be able to check transactions
             </p>
             :
             null
         }
-        {user.role !== 'admin' && stores.length ?
+        {user.role !== 'admin' && activeStores ?
 
             <Select defaultValue={stores[0]?.apiKey} style={{ width: 120, marginBottom: 20 }} onChange={handleChange}>
                 {
-                    stores.filter((store) => store.apiKey && !store.blocked).map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
+                    activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                 }
 
             </Select>
