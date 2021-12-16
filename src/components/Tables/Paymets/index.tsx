@@ -146,7 +146,6 @@ const Payments = () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-                    console.log(currentStore)
                     await dispatch(addPayment({
                         ...payment,
                         status: 'Not_paid',
@@ -228,16 +227,16 @@ const Payments = () => {
                 :
                 null
             }
-            {user.role !== 'admin' && activeStores ?
+            {user.role !== 'admin' && activeStores.length && activeStores[0]?.name ?
                 <>
                     <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
                         Add Payment
                     </Button>
                     <br/>
 
-                    <Select defaultValue={stores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
+                    <Select defaultValue={activeStores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
                         {
-                            activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{console.log(store)}{store.name}</Option>)
+                            activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                         }
 
                     </Select>

@@ -83,9 +83,8 @@ const Transactions = () => {
             :
             null
         }
-        {user.role !== 'admin' && activeStores ?
-
-            <Select defaultValue={stores[0]?.apiKey} style={{ width: 120, marginBottom: 20 }} onChange={handleChange}>
+        {user.role !== 'admin' && activeStores.length && activeStores[0]?.name ?
+            <Select defaultValue={activeStores[0]?.name} style={{ width: 120, marginBottom: 20 }} onChange={handleChange}>
                 {
                     activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                 }
