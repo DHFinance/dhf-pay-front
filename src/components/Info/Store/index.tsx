@@ -60,7 +60,7 @@ const Store = () => {
     }, [])
 
     const {
-        storeId,
+        id,
         description,
         name,
         url,
@@ -93,8 +93,8 @@ const Store = () => {
     };
 
     const onChangeBlock = (block) => () => {
-        console.log(block)
-        dispatch(blockStore(storeId, block))
+        console.log(block, id)
+        dispatch(blockStore(id, block))
     }
 
     useEffect(() => {

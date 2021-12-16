@@ -95,7 +95,7 @@ const Payments = () => {
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
-    const [currentStore, setCurrentStore] = useState(activeStores[0]);
+    const [currentStore, setCurrentStore] = useState(null);
 
     const [form] = Form.useForm();
 
@@ -138,11 +138,17 @@ const Payments = () => {
         }
     }, [stores.length])
 
+    useEffect(() => {
+        if (!currentStore) {
+            setCurrentStore(activeStores[0])
+        }
+    }, [activeStores])
+
     const handleOk = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-                    console.log(currentStore)
+
                     await dispatch(addPayment({
                         ...payment,
                         status: 'Not_paid',
