@@ -79,12 +79,6 @@ const Payments = () => {
         }
     }, [])
 
-    useEffect(() => {
-        if (stores.length) {
-            dispatch(getUserPayments(stores[0]?.apiKey))
-        }
-    }, [stores.length])
-
     const paymentsTable = payments.map((payment) => {
         return {
             ...payment,
@@ -97,9 +91,11 @@ const Payments = () => {
     const router = useRouter()
     const dispatch = useDispatch()
 
+
+    const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
-    const [currentStore, setCurrentStore] = useState(stores[0]);
+    const [currentStore, setCurrentStore] = useState(activeStores[0]);
 
     const [form] = Form.useForm();
 
@@ -146,6 +142,7 @@ const Payments = () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    console.log(currentStore)
                     await dispatch(addPayment({
                         ...payment,
                         status: 'Not_paid',
@@ -183,8 +180,6 @@ const Payments = () => {
         setCurrentStore(current)
         dispatch(getUserPayments(value))
     }
-
-    const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
 
     return <>
         <WithLoadingData data={(user.role === 'admin' ? paymentsLoaded : storesLoaded)}>
