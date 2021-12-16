@@ -41,8 +41,10 @@ const columns = [
 
 const Transactions = () => {
     const transactions = useSelector((state) => state.transactions.data);
-    const user = useSelector((state) => state.auth.data);
     const stores = useSelector((state) => state.storesData.data);
+    const transactionsLoaded = useSelector((state) => state.transactions.isChanged);
+    const storesLoaded = useSelector((state) => state.storesData.isChanged);
+    const user = useSelector((state) => state.auth.data);
     const router = useRouter()
     const dispatch = useDispatch()
 
@@ -71,12 +73,21 @@ const Transactions = () => {
         dispatch(getUserTransactions(value))
     }
 
-    return <WithLoadingData data={user.role === 'admin' ? transactions.length : stores.length}>
-        {user.role !== 'admin' ?
+    const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
+
+    return <WithLoadingData data={(user.role === 'admin' ? transactionsLoaded : storesLoaded)}>
+        { !activeStores.length && user.role !== 'admin'  ?
+            <p>
+                Create a store to be able to check transactions
+            </p>
+            :
+            null
+        }
+        {user.role !== 'admin' && activeStores ?
 
             <Select defaultValue={stores[0]?.apiKey} style={{ width: 120, marginBottom: 20 }} onChange={handleChange}>
                 {
-                    stores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
+                    activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                 }
 
             </Select>

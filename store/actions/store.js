@@ -9,6 +9,9 @@ export const EDIT_STORE_FAILED = 'EDIT_STORE_FAILED';
 export const ADD_STORE_START = 'ADD_STORE_START';
 export const ADD_STORE_SUCCESS = 'ADD_STORE_SUCCESS';
 export const ADD_STORE_FAILED = 'ADD_STORE_FAILED';
+export const BlOCK_STORE_START = 'BlOCK_STORE_START';
+export const BlOCK_STORE_SUCCESS = 'BlOCK_STORE_SUCCESS';
+export const BlOCK_STORE_FAILED = 'BlOCK_STORE_FAILED';
 
 const editStoreStart = () => ({
   type: EDIT_STORE_START,
@@ -67,5 +70,24 @@ const addStoreFailed = (error) => ({
 
 export const addStore = (data) => async (dispatch) => {
   dispatch(addStoreStart());
-  const result = await post(`/store`, data).then(result => dispatch(addStoreSuccess(result.data))).catch(e => dispatch(addStoreFailed(e)));
+  const result = await post(`/store`, {...data, blocked: false}).then(result => dispatch(addStoreSuccess(result.data))).catch(e => dispatch(addStoreFailed(e)));
+};
+
+const blockStoreStart = () => ({
+  type: BlOCK_STORE_START,
+});
+
+const blockStoreSuccess = (data) => ({
+  type: BlOCK_STORE_SUCCESS,
+  payload: data
+});
+
+const blockStoreFailed = (error) => ({
+  type: BlOCK_STORE_FAILED,
+  payload: error
+});
+
+export const blockStore = (id, blocked) => async (dispatch) => {
+  dispatch(blockStoreStart());
+  await post(`/store/block`, {id, blocked}).then(result => dispatch(blockStoreSuccess(result.data))).catch(e => dispatch(blockStoreFailed(e)));
 };

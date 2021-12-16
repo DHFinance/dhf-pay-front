@@ -8,6 +8,7 @@ import payment from "./reducers/payment"
 import transactions from "./reducers/transactions"
 import transaction from "./reducers/transaction";
 import users from "./reducers/users"
+import user from "./reducers/user"
 import auth from "./reducers/auth";
 import pay from "./reducers/pay";
 import storeData from "./reducers/store";
@@ -33,7 +34,8 @@ const combinedReducer = combineReducers({
   pay,
   transaction,
   storeData,
-  storesData
+  storesData,
+  user
 });
 
 const reducer = (state, action) => {
