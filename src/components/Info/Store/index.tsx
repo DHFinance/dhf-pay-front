@@ -190,15 +190,20 @@ const Store = () => {
                 :
                 null
             }
-            {blocked && user?.role === 'admin' ?
-                <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 0 0 0'}} className="login-form-button">
-                    Unblock
-                </Button>
-                :
-                <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 0 0 0'}} className="login-form-button">
-                    Block
-                </Button>
+            {
+                user?.role === 'admin' && <>
+                    {blocked ?
+                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                            Unblock
+                        </Button>
+                        :
+                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                            Block
+                        </Button>
+                    }
+                </>
             }
+
         </WithLoadingData>
     );
 };
