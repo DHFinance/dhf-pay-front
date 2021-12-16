@@ -185,6 +185,8 @@ const Payments = () => {
         dispatch(getUserPayments(value))
     }
 
+    const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
+
     return <>
         <WithLoadingData data={(user.role === 'admin' ? paymentsLoaded : storesLoaded)}>
             <Modal title="Add payment" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
@@ -219,14 +221,14 @@ const Payments = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-            { !stores.length && user.role !== 'admin' ?
+            { !activeStores.length && user.role !== 'admin' ?
                 <p>
                     Create a store to be able to create payments
                 </p>
                 :
                 null
             }
-            {user.role !== 'admin' && stores.length ?
+            {user.role !== 'admin' && activeStores ?
                 <>
                     <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
                         Add Payment
@@ -235,7 +237,7 @@ const Payments = () => {
 
                     <Select defaultValue={stores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
                         {
-                            stores.filter((store) => store.apiKey && !store.blocked).map((store) => <Option key={store.id} value={store.apiKey}>{console.log(store)}{store.name}</Option>)
+                            activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{console.log(store)}{store.name}</Option>)
                         }
 
                     </Select>
