@@ -1,4 +1,5 @@
 import {  GET_TRANSACTIONS_FAILED, GET_TRANSACTIONS_START, GET_TRANSACTIONS_SUCCESS }  from '../actions/transacrions';
+import {POST_LOGOUT_SUCCESS} from "../actions/auth";
 
 const initialState = {
   data: [],
@@ -9,6 +10,8 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  POST_LOGOUT_SUCCESS:
+      return initialState;
     case  GET_TRANSACTIONS_START:
       return {
         ...state,

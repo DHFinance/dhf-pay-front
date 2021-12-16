@@ -226,7 +226,7 @@ const Payments = () => {
 
                     <Select defaultValue={stores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
                         {
-                            stores.filter((store) => store.apiKey).map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
+                            stores.filter((store) => store.apiKey ).map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                         }
 
                     </Select>

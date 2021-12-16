@@ -1,4 +1,5 @@
 import {  GET_USERS_FAILED, GET_USERS_SUCCESS, GET_USERS_START }  from '../actions/users';
+import {POST_LOGOUT_SUCCESS} from "../actions/auth";
 
 const initialState = {
   data: [],
@@ -9,6 +10,8 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  POST_LOGOUT_SUCCESS:
+      return initialState;
     case  GET_USERS_START:
       return {
         ...state,
