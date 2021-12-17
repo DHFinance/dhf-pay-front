@@ -58,7 +58,7 @@ const Transactions = () => {
     }, [])
 
     useEffect(() => {
-        if (stores.length && user.role !== 'admin') {
+        if (stores.length && user.role !== 'admin' && stores[0]?.apiKey) {
             dispatch(getUserTransactions(stores[0]?.apiKey))
         }
     }, [stores.length])
