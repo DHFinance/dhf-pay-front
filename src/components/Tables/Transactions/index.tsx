@@ -40,6 +40,7 @@ const columns = [
 
 
 const Transactions = () => {
+
     const transactions = useSelector((state) => state.transactions.data);
     const stores = useSelector((state) => state.storesData.data);
     const transactionsLoaded = useSelector((state) => state.transactions.isChanged);
