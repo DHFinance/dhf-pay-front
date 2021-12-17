@@ -91,7 +91,7 @@ const signerErrors = [
 ]
 
 const Bill = () => {
-    const isFake = window.location.hostname === 'localhost' || window.location.hostname !== 'localhost'
+    const isFake = window.location.hostname !== 'localhost'
     if (isFake) {
         return <FakeBill/>
     }
