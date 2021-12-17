@@ -133,8 +133,8 @@ const Payments = () => {
     };
 
     useEffect(() => {
-        if (stores.length && user.role !== 'admin' && stores[0]?.apiKey) {
-            dispatch(getUserPayments(stores[0]?.apiKey))
+        if (stores.length && user.role !== 'admin' && activeStores[0]?.apiKey) {
+            dispatch(getUserPayments(activeStores[0]?.apiKey))
         }
     }, [stores.length])
 
