@@ -21,7 +21,7 @@ export default function reducer(state = initialState, action) {
     case  GET_STORES_SUCCESS:
       return {
         ...state,
-        data: action.payload,
+        data: action.payload.sort((a, b) => a.id - b.id),
         isLoading: false,
         isChanged: true
       };

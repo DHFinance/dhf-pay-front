@@ -84,6 +84,7 @@ const Store = () => {
                     form.resetFields();
                     setEdit(false);
                     await dispatch(getStore(router.query.slug))
+                    await dispatch(getStores())
                 } catch (e) {
                     console.log(e, 'registration error')
                 }

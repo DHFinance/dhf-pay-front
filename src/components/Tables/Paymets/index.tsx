@@ -62,6 +62,7 @@ const initialState = {
     wallet: ''
 }
 
+
 const Payments = () => {
 
     const payments = useSelector((state) => state.payments.data);
@@ -228,19 +229,21 @@ const Payments = () => {
                 :
                 null
             }
-            {user.role !== 'admin' && activeStores.length && activeStores[0]?.name ?
+            {user.role !== 'admin' && activeStores.length && currentStore ?
                 <>
                     <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
                         Add Payment
                     </Button>
                     <br/>
 
-                    <Select defaultValue={activeStores[0]?.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
+                    {console.log(currentStore)}
+                    <Select defaultValue={currentStore.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
                         {
                             activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)
                         }
 
                     </Select>
+
                 </>
             : null
             }
