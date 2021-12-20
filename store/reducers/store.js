@@ -30,6 +30,7 @@ export default function reducer(state = initialState, action) {
         ...state,
         data: action.payload,
         start: false,
+        error: '',
         isLoading: false,
         isChanged: true
       };

@@ -5,7 +5,7 @@ import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
 import Store from "../../../src/components/Info/Store";
 
-const StorePage = ({storeData}) => {
+const StorePage = () => {
 
     return <WithAuth><SliderContainer><Store/></SliderContainer></WithAuth>
 }

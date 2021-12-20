@@ -11,11 +11,13 @@ import {addPayment} from "../../../../store/actions/payment";
 import {getPayments} from "../../../../store/actions/payments";
 import {blockUser, getUser} from "../../../../store/actions/user";
 import Title from "antd/lib/typography/Title";
+import WithPageExist from "../../../../hoc/withPageExist";
 
 
 const User = () => {
 
     const user = useSelector((state) => state.user.data);
+    const userError = useSelector((state) => state.user);
     const dispatch = useDispatch()
     const router = useRouter()
 
@@ -40,7 +42,7 @@ const User = () => {
     }
 
     return (
-        <WithLoadingData data={user.id}>
+        <WithPageExist error={userError} data={user}><WithLoadingData data={user.id}>
             {blocked ?
                 <Title style={{width: '100%', textAlign: 'center', color: 'red'}}>Blocked</Title>
                 :
@@ -71,7 +73,7 @@ const User = () => {
                     }
                 </>
             }
-        </WithLoadingData>
+        </WithLoadingData></WithPageExist>
     );
 };
 

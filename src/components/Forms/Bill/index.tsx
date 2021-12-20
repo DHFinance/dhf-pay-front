@@ -8,8 +8,11 @@ import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} fro
 import React, {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
 import {postLogin} from "../../../../store/actions/auth";
-import {addPayment} from "../../../../store/actions/payment";
+import {addPayment, getPayment} from "../../../../store/actions/payment";
 import {getPayments} from "../../../../store/actions/payments";
+import {getTransaction} from "../../../../store/actions/transaction";
+import {getTransactions} from "../../../../store/actions/transacrions";
+import WithPageExist from "../../../../hoc/withPageExist";
 
 
 const initialState = {
@@ -92,12 +95,25 @@ const signerErrors = [
 
 const Bill = () => {
     const isFake = process.env.NEXT_PUBLIC_FAKE_TRANSACTION === '1'
+    const billInfo = useSelector((state) => state.payment.data);
+    const transactions = useSelector((state) => state.transactions.data);
+    const billInfoError = useSelector((state) => state.payment.error);
+    const transactionsError = useSelector((state) => state.transactions.error);
+    useEffect(() => {
+        dispatch(getPayment(router.query.slug))
+        dispatch(getTransactions())
+    }, [])
     if (isFake) {
-        return <FakeBill/>
+        return <WithPageExist error={billInfoError} data={billInfo}>
+            <FakeBill billInfo={billInfo} transactions={transactions}/>
+        </WithPageExist>
     }
-    return <CasperBill/>
+    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill/></WithPageExist>
 }
-const FakeBill = () => {
+
+
+
+const FakeBill = ({billInfo, transactions}) => {
 
     const dispatch = useDispatch();
     const [billData, setBillData] = useState(initialState)
@@ -106,8 +122,7 @@ const FakeBill = () => {
     const [form] = Form.useForm();
     const router = useRouter()
     const defaultTxHash = 'd7DdAC148B97671859946603915175b46ea976e11D3263C28E2A35075D634789'
-    const billInfo = useSelector((state) => state.payment.data);
-    const transactions = useSelector((state) => state.transactions.data);
+
 
     const deploy = async ()=> {
         await form.validateFields()
@@ -253,7 +268,7 @@ const FakeBill = () => {
     );
 };
 
-const CasperBill = () => {
+const CasperBill = ({billInfo, transactions}) => {
 
     const dispatch = useDispatch();
     const router = useRouter()
@@ -283,9 +298,6 @@ const CasperBill = () => {
             description: desc,
         });
     };
-
-    const billInfo = useSelector((state) => state.payment.data);
-    const transactions = useSelector((state) => state.transactions.data);
 
     const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
     const casperService = new CasperServiceByJsonRPC(apiUrl);

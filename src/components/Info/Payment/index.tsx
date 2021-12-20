@@ -1,15 +1,20 @@
 // @ts-nocheck
 import { Statistic, Row, Col, Button } from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined} from '@ant-design/icons';
-import {useSelector} from "react-redux";
-import React from "react";
+import {useDispatch, useSelector} from "react-redux";
+import React, {useEffect} from "react";
 import {useRouter} from "next/router";
+import {getStore} from "../../../../store/actions/store";
+import {getPayment} from "../../../../store/actions/payment";
+import WithPageExist from "../../../../hoc/withPageExist";
 
 
 const Payment = () => {
 
     const payments = useSelector((state) => state.payment.data);
+    const paymentsError = useSelector((state) => state.payment.error);
     const user = useSelector((state) => state.auth.data);
+    const dispatch = useDispatch()
 
     const {
         id,
@@ -27,10 +32,14 @@ const Payment = () => {
         })
     }
 
+    useEffect(() => {
+        dispatch(getPayment(router.query.slug))
+    }, [])
+
     const date = new Date(datetime).toDateString()
 
     return (
-        <>
+        <WithPageExist error={paymentsError} data={payments}>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
@@ -46,7 +55,7 @@ const Payment = () => {
             </Button>
             : null
             }
-        </>
+        </WithPageExist>
     );
 };
 

@@ -29,6 +29,7 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         data: action.payload,
+        error: '',
         start: false,
         isLoading: false,
         isChanged: true

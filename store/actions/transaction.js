@@ -21,7 +21,7 @@ const getTransactionFailed = (error) => ({
 
 export const getTransaction = (id = '') => async (dispatch) => {
   dispatch(getTransactionStart());
-  const result = await get(`/transaction/${id}`);
+  const result = await get(`/transaction/${id}`).catch(e => console.log(e));
 
   try {
     dispatch(getTransactionSuccess(result.data));

@@ -11,12 +11,14 @@ import {addPayment} from "../../../../store/actions/payment";
 import {getPayments} from "../../../../store/actions/payments";
 import {blockUser} from "../../../../store/actions/user";
 import Title from "antd/lib/typography/Title";
+import WithPageExist from "../../../../hoc/withPageExist";
 
 
 const Store = () => {
 
     const [edit, setEdit] = useState(false)
     const store = useSelector((state) => state.storeData.data);
+    const storeError = useSelector((state) => state.storeData.error);
     const user = useSelector((state) => state.auth.data);
     const [storeEdit, setStoreEdit] = useState(store);
     const dispatch = useDispatch()
@@ -56,7 +58,9 @@ const Store = () => {
     }
 
     useEffect(() => {
-        dispatch(getStore(router.query.slug))
+        if (router.query.slug) {
+            dispatch(getStore(router.query.slug))
+        }
     }, [])
 
     const {
@@ -102,7 +106,8 @@ const Store = () => {
     }, [store])
 
     return (
-        <WithLoadingData data={storeEdit}>
+        <WithPageExist error={storeError} data={store}>
+            <WithLoadingData data={storeEdit}>
             <Modal title="Edit store" visible={edit} onOk={handleOk} onCancel={handleCancel}>
                 <Form
                     name="basic"
@@ -205,6 +210,7 @@ const Store = () => {
             }
 
         </WithLoadingData>
+        </WithPageExist>
     );
 };
 

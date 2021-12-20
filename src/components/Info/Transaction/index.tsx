@@ -10,6 +10,9 @@ import {useEffect, useState} from "react";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
 import Link from "next/link";
+import {getPayment} from "../../../../store/actions/payment";
+import {getTransaction} from "../../../../store/actions/transaction";
+import WithPageExist from "../../../../hoc/withPageExist";
 
 interface IUserData {
     name: string,
@@ -36,8 +39,11 @@ const Transaction = () => {
     const [balance, setBalance] = useState('')
 
     const transaction = useSelector((state) => state.transaction.data);
+    const transactionError = useSelector((state) => state.transaction.error);
 
-
+    useEffect(() => {
+        dispatch(getTransaction(router.query.slug))
+    }, [])
 
     const {
         txHash,
@@ -50,7 +56,7 @@ const Transaction = () => {
     const date = new Date(updated).toDateString()
 
     return (
-        <>
+        <WithPageExist error={transactionError} data={transaction}>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="TxHash" value={txHash} prefix={<CommentOutlined />} />
             </Col>
@@ -76,7 +82,7 @@ const Transaction = () => {
                 </Link>
                 : null
             }
-        </>
+        </WithPageExist>
     );
 };
 

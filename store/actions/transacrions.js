@@ -20,7 +20,7 @@ const getTransactionsFailed = (error) => ({
 
 export const getTransactions = () => async (dispatch) => {
   dispatch(getTransactionsStart());
-  const result = await get('/transaction');
+  const result = await get('/transaction').catch(e => console.log(e));
   try {
     dispatch(getTransactionsSuccess(result.data));
   } catch (e) {

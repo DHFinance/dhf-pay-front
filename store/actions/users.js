@@ -20,7 +20,7 @@ const getUsersFailed = (error) => ({
 
 export const getUsers = () => async (dispatch) => {
   dispatch(getUsersStart());
-  const result = await get('/user');
+  const result = await get('/user').catch(e => console.log(e));
   try {
     dispatch(getUsersSuccess(result.data));
   } catch (e) {
