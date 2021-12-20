@@ -42,7 +42,9 @@ const Transaction = () => {
     const transactionError = useSelector((state) => state.transaction.error);
 
     useEffect(() => {
-        dispatch(getTransaction(router.query.slug))
+        if (router.query.slug) {
+            dispatch(getTransaction(router.query.slug))
+        }
     }, [])
 
     const {

@@ -33,7 +33,10 @@ const Payment = () => {
     }
 
     useEffect(() => {
-        dispatch(getPayment(router.query.slug))
+        if (router.query.slug) {
+            dispatch(getPayment(router.query.slug))
+        }
+
     }, [])
 
     const date = new Date(datetime).toDateString()

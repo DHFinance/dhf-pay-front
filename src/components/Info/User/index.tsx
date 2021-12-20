@@ -22,7 +22,9 @@ const User = () => {
     const router = useRouter()
 
     useEffect(() => {
-        dispatch(getUser(router.query.slug))
+        if (router.query.slug) {
+            dispatch(getUser(router.query.slug))
+        }
     }, [])
 
     const {

@@ -13,6 +13,7 @@ import {getPayments} from "../../../../store/actions/payments";
 import {getTransaction} from "../../../../store/actions/transaction";
 import {getTransactions} from "../../../../store/actions/transacrions";
 import WithPageExist from "../../../../hoc/withPageExist";
+import WithLoadingData from "../../../../hoc/withLoadingData";
 
 
 const initialState = {
@@ -99,16 +100,20 @@ const Bill = () => {
     const transactions = useSelector((state) => state.transactions.data);
     const billInfoError = useSelector((state) => state.payment.error);
     const transactionsError = useSelector((state) => state.transactions.error);
+    const dispatch = useDispatch();
+    const router = useRouter()
     useEffect(() => {
-        dispatch(getPayment(router.query.slug))
-        dispatch(getTransactions())
+        if (router.query.slug) {
+            dispatch(getPayment(router.query.slug))
+            dispatch(getTransactions())
+        }
     }, [])
     if (isFake) {
         return <WithPageExist error={billInfoError} data={billInfo}>
             <FakeBill billInfo={billInfo} transactions={transactions}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill billInfo={billInfo} transactions={transactions}/></WithPageExist>
 }
 
 
