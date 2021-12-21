@@ -7,13 +7,9 @@ import {useRouter} from "next/router";
 import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} from "casper-js-sdk";
 import React, {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
-import {postLogin} from "../../../../store/actions/auth";
-import {addPayment, getPayment} from "../../../../store/actions/payment";
-import {getPayments} from "../../../../store/actions/payments";
-import {getTransaction} from "../../../../store/actions/transaction";
+import {getPayment} from "../../../../store/actions/payment";
 import {getTransactions} from "../../../../store/actions/transacrions";
 import WithPageExist from "../../../../hoc/withPageExist";
-import WithLoadingData from "../../../../hoc/withLoadingData";
 
 
 const initialState = {
@@ -109,23 +105,21 @@ const Bill = () => {
         }
     }, [])
     if (isFake) {
-        return <WithPageExist error={billInfoError} data={billInfo}>
-            <FakeBill billInfo={billInfo} transactions={transactions}/>
+        return <WithPageExist error={billInfoError} data={billInfo} >
+            <FakeBill billInfo={billInfo} transactions={transactions} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill billInfo={billInfo} transactions={transactions}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill billInfo={billInfo} transactions={transactions} dispatch={dispatch} router={router}/></WithPageExist>
 }
 
 
 
-const FakeBill = ({billInfo, transactions}) => {
+const FakeBill = ({billInfo, transactions, dispatch, router}) => {
 
-    const dispatch = useDispatch();
     const [billData, setBillData] = useState(initialState)
     const [sign, setSign] = useState(false)
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [form] = Form.useForm();
-    const router = useRouter()
     const defaultTxHash = 'd7DdAC148B97671859946603915175b46ea976e11D3263C28E2A35075D634789'
 
 
@@ -273,10 +267,9 @@ const FakeBill = ({billInfo, transactions}) => {
     );
 };
 
-const CasperBill = ({billInfo, transactions}) => {
+const CasperBill = ({billInfo, transactions, dispatch, router}) => {
 
-    const dispatch = useDispatch();
-    const router = useRouter()
+
     const [balance, setBalance] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
