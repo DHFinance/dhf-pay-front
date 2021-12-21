@@ -66,7 +66,7 @@ const Transactions = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`transactions/${record.id}`), // click row
+            onClick: event => router.push(`transactions/${record.id}`), // click row
         };
     }
 

@@ -9,7 +9,6 @@ import {wrapper} from "../../../../store/store";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CLPublicKey} from "casper-js-sdk";
 import WithLoadingData from "../../../../hoc/withLoadingData";
-import {getUserTransactions} from "../../../../store/actions/transacrions";
 import {getUserStores} from "../../../../store/actions/stores";
 const { Option } = Select;
 
@@ -112,19 +111,6 @@ const Payments = () => {
         setIsModalVisible(true);
     };
 
-    const validateWallet = (rule: any, value: any, callback: any) => {
-        if (value) {
-            try {
-                CLPublicKey.fromHex(value)
-                callback();
-            } catch (e) {
-                callback("This wallet not exist!");
-            }
-        } else {
-            callback();
-        }
-    };
-
     const validateAmount = (rule: any, value: any, callback: any) => {
         if (value < 2500000000) {
             callback("Must be at least 2500000000");
@@ -153,7 +139,8 @@ const Payments = () => {
                     await dispatch(addPayment({
                         ...payment,
                         status: 'Not_paid',
-                        datetime: new Date()
+                        datetime: new Date(),
+                        wallet: currentStore.wallet
                     }, currentStore.apiKey))
                     if (user?.role === 'admin') {
                         dispatch(getPayments())
@@ -178,7 +165,7 @@ const Payments = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`payments/${record.id}`),
+            onClick: event => router.push(`payments/${record.id}`),
         };
     }
 
@@ -200,13 +187,6 @@ const Payments = () => {
                     validateTrigger={'onSubmit'}
                     form={form}
                 >
-                    <Form.Item
-                        label="Wallet"
-                        name="wallet"
-                        rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
-                    >
-                        <Input onChange={onChangePayment('wallet')}/>
-                    </Form.Item>
                     <Form.Item
                         label="Amount"
                         name="amount"

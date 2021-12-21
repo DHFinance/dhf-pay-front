@@ -11,7 +11,7 @@ import {
   POST_LOGOUT_START,
   POST_REGISTRATION_SUCCESS,
   POST_REGISTRATION_START,
-  CLEAR_AUTH, CLEAR_AUTH_ERROR
+  CLEAR_AUTH, CLEAR_AUTH_ERROR, POST_VERIFY_SUCCESS, POST_VERIFY_FAILED, POST_VERIFY_START
 } from '../actions/auth';
 
 const initialState = {
@@ -23,6 +23,7 @@ const initialState = {
     token: "",
     resetEnabled: false,
   },
+  verify: false,
   isLoading: false,
   error: '',
   isChanged: false
@@ -60,6 +61,26 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
     case  POST_REGISTRATION_SUCCESS:
+      return {
+        ...state,
+        verify: true,
+        isLoading: false,
+        isChanged: true
+      };
+    case  POST_REGISTRATION_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+        isChanged: true
+      };
+    case  POST_VERIFY_START:
+      return {
+        ...state,
+        isLoading: true,
+        isChanged: true
+      };
+    case  POST_VERIFY_SUCCESS:
       if (action.payload.token) {
         localStorage.setItem('token', action.payload.token);
       }
@@ -72,7 +93,7 @@ export default function reducer(state = initialState, action) {
         isLoading: false,
         isChanged: true
       };
-    case  POST_REGISTRATION_FAILED:
+    case  POST_VERIFY_FAILED:
       return {
         ...state,
         isLoading: false,

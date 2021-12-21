@@ -10,6 +10,7 @@ import {addStore} from "../../../../store/actions/store";
 import {getStores, getUserStores} from "../../../../store/actions/stores";
 import {wrapper} from "../../../../store/store";
 import WithLoadingData from "../../../../hoc/withLoadingData";
+import {CLPublicKey} from "casper-js-sdk";
 
 const columns = [
     {
@@ -32,6 +33,11 @@ const columns = [
         key: 'user',
         dataIndex: 'user',
     },
+    {
+        title: 'wallet',
+        key: 'wallet',
+        dataIndex: 'wallet',
+    },
 ];
 
 const initialState = {
@@ -39,6 +45,7 @@ const initialState = {
     name: '',
     url: '',
     apiKey: '',
+    wallet: ''
 }
 
 const Stores = () => {
@@ -140,9 +147,22 @@ const Stores = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`stores/${record.id}`),
+            onClick: event => router.push(`stores/${record.id}`),
         };
     }
+
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        if (value) {
+            try {
+                CLPublicKey.fromHex(value)
+                callback();
+            } catch (e) {
+                callback("This wallet not exist!");
+            }
+        } else {
+            callback();
+        }
+    };
 
     return <>
         <WithLoadingData data={storesTable}>
@@ -169,6 +189,13 @@ const Stores = () => {
                         rules={[{ required: true, message: 'Please input callback url!' }]}
                     >
                         <Input onChange={onChangeStore('url')}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="Wallet"
+                        name="wallet"
+                        rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+                    >
+                        <Input onChange={onChangeStore('wallet')}/>
                     </Form.Item>
                     <Form.Item
                         label="ApiKey"

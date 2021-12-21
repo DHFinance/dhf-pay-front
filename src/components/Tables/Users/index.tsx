@@ -43,7 +43,7 @@ const Users = () => {
 
     const onRow=(record, rowIndex) => {
         return {
-            onDoubleClick: event => router.push(`users/${record.id}`),
+            onClick: event => router.push(`users/${record.id}`),
         };
     }
 

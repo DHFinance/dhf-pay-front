@@ -5,6 +5,9 @@ import {Router} from "next/router";
 export const POST_REGISTRATION_START = 'POST_REGISTRATION_START';
 export const POST_REGISTRATION_SUCCESS = 'POST_REGISTRATION_SUCCESS';
 export const POST_REGISTRATION_FAILED = 'POST_REGISTRATION_FAILED';
+export const POST_VERIFY_START = 'POST_VERIFY_START';
+export const POST_VERIFY_SUCCESS = 'POST_VERIFY_SUCCESS';
+export const POST_VERIFY_FAILED = 'POST_VERIFY_FAILED';
 export const POST_LOGIN_START = 'POST_LOGIN_START';
 export const POST_LOGIN_SUCCESS = 'POST_LOGIN_SUCCESS';
 export const POST_LOGIN_FAILED = 'POST_LOGIN_FAILED';
@@ -17,20 +20,6 @@ export const POST_RESTORE_FAILED = 'POST_RESTORE_FAILED';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
 export const CLEAR_AUTH_ERROR = 'CLEAR_AUTH_ERROR';
 
-const postRegistrationStart = () => ({
-  type: POST_REGISTRATION_START
-});
-
-const postRegistrationSuccess = (data) => ({
-  type: POST_REGISTRATION_SUCCESS,
-  payload: data
-});
-
-const postRegistrationFailed = (error) => ({
-  type: POST_REGISTRATION_FAILED,
-  payload: error
-});
-
 export const clearAuth = () => ({
   type: CLEAR_AUTH
 });
@@ -39,13 +28,50 @@ export const clearAuthError = () => ({
   type: CLEAR_AUTH_ERROR
 });
 
-export const postRegistration = (data, goStartPage) => async (dispatch) => {
+
+const postRegistrationStart = () => ({
+  type: POST_REGISTRATION_START
+});
+
+const postRegistrationSuccess = () => ({
+  type: POST_REGISTRATION_SUCCESS
+});
+
+const postRegistrationFailed = (error) => ({
+  type: POST_REGISTRATION_FAILED,
+  payload: error
+});
+
+export const postRegistration = (data) => async (dispatch) => {
   dispatch(postRegistrationStart());
   await post(`/auth/register`, {...data, blocked: false}).then((result) => {
-    dispatch(postRegistrationSuccess(result.data));
-    goStartPage()
+    dispatch(postRegistrationSuccess());
   }).catch(e => {
     dispatch(postRegistrationFailed(e));
+  });
+};
+
+const postVerifyStart = () => ({
+  type: POST_VERIFY_START
+});
+
+const postVerifySuccess = (data) => ({
+  type: POST_VERIFY_SUCCESS,
+  payload: data
+});
+
+const postVerifyFailed = (error) => ({
+  type: POST_VERIFY_FAILED,
+  payload: error
+});
+
+export const postVerify = (email, code, goStartPage) => async (dispatch) => {
+  dispatch(postVerifyStart());
+  await post(`/auth/verify`, {email, code}).then((result) => {
+    dispatch(postVerifySuccess(result.data));
+    goStartPage()
+  }).catch(e => {
+    dispatch(postVerifyFailed(e));
   });
 };
 
