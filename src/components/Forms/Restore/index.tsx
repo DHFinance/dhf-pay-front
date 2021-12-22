@@ -71,7 +71,6 @@ const EmailForm = ({auth}: any) => {
     }, [fieldError])
 
     const validateEmail = (rule: any, value: any, callback: any) => {
-        console.log(fieldError)
         if (fieldError === 'email') {
             callback(errorMessage);
             dispatch(clearAuth())
@@ -88,7 +87,6 @@ const EmailForm = ({auth}: any) => {
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }
@@ -163,7 +161,6 @@ const CodeForm = ({auth}: any) => {
                 } catch (e) {
                     console.log(e, 'registration error: Code step')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }
@@ -222,7 +219,6 @@ const PasswordForm = ({auth}: any) => {
                 } catch (e) {
                     console.log(e, 'registration error: Code step')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }

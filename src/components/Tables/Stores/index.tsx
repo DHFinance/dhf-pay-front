@@ -71,7 +71,6 @@ const Stores = () => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        console.log(user)
         if (user.role === 'admin') {
             dispatch(getStores())
         }
@@ -112,7 +111,6 @@ const Stores = () => {
                 } catch (e) {
                     console.log(e, 'store creating error')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }

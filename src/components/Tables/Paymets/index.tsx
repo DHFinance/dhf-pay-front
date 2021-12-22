@@ -154,7 +154,6 @@ const Payments = () => {
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }

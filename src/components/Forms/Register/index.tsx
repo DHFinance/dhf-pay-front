@@ -76,7 +76,6 @@ const CreateUserForm = ({auth, setEmail}) => {
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }
@@ -168,7 +167,6 @@ const VerifyForm = ({auth, email}) => {
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     }

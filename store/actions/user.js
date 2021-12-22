@@ -42,6 +42,5 @@ const blockUserFailed = (error) => ({
 
 export const blockUser = (id, blocked) => async (dispatch) => {
   dispatch(blockUserStart());
-  console.log(id, blocked)
   await post(`/user/block`, {id, blocked}).then(result => dispatch(blockUserSuccess(result.data))).catch(e => dispatch(blockUserFailed(e)));
 };

@@ -37,8 +37,6 @@ const User = () => {
         role
     } = user
 
-    console.log({user})
-
     const onChangeBlock = (block) => () => {
         dispatch(blockUser(id, block))
     }

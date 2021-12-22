@@ -95,14 +95,13 @@ const Bill = () => {
     const billInfo = useSelector((state) => state.payment.data);
     const transactions = useSelector((state) => state.transactions.data);
     const billInfoError = useSelector((state) => state.payment.error);
-    const transactionsError = useSelector((state) => state.transactions.error);
     const dispatch = useDispatch();
     const router = useRouter()
     useEffect(() => {
-        if (router.query.slug) {
-            dispatch(getPayment(router.query.slug))
-            dispatch(getTransactions())
-        }
+        const pathname = window.location.pathname.split('/')
+        const id = pathname && pathname[pathname.length - 1]
+        dispatch(getPayment(id))
+        dispatch(getTransactions())
     }, [])
     if (isFake) {
         return <WithPageExist error={billInfoError} data={billInfo} >
@@ -302,7 +301,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
     const casperClient = new CasperClient(apiUrl);
 
     const singInSigner = async () => {
-        console.log(window)
         if (window.casperlabsHelper) {
             try {
                 await window.casperlabsHelper.requestConnection().then(r => getBalance().catch((e: TypeError) => showError(e.message)));
@@ -361,7 +359,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
                 } catch (e: any) {
                     showError(e.message)
                 }
-                console.log(res, 'valid')
             })
             .catch(async (err) => console.log(err))
     };
