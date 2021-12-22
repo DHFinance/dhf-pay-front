@@ -144,8 +144,9 @@ const CreateUserForm = ({auth, setEmail}) => {
     </Form>
 }
 
-const VerifyForm = ({auth, email}) => {
+const VerifyForm = ({email}) => {
 
+    const auth = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const [form] = Form.useForm();
     const router = useRouter();
