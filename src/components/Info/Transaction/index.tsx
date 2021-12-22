@@ -6,7 +6,7 @@ import {get} from "../../../../api"
 import {useRouter} from "next/router";
 import {CasperClient,CasperServiceByJsonRPC, PublicKey, DeployUtil } from "casper-js-sdk";
 const casperClientSDK = require("casper-js-sdk");
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {wrapper} from "../../../../store/store";
 import {getPayments} from "../../../../store/actions/payments";
 import Link from "next/link";
@@ -77,13 +77,16 @@ const Transaction = () => {
             {txHash ?
                 <Link href={`https://testnet.cspr.live/deploy/${txHash}`}>
                     <a target="_blank" rel="noreferrer">
-                        <Button style={{margin: '20px 0 20px 0'}} type="primary" size={'large'}>
+                        <Button style={{margin: '20px 20px 0 0'}} type="primary">
                             Check transaction
                         </Button>
                     </a>
                 </Link>
                 : null
             }
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">
+                Back
+            </Button>
         </WithPageExist>
     );
 };

@@ -50,14 +50,17 @@ const Payment = () => {
                 <Statistic title="Amount" value={amount} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+                <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
             {payments.status !== 'Paid' && user?.role !== 'admin' ?
-            <Button type="primary" onClick={toBill} style={{margin: '20px 0 0 0'}} className="login-form-button">
+            <Button type="primary" onClick={toBill} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                 Create bill
             </Button>
             : null
             }
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">
+                Back
+            </Button>
         </WithPageExist>
     );
 };

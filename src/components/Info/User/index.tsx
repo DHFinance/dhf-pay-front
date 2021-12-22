@@ -63,16 +63,19 @@ const User = () => {
             {
                 role !== 'admin' && <>
                     {blocked ?
-                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Unblock
                         </Button>
                         :
-                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Block
                         </Button>
                     }
                 </>
             }
+            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
+                Back
+            </Button>
         </WithLoadingData></WithPageExist>
     );
 };

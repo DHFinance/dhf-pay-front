@@ -185,10 +185,10 @@ const Store = () => {
                 <Statistic title="api key" value={apiKey || 'None (generate an api key to perform actions)'} prefix={<CommentOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="description" value={description} prefix={<CommentOutlined />} />
+                <Statistic title="description" value={description || 'none'} prefix={<CommentOutlined />} />
             </Col>
             {user?.id === store?.user?.id ?
-                <Button type="primary" onClick={onEdit} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                <Button type="primary" onClick={onEdit} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                     Edit
                 </Button>
                 :
@@ -197,16 +197,19 @@ const Store = () => {
             {
                 user?.role === 'admin' && <>
                     {blocked ?
-                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Unblock
                         </Button>
                         :
-                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 0 0 0'}} className="login-form-button">
+                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Block
                         </Button>
                     }
                 </>
             }
+                <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">
+                    Back
+                </Button>
 
         </WithLoadingData>
         </WithPageExist>

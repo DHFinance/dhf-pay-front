@@ -411,7 +411,7 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
                 <Statistic title="Amount" value={amount} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+                <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
             {status !== 'Paid' ?
                 <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
