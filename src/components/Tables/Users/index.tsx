@@ -43,6 +43,7 @@ const Users = () => {
 
     const onRow=(record, rowIndex) => {
         return {
+            style: {cursor: "pointer"},
             onClick: event => router.push(`users/${record.id}`),
         };
     }

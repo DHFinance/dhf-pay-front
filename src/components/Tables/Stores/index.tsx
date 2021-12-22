@@ -37,6 +37,7 @@ const columns = [
         title: 'wallet',
         key: 'wallet',
         dataIndex: 'wallet',
+        cursor: 'pointer',
     },
 ];
 
@@ -145,6 +146,7 @@ const Stores = () => {
 
     const onRow=(record, rowIndex) => {
         return {
+            style: {cursor: "pointer"},
             onClick: event => router.push(`stores/${record.id}`),
         };
     }

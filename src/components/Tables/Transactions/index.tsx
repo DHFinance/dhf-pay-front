@@ -66,6 +66,7 @@ const Transactions = () => {
 
     const onRow=(record, rowIndex) => {
         return {
+            style: {cursor: "pointer"},
             onClick: event => router.push(`transactions/${record.id}`), // click row
         };
     }

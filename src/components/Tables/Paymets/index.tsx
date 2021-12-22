@@ -164,6 +164,7 @@ const Payments = () => {
 
     const onRow=(record, rowIndex) => {
         return {
+            style: {cursor: "pointer"},
             onClick: event => router.push(`payments/${record.id}`),
         };
     }
