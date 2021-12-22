@@ -4,7 +4,7 @@ import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined} from '@ant-desi
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import {getStores} from "../../../../store/actions/stores";
+import {getStores, getUserStores} from "../../../../store/actions/stores";
 import {blockStore, editStore, getStore} from "../../../../store/actions/store";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {addPayment} from "../../../../store/actions/payment";
@@ -84,7 +84,7 @@ const Store = () => {
                     form.resetFields();
                     setEdit(false);
                     await dispatch(getStore(router.query.slug))
-                    await dispatch(getStores())
+                    await dispatch(getUserStores(router.query.slug))
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
