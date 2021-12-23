@@ -18,7 +18,7 @@ const getDataFailed = (error) => ({
   payload: error
 });
 
-export const getQuery = (url) => async (dispatch) => {
+export const getQuery = (url) => async (dispatch, getState) => {
   dispatch(getDataStart());
   const result = await get(url);
   try {

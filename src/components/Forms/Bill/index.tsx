@@ -10,6 +10,7 @@ import {pay} from "../../../../store/actions/pay";
 import {getPayment} from "../../../../store/actions/payment";
 import {getTransactions} from "../../../../store/actions/transacrions";
 import WithPageExist from "../../../../hoc/withPageExist";
+import {getStore} from "../../../../store/actions/store";
 
 
 const initialState = {
@@ -95,25 +96,31 @@ const Bill = () => {
     const billInfo = useSelector((state) => state.payment.data);
     const transactions = useSelector((state) => state.transactions.data);
     const billInfoError = useSelector((state) => state.payment.error);
+    const store = useSelector((state) => state.storeData.data);
     const dispatch = useDispatch();
-    const router = useRouter()
+    const router = useRouter();
     useEffect(() => {
         const pathname = window.location.pathname.split('/')
         const id = pathname && pathname[pathname.length - 1]
         dispatch(getPayment(id))
         dispatch(getTransactions())
     }, [])
+    useEffect(() => {
+        if (billInfo?.store?.id) {
+            dispatch(getStore(billInfo?.store?.id))
+        }
+    }, [billInfo])
     if (isFake) {
-        return <WithPageExist error={billInfoError} data={billInfo} >
-            <FakeBill billInfo={billInfo} transactions={transactions} dispatch={dispatch} router={router}/>
+        return <WithPageExist error={billInfoError} data={store} >
+            <FakeBill billInfo={billInfo} store={store} transactions={transactions} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill billInfo={billInfo} transactions={transactions} dispatch={dispatch} router={router}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} store={store} transactions={transactions} dispatch={dispatch} router={router}/></WithPageExist>
 }
 
 
 
-const FakeBill = ({billInfo, transactions, dispatch, router}) => {
+const FakeBill = ({billInfo, transactions, dispatch, router, store}) => {
 
     const [billData, setBillData] = useState(initialState)
     const [sign, setSign] = useState(false)
@@ -128,12 +135,9 @@ const FakeBill = ({billInfo, transactions, dispatch, router}) => {
                 await dispatch(pay({
                     txHash: defaultTxHash,
                     status: "fake_processing",
-                    amount,
                     email: billData.email,
-                    payment: billInfo.id,
-                    updated: new Date(),
+                    payment: billInfo,
                     sender: billData.wallet,
-                    receiver: billInfo.wallet
                 }))
                 setTransactionExplorer(defaultTxHash)
             })
@@ -146,7 +150,6 @@ const FakeBill = ({billInfo, transactions, dispatch, router}) => {
         datetime,
         amount,
         comment,
-        wallet,
         status,
         payment
     } = billInfo
@@ -179,9 +182,6 @@ const FakeBill = ({billInfo, transactions, dispatch, router}) => {
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Your Balance" value={'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Recipient" value={wallet} prefix={<AreaChartOutlined />} />
             </Col>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
@@ -258,23 +258,17 @@ const FakeBill = ({billInfo, transactions, dispatch, router}) => {
                         Pay
                     </Button>) : null
             }
-
-            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
-                Back
-            </Button>
         </>
     );
 };
 
-const CasperBill = ({billInfo, transactions, dispatch, router}) => {
+const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
 
 
     const [balance, setBalance] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
     const [form] = Form.useForm();
-
-
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
@@ -314,7 +308,7 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
 
     const deploy = async ()=> {
 
-        const to = wallet;
+        const to = store.wallet;
         const amountStr = amount.toString()
         const amountNum = amount;
         const id = 287821;
@@ -387,7 +381,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
         datetime,
         amount,
         comment,
-        wallet,
         status,
         payment
     } = billInfo
@@ -400,9 +393,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Your Balance" value={balance || 'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Recipient" value={wallet} prefix={<AreaChartOutlined />} />
             </Col>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
@@ -434,8 +424,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
                 </Col>
                 : null
             }
-
-
 
             {lastTransaction.length ?
                 <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
@@ -479,10 +467,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router}) => {
                     Pay
                 </Button>) : null
             }
-
-            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary" size={'large'}>
-                Back
-            </Button>
         </>
     );
 };

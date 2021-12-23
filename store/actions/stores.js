@@ -21,16 +21,18 @@ const getStoresFailed = (error) => ({
 
 
 
-export const getStores = () => async (dispatch) => {
+export const getStores = () => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(getStoresStart());
-  await get(`/store`).then((result) => {
+  await get(`/store`, {headers: {"Authorization-x": token}}).then((result) => {
     dispatch(getStoresSuccess(result.data));
   }).catch((e) => dispatch(getStoresFailed(e)));
 };
 
-export const getUserStores = (userId) => async (dispatch) => {
+export const getUserStores = (userId) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(getStoresStart());
-  await get(`/store?filter=user.id||eq||${userId}`).then((result) => {
+  await get(`/store?filter=user.id||eq||${userId}`, {headers: {"Authorization-x": token}}).then((result) => {
     dispatch(getStoresSuccess(result.data));
   }).catch((e) => dispatch(getStoresFailed(e)));
 };

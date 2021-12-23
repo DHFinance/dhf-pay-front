@@ -30,11 +30,6 @@ const columns = [
         key: 'sender',
         dataIndex: 'sender'
     },
-    {
-        title: 'receiver',
-        key: 'receiver',
-        dataIndex: 'receiver',
-    },
 ];
 
 

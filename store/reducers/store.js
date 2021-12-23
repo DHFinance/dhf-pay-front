@@ -5,7 +5,7 @@ import {
   ADD_STORE_START,
   ADD_STORE_SUCCESS, ADD_STORE_FAILED, EDIT_STORE_SUCCESS, EDIT_STORE_FAILED, EDIT_STORE_START, BlOCK_STORE_FAILED, BlOCK_STORE_START, BlOCK_STORE_SUCCESS
 } from '../actions/store';
-import {POST_LOGOUT_SUCCESS} from "../actions/auth";
+import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
 const initialState = {
   data: {},
@@ -16,6 +16,8 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  CLEAR_STORE:
+      return initialState;
     case  POST_LOGOUT_SUCCESS:
       return initialState;
     case  EDIT_STORE_START:

@@ -18,7 +18,7 @@ const postDataFailed = (error) => ({
   payload: error
 });
 
-export const postQuery = (url, data, params) => async (dispatch) => {
+export const postQuery = (url, data, params) => async (dispatch, getState) => {
   dispatch(postDataStart());
   const result = await post(url, data, params);
   try {

@@ -24,9 +24,10 @@ const pushPayment = (data) => ({
   payload: data
 });
 
-export const pay = (data) => async (dispatch) => {
+export const pay = (data) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(payStart());
-  await post('/transaction', data).then((result => {
+  await post('/transaction', data, {headers: {"Authorization-x": token}}).then((result => {
     dispatch(paySuccess(result.data.data));
     dispatch(pushPayment(result.data.data));
   })).catch(e => {

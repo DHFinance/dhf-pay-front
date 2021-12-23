@@ -1,5 +1,5 @@
 import {  POST_PAY_SUCCESS, POST_PAY_FAILED, POST_PAY_START }  from '../actions/pay';
-import {POST_LOGOUT_SUCCESS} from "../actions/auth";
+import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
 const initialState = {
   data: {},
@@ -10,6 +10,8 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  CLEAR_STORE:
+      return initialState;
     case  POST_LOGOUT_SUCCESS:
       return initialState;
     case  POST_PAY_FAILED:

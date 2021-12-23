@@ -35,30 +35,15 @@ const columns = [
         dataIndex: 'comment',
     },
     {
-        title: 'wallet',
-        key: 'wallet',
-        dataIndex: 'wallet',
-    },
-    {
         title: 'status',
         key: 'status',
         dataIndex: 'status',
     },
 ];
 
-interface IPayment {
-    datetime: "2014-12-24 23:12:00",
-    amount: 2500000000,
-    user: 11,
-    comment: "test comment",
-    wallet: "016ecf8a64f9b341d7805d6bc5041bc42139544561f07a7df5a1d660d8f2619fee"
-}
-
 const initialState = {
-    datetime: '',
     amount: '',
-    comment: '',
-    wallet: ''
+    comment: ''
 }
 
 
@@ -135,13 +120,7 @@ const Payments = () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-
-                    await dispatch(addPayment({
-                        ...payment,
-                        status: 'Not_paid',
-                        datetime: new Date(),
-                        wallet: currentStore.wallet
-                    }, currentStore.apiKey))
+                    await dispatch(addPayment(payment, currentStore.apiKey))
                     if (user?.role === 'admin') {
                         dispatch(getPayments())
                     }

@@ -4,7 +4,7 @@ import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined} from '@ant-desi
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect} from "react";
 import {useRouter} from "next/router";
-import {getStore} from "../../../../store/actions/store";
+import Link from "next/link";
 import {getPayment} from "../../../../store/actions/payment";
 import WithPageExist from "../../../../hoc/withPageExist";
 
@@ -25,12 +25,6 @@ const Payment = () => {
     } = payments
 
     const router = useRouter()
-
-    const toBill = () => {
-        router.push({
-            pathname: `/bill/${id}`
-        })
-    }
 
     useEffect(() => {
         if (router.query.slug) {
@@ -53,9 +47,13 @@ const Payment = () => {
                 <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
             {payments.status !== 'Paid' && user?.role !== 'admin' ?
-            <Button type="primary" onClick={toBill} style={{margin: '20px 20px 0 0'}} className="login-form-button">
-                Create bill
-            </Button>
+                <Link href={`/bill/${id}`}>
+                    <a target="_blank" rel="noreferrer">
+                        <Button type="primary" style={{margin: '20px 20px 0 0'}} className="login-form-button">
+                            Create bill
+                        </Button>
+                    </a>
+                </Link>
             : null
             }
             <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">

@@ -18,9 +18,10 @@ const getTransactionsFailed = (error) => ({
   payload: error
 });
 
-export const getTransactions = () => async (dispatch) => {
+export const getTransactions = () => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(getTransactionsStart());
-  const result = await get('/transaction').catch(e => console.log(e));
+  const result = await get('/transaction', {headers: {"Authorization-x": token}}).catch(e => console.log(e));
   try {
     dispatch(getTransactionsSuccess(result.data));
   } catch (e) {
@@ -28,9 +29,11 @@ export const getTransactions = () => async (dispatch) => {
   }
 };
 
-export const getUserTransactions = (store) => async (dispatch) => {
+export const getUserTransactions = (apiKey) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
+  console.log(token)
   dispatch(getTransactionsStart());
-  await get(`${store}/transaction`).then(async (transactions) => {
+  await get(`/transaction`, {headers: {"Authorization": apiKey, "Authorization-x": token}}).then(async (transactions) => {
     dispatch(getTransactionsSuccess(transactions.data))
   }).catch(e => dispatch(getTransactionsFailed(e)));
 };

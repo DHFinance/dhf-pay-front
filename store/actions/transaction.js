@@ -19,9 +19,10 @@ const getTransactionFailed = (error) => ({
   payload: error
 });
 
-export const getTransaction = (id = '') => async (dispatch) => {
+export const getTransaction = (id = '') => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
-  const result = await get(`/transaction/${id}`).catch(e => console.log(e));
+  const result = await get(`/transaction/${id}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
 
   try {
     dispatch(getTransactionSuccess(result.data));

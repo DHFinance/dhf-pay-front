@@ -21,9 +21,10 @@ const getPaymentsFailed = (error) => ({
 
 
 
-export const getPayments = () => async (dispatch) => {
+export const getPayments = () => async (dispatch, getState) => {
   dispatch(getPaymentsStart());
-  const result = await get(`/payment`);
+  const token = getState().auth?.data?.token
+  const result = await get(`/payment`, {headers: {"Authorization-x": token}});
 
   try {
     dispatch(getPaymentsSuccess(result.data));
@@ -32,9 +33,10 @@ export const getPayments = () => async (dispatch) => {
   }
 };
 
-export const getUserPayments = (store) => async (dispatch) => {
+export const getUserPayments = (apiKey) => async (dispatch, getState) => {
   dispatch(getPaymentsStart());
-  await get(`${store}/payment`).then((result) => {
+  const token = getState().auth?.data?.token
+  await get(`/payment`, {headers: {"Authorization": apiKey, "Authorization-x": token}}).then((result) => {
     dispatch(getPaymentsSuccess(result.data));
   }).catch((e) => dispatch(getPaymentsFailed(e)));
 };

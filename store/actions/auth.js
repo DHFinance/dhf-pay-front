@@ -19,9 +19,14 @@ export const POST_RESTORE_SUCCESS = 'POST_RESTORE_SUCCESS';
 export const POST_RESTORE_FAILED = 'POST_RESTORE_FAILED';
 export const CLEAR_AUTH = 'CLEAR_AUTH';
 export const CLEAR_AUTH_ERROR = 'CLEAR_AUTH_ERROR';
+export const CLEAR_STORE = 'CLEAR_STORE';
 
 export const clearAuth = () => ({
   type: CLEAR_AUTH
+});
+
+export const clearStore = () => ({
+  type: CLEAR_STORE
 });
 
 export const clearAuthError = () => ({
@@ -42,7 +47,7 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
-export const postRegistration = (data) => async (dispatch) => {
+export const postRegistration = (data) => async (dispatch, getState) => {
   dispatch(postRegistrationStart());
   await post(`/auth/register`, {...data, blocked: false}).then((result) => {
     dispatch(postRegistrationSuccess());
@@ -65,7 +70,7 @@ const postVerifyFailed = (error) => ({
   payload: error
 });
 
-export const postVerify = (email, code, goStartPage) => async (dispatch) => {
+export const postVerify = (email, code, goStartPage) => async (dispatch, getState) => {
   dispatch(postVerifyStart());
   await post(`/auth/verify`, {email, code}).then((result) => {
     dispatch(postVerifySuccess(result.data));
@@ -91,7 +96,7 @@ const postLoginFailed = (error) => {
   }
 }
 
-export const reAuth = (token) => async (dispatch) => {
+export const reAuth = (token) => async (dispatch, getState) => {
   dispatch(postLoginStart());
   await get(`auth/reAuth?token=${token}`).then((result) => {
     dispatch(postLoginSuccess(result.data));
@@ -100,7 +105,7 @@ export const reAuth = (token) => async (dispatch) => {
   });
 };
 
-export const postLogin = (data, goStartPage) => async (dispatch) => {
+export const postLogin = (data, goStartPage) => async (dispatch, getState) => {
   dispatch(postLoginStart());
   await post(`auth/login`, data).then((result) => {
     goStartPage()
@@ -124,7 +129,7 @@ const postLogoutFailed = (error) => ({
   payload: error
 });
 
-export const postLogout = (goLoginPage) => async (dispatch) => {
+export const postLogout = (goLoginPage) => async (dispatch, getState) => {
   dispatch(postLogoutStart());
   try {
     dispatch(postLogoutSuccess());
@@ -148,7 +153,7 @@ const postRestoreFailed = (error) => ({
   payload: error
 });
 
-export const postRestoreStepEmail = (data) => async (dispatch) => {
+export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
   dispatch(postRestoreStart());
   await post('/auth/send-code', data).then((result) => {
     dispatch(postRestoreSuccess({
@@ -160,7 +165,7 @@ export const postRestoreStepEmail = (data) => async (dispatch) => {
   });
 };
 
-export const postRestoreStepCode = (data) => async (dispatch) => {
+export const postRestoreStepCode = (data) => async (dispatch, getState) => {
   dispatch(postRestoreStart())
   await post('/auth/check-code', data).then((result) => {
     dispatch(postRestoreSuccess({
@@ -171,7 +176,7 @@ export const postRestoreStepCode = (data) => async (dispatch) => {
   });
 };
 
-export const postRestoreStepPassword = (data, goStartPage) => async (dispatch) => {
+export const postRestoreStepPassword = (data, goStartPage) => async (dispatch, getState) => {
   dispatch(postRestoreStart());
   await post('/auth/reset-pwd', data).then((result) => {
     dispatch(postRestoreSuccess({

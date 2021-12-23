@@ -133,7 +133,7 @@ const Stores = () => {
         }
         setStore({
             ...store,
-            apiKey: randomString(8)
+            apiKey: randomString(36)
         })
     };
 

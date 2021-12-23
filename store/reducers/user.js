@@ -1,4 +1,5 @@
 import {  GET_USER_FAILED, GET_USER_SUCCESS, GET_USER_START, BLOCK_USER_SUCCESS, BLOCK_USER_START, BLOCK_USER_FAILED }  from '../actions/user';
+import {CLEAR_STORE} from "../actions/auth";
 
 const initialState = {
   data: {},
@@ -9,6 +10,8 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
+    case  CLEAR_STORE:
+      return initialState;
     case  GET_USER_START:
       return {
         ...state,

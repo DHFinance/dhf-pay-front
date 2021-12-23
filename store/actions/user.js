@@ -21,9 +21,10 @@ const getUserFailed = (error) => ({
   payload: error
 });
 
-export const getUser = (id) => async (dispatch) => {
+export const getUser = (id) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(getUserStart());
-  await get(`/user/${id}`).then(result => dispatch(getUserSuccess(result.data))).catch(e => dispatch(getUserFailed(e)));
+  await get(`/user/${id}`, {headers: {"Authorization-x": token}}).then(result => dispatch(getUserSuccess(result.data))).catch(e => dispatch(getUserFailed(e)));
 };
 
 const blockUserStart = () => ({
@@ -40,7 +41,8 @@ const blockUserFailed = (error) => ({
   payload: error
 });
 
-export const blockUser = (id, blocked) => async (dispatch) => {
+export const blockUser = (id, blocked) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
   dispatch(blockUserStart());
-  await post(`/user/block`, {id, blocked}).then(result => dispatch(blockUserSuccess(result.data))).catch(e => dispatch(blockUserFailed(e)));
+  await post(`/user/block`, {id, blocked}, {headers: {"Authorization-x": token}}).then(result => dispatch(blockUserSuccess(result.data))).catch(e => dispatch(blockUserFailed(e)));
 };
