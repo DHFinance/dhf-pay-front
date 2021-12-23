@@ -335,16 +335,20 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
                     } else {
                         openNotification('Transaction error', 'Your transaction has not been completed, please try again')
                     }
+                    console.log({
+                        txHash: signed,
+                        status: "processing",
+                        email,
+                        payment: billInfo,
+                        sender: publicKeyHex
+                    })
                     try {
                         await dispatch(pay({
                             txHash: signed,
                             status: "processing",
-                            amount,
                             email,
-                            payment: billInfo.id,
-                            updated: new Date(),
-                            sender: publicKeyHex,
-                            receiver: to
+                            payment: billInfo,
+                            sender: publicKeyHex
                         }))
                     } catch (e) {
                         showError('Transaction aborted')
