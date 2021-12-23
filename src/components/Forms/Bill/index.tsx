@@ -8,9 +8,9 @@ import {CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil, Keys} fro
 import React, {useEffect, useState} from "react";
 import {pay} from "../../../../store/actions/pay";
 import {getPayment} from "../../../../store/actions/payment";
-import {getTransactions} from "../../../../store/actions/transacrions";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {getStore} from "../../../../store/actions/store";
+import {getLastTransaction} from "../../../../store/actions/transaction";
 
 
 const initialState = {
@@ -94,7 +94,7 @@ const signerErrors = [
 const Bill = () => {
     const isFake = process.env.NEXT_PUBLIC_FAKE_TRANSACTION === '1'
     const billInfo = useSelector((state) => state.payment.data);
-    const transactions = useSelector((state) => state.transactions.data);
+    const transaction = useSelector((state) => state.transaction.data);
     const billInfoError = useSelector((state) => state.payment.error);
     const store = useSelector((state) => state.storeData.data);
     const dispatch = useDispatch();
@@ -103,24 +103,25 @@ const Bill = () => {
         const pathname = window.location.pathname.split('/')
         const id = pathname && pathname[pathname.length - 1]
         dispatch(getPayment(id))
-        dispatch(getTransactions())
+
     }, [])
     useEffect(() => {
         if (billInfo?.store?.id) {
             dispatch(getStore(billInfo?.store?.id))
+            dispatch(getLastTransaction(billInfo?.id))
         }
     }, [billInfo])
     if (isFake) {
         return <WithPageExist error={billInfoError} data={store} >
-            <FakeBill billInfo={billInfo} store={store} transactions={transactions} dispatch={dispatch} router={router}/>
+            <FakeBill billInfo={billInfo} store={store} transaction={transaction} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} store={store} transactions={transactions} dispatch={dispatch} router={router}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
 
 
 
-const FakeBill = ({billInfo, transactions, dispatch, router, store}) => {
+const FakeBill = ({billInfo, transaction, dispatch, router, store}) => {
 
     const [billData, setBillData] = useState(initialState)
     const [sign, setSign] = useState(false)
@@ -154,8 +155,6 @@ const FakeBill = ({billInfo, transactions, dispatch, router, store}) => {
         payment
     } = billInfo
     const date = new Date(datetime).toDateString()
-
-    const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
 
     const validateWallet = (rule: any, value: any, callback: any) => {
         if (value) {
@@ -248,7 +247,7 @@ const FakeBill = ({billInfo, transactions, dispatch, router, store}) => {
                         : null
             }
 
-            {   status !== 'Paid' ?
+            {   status !== 'Paid' && !transaction?.id && !payment?.transaction?.txHash ?
                 (!sign ?
                     <Button onClick={() => setSign(true)} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                         Sign in Signer
@@ -262,7 +261,7 @@ const FakeBill = ({billInfo, transactions, dispatch, router, store}) => {
     );
 };
 
-const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
+const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
 
 
     const [balance, setBalance] = useState('')
@@ -335,13 +334,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
                     } else {
                         openNotification('Transaction error', 'Your transaction has not been completed, please try again')
                     }
-                    console.log({
-                        txHash: signed,
-                        status: "processing",
-                        email,
-                        payment: billInfo,
-                        sender: publicKeyHex
-                    })
                     try {
                         await dispatch(pay({
                             txHash: signed,
@@ -350,6 +342,7 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
                             payment: billInfo,
                             sender: publicKeyHex
                         }))
+                        await dispatch(ge)
                     } catch (e) {
                         showError('Transaction aborted')
                     }
@@ -390,9 +383,6 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
     } = billInfo
     const date = new Date(datetime).toDateString()
 
-    const lastTransaction = transactions.filter((transaction) => transaction.payment.id === id)
-
-
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -429,8 +419,8 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
                 : null
             }
 
-            {lastTransaction.length ?
-                <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+            {transaction?.txHash ?
+                <Link href={`https://testnet.cspr.live/deploy/${transaction?.txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -461,7 +451,9 @@ const CasperBill = ({billInfo, transactions, dispatch, router, store}) => {
                 : null
             }
 
-            {   status !== 'Paid' ?
+            {console.log(transaction)}
+
+            {   status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
                 (!balance ?
                 <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                     Sign in Signer

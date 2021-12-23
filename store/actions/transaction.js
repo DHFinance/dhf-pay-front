@@ -19,11 +19,23 @@ const getTransactionFailed = (error) => ({
   payload: error
 });
 
-export const getTransaction = (id = '') => async (dispatch, getState) => {
+export const getTransaction = (txHash = '') => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
-  const result = await get(`/transaction/${id}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get(`/transaction/${txHash}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
 
+  try {
+    dispatch(getTransactionSuccess(result.data));
+    return result
+  } catch (e) {
+    dispatch(getTransactionFailed(e));
+  }
+};
+
+export const getLastTransaction = (paymentId = '') => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
+  dispatch(getTransactionStart());
+  const result = await get(`/transaction/last/${paymentId}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
   try {
     dispatch(getTransactionSuccess(result.data));
     return result

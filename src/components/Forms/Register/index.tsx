@@ -161,6 +161,7 @@ const VerifyForm = ({email}) => {
     const [code, setCode] = useState('')
 
     const onVerify = async () => {
+
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -173,6 +174,12 @@ const VerifyForm = ({email}) => {
     }
 
     const onChangeCode = (e) => setCode(e.target.value)
+
+    useEffect(() => {
+        if (fieldError) {
+            form.validateFields(["code"])
+        }
+    }, [auth])
 
     const validateCode = (rule: any, value: any, callback: any) => {
         if (fieldError === 'code') {
