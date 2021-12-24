@@ -451,8 +451,6 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
                 : null
             }
 
-            {console.log(transaction)}
-
             {   status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
                 (!balance ?
                 <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
