@@ -12,6 +12,7 @@ import {getPayments} from "../../../../store/actions/payments";
 import {blockUser} from "../../../../store/actions/user";
 import Title from "antd/lib/typography/Title";
 import WithPageExist from "../../../../hoc/withPageExist";
+import {CLPublicKey} from "casper-js-sdk";
 
 
 const Store = () => {
@@ -104,6 +105,19 @@ const Store = () => {
         setStoreEdit(store)
     }, [store])
 
+    const validateWallet = (rule: any, value: any, callback: any) => {
+        if (value) {
+            try {
+                CLPublicKey.fromHex(value)
+                callback();
+            } catch (e) {
+                callback("This wallet not exist!");
+            }
+        } else {
+            callback();
+        }
+    };
+
     return (
         <WithPageExist error={storeError} data={store}>
             <WithLoadingData data={storeEdit}>
@@ -132,6 +146,14 @@ const Store = () => {
                         rules={[{ required: true, message: 'Please input wallet!' }]}
                     >
                         <Input value={storeEdit.url} onChange={onChangeStore('url')}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="Wallet"
+                        name="wallet"
+                        initialValue={storeEdit.wallet}
+                        rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }]}
+                    >
+                        <Input onChange={onChangeStore('wallet')}/>
                     </Form.Item>
                     <Form.Item
                         label="ApiKey"
