@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Statistic, Row, Col, Button } from 'antd';
+import {Statistic, Row, Col, Button, Modal, Form, Input} from 'antd';
 import Script from 'next/script'
 import {
     AreaChartOutlined,
@@ -9,13 +9,16 @@ import {
     TwitterSquareFilled
 } from '@ant-design/icons';
 import {useDispatch, useSelector} from "react-redux";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import Link from "next/link";
-import {getPayment} from "../../../../store/actions/payment";
+import {getPayment, sendMailBill} from "../../../../store/actions/payment";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {getUserTransactions} from "../../../../store/actions/transacrions";
 import Title from "antd/es/typography/Title";
+import {addStore} from "../../../../store/actions/store";
+import {getStores, getUserStores} from "../../../../store/actions/stores";
+import {clearAuth, postRestoreStepEmail} from "../../../../store/actions/auth";
 
 
 const Payment = () => {
@@ -26,12 +29,25 @@ const Payment = () => {
     const user = useSelector((state) => state.auth.data);
     const dispatch = useDispatch()
 
+    const [form] = Form.useForm();
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
     const {
         id,
         datetime,
         amount,
         comment,
         status,
+        store,
         wallet
     } = payments
 
@@ -58,6 +74,8 @@ const Payment = () => {
 
     const domain = location.origin
 
+    const billUrl = `${domain}/bill/${id}`
+
     function copy() {
         const copyLink = document.getElementById("link");
 
@@ -66,8 +84,94 @@ const Payment = () => {
         document.execCommand("copy");
     }
 
+    const onSubmit = async () => {
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    await dispatch(sendMailBill(id, userData.email, billUrl))
+                    setIsModalVisible(false);
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+            })
+            .catch(async (err) => console.log(err))
+    }
+
+    const [userData, setUserData] = useState({
+        email: ''
+    })
+
+    const onUpdateData = (e: any) => {
+        const value = e.target.value
+        const field = e.target.name
+        setUserData({
+            ...userData,
+            [field]: value,
+        })
+    }
+
+    const receiverEmail = userData.email
+
     return (
         <WithPageExist error={paymentsError} data={payments}>
+            <Modal title="Create a letter" visible={isModalVisible} onOk={onSubmit} onCancel={handleCancel}>
+                <table border="0" cellPadding="0" cellSpacing="0" className="body">
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td className="container">
+                            <div className="content">
+                                <table className="main">
+
+                                    <tr>
+                                        <td className="wrapper">
+                                            <table border="0" cellPadding="0" cellSpacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>Hello, {receiverEmail}</p>
+                                                        <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
+                                                            Payment details
+                                                        </p>
+                                                        <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
+                                                            Store: {store?.name}
+                                                        </p>
+                                                        <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
+                                                            Amount: {amount} CSPR
+                                                        </p>
+                                                        <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
+                                                            Comment: {comment}
+                                                        </p>
+                                                        <a style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}
+                                                           href={billUrl}>Bill page</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <Form
+                    style={{ padding: '0 0px', marginTop: 64 }}
+                    form={form}
+                    name="restore"
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 12 }}
+                    initialValues={{ remember: true }}
+                    onSubmitCapture={onSubmit}
+                    validateTrigger={'onSubmit'}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                    >
+                        <Input name="email" onChange={onUpdateData}/>
+                    </Form.Item>
+                </Form>
+            </Modal>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
@@ -87,7 +191,7 @@ const Payment = () => {
                     fontSize: '14px',
                 }}>Link</div>
             </Col>
-            <input type="text" value={`${domain}/bill/${id}`} id="link" style={{
+            <input type="text" value={billUrl} id="link" style={{
                 position: 'absolute'
             }}/>
             <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
@@ -103,18 +207,21 @@ const Payment = () => {
                                     color: 'rgba(0, 0, 0, 0.85)',
                                 }}
                             />
-                            {`${domain}/bill/${id}`}
+                            {billUrl}
                         </a>
                     </Link>
                     : null
                 }
             </Col>
 
-            <Col span={24} style={{padding: '0px 0 0px 0px'}}>
-                <Button onClick={() => copy()} style={{margin: '20px 20px 0 0'}} type="primary">
+            <Col span={24} style={{padding: '20px 0 0px 0px'}}>
+                <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
+                    Send by mail
+                </Button>
+                <Button onClick={() => copy()} style={{margin: '0px 20px 0 0'}} type="primary">
                     Copy link
                 </Button>
-                <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">
+                <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
                     Back
                 </Button>
             </Col>
@@ -124,7 +231,7 @@ const Payment = () => {
                     (domain && id) && <>
                         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
                            data-text="Casper payment:"
-                           data-url={`${domain}/bill/${id}`}
+                           data-url={billUrl}
                            data-show-count="false">Tweet</a>
                         <Script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></Script>
                     </>
@@ -133,18 +240,9 @@ const Payment = () => {
 
             <Col span={24} style={{padding: '0px 0 0px 0px'}}>
                 <Button size={'small'}
-                        style={{margin: '0px 0 0 0px',
-                            // position: 'relative',
-                            // height: '20px',
-                            // boxSizing: 'border-box',
-                            // padding: '1px 12px 1px 12px',
-                            // backgroundColor: '#1d9bf0',
-                            // color: '#fff',
-                            // borderRadius: '9999px',
-                            // fontWeight: 500,
-                            // cursor: 'pointer',
+                        style={{margin: '0px 0 0 0px'
                         }} type="primary">
-                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${location}`} style={{color: 'white'}} rel="noreferrer" data-text={`Casper payment: ${domain}/bill/${id}`} target="_blank">
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${billUrl}`} style={{color: 'white'}} rel="noreferrer" data-text={`Casper payment: ${billUrl}`} target="_blank">
                         <FacebookFilled style={{margin: '0px 3px 0px 0px'}}/>
                         Share on Facebook
                     </a>

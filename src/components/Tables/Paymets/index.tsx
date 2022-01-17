@@ -7,7 +7,6 @@ import {useRouter} from "next/router";
 import {addPayment} from "../../../../store/actions/payment";
 import {wrapper} from "../../../../store/store";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
-import {CLPublicKey} from "casper-js-sdk";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
 const { Option } = Select;

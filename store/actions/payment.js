@@ -35,6 +35,11 @@ export const getPayment = (id = '') => async (dispatch, getState) => {
 
 };
 
+export const sendMailBill = (id, email, billUrl) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
+  const result = await post(`payment/send-mail-bill`, {id, email, billUrl}, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+};
+
 const addPaymentStart = () => ({
   type: ADD_PAYMENT_START,
 });
