@@ -41,8 +41,8 @@ const Transactions = () => {
     const transactionsLoaded = useSelector((state) => state.transactions.isChanged);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
-    const router = useRouter()
-    const dispatch = useDispatch()
+    const router = useRouter();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (user?.role === 'admin') {
