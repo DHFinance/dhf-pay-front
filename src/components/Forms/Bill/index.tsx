@@ -11,7 +11,7 @@ import {getPayment} from "../../../../store/actions/payment";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {getStore} from "../../../../store/actions/store";
 import {getLastTransaction} from "../../../../store/actions/transaction";
-
+import axios from "axios";
 
 const initialState = {
     email: '',
@@ -118,8 +118,6 @@ const Bill = () => {
     }
     return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
-
-
 
 const FakeBill = ({billInfo, transaction, dispatch, router, store}) => {
 
@@ -265,6 +263,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
 
 
     const [balance, setBalance] = useState('')
+    const [balanceUsd, setBalanceUsd] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
     const [form] = Form.useForm();
@@ -300,7 +299,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
             } catch (e: any) {
                 showError(e.message)
             }
-            } else {
+        } else {
             showError('Please download CasperLabs Signer')
         }
     };
@@ -369,7 +368,9 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
             latestBlock.block.header.state_root_hash,
             balanceUref
         );
-
+        const course = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
+        const CSPRtoUSD = ((balance/1000000000) * course.data['casper-network'].usd).toFixed(2)
+        setBalanceUsd(CSPRtoUSD.toString())
         setBalance(balance.toString())
     };
 
@@ -386,7 +387,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Your Balance" value={balance || 'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
+                <Statistic title="Your Balance" value={balance ? `${balance} CSPR ($${balanceUsd})` : 'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
             </Col>
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
@@ -423,47 +424,41 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
                 <Link href={`https://testnet.cspr.live/deploy/${transaction?.txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                            Check last transaction
+                        </Button>
+                    </a>
+                </Link>
+                : payment?.transaction?.txHash ?
+                    <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                        <a target="_blank" rel="noreferrer">
+                            <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
-                        </Button>
-                    </a>
-                </Link>
-                : null
-            }
-            {payment?.transaction?.txHash ?
-                <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
-                    <a target="_blank" rel="noreferrer">
-                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                            Check last transaction
-                        </Button>
-                    </a>
-                </Link>
-                : null
+                            </Button>
+                        </a>
+                    </Link>
+                    : transactionExplorer ?
+                        <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                            <a target="_blank" rel="noreferrer">
+                                <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                    Check last transaction
+                                </Button>
+                            </a>
+                        </Link>
+                        : null
             }
 
-            {transactionExplorer ?
-                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
-                    <a target="_blank" rel="noreferrer">
-                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                            Check last transaction
-                        </Button>
-                    </a>
-                </Link>
-                : null
-            }
-
-            {   status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
+            {   status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !transaction?.txHash && !payment?.transaction?.txHash && !transactionExplorer ?
                 (!balance ?
-                <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                    Sign in Signer
-                </Button>
-                :
-                <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                    Pay
-                </Button>) : null
+                    <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                        Sign in Signer
+                    </Button>
+                    :
+                    <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                        Pay
+                    </Button>) : null
             }
         </>
     );
 };
-
 
 export default Bill

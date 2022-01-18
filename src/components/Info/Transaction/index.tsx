@@ -13,6 +13,8 @@ import Link from "next/link";
 import {getPayment} from "../../../../store/actions/payment";
 import {getTransaction} from "../../../../store/actions/transaction";
 import WithPageExist from "../../../../hoc/withPageExist";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import axios from "axios";
 
 interface IUserData {
     name: string,
@@ -37,6 +39,12 @@ const Transaction = () => {
     const [billData, setBillData] = useState(initialState)
     const [connected, setConnected] = useState(false)
     const [balance, setBalance] = useState('')
+    const [course, setCourse] = useState(null);
+
+    useEffect(async () => {
+        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
+        setCourse(courseUsd.data['casper-network'].usd)
+    }, [])
 
     const transaction = useSelector((state) => state.transaction.data);
     const transactionError = useSelector((state) => state.transaction.error);
@@ -53,6 +61,7 @@ const Transaction = () => {
         updated,
         sender,
         receiver,
+        amount,
     } = transaction
 
     const date = new Date(updated).toDateString()
@@ -70,6 +79,9 @@ const Transaction = () => {
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Sender" value={sender} prefix={<AreaChartOutlined />} />
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
+                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<CommentOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
