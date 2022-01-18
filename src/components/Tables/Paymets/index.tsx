@@ -174,13 +174,20 @@ const Payments = () => {
                     form={form}
                 >
                     <Form.Item
-                        label="Amount"
+                        label="Amount CSPR"
                         name="amount"
                         rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                     >
                         <Input type='number' onChange={onChangePayment('amount')}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="Amount USD"
+                        name="amount"
+                        rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
+                    >
                         ${CSPRtoUSD(+payment.amount, +course)}
                     </Form.Item>
+
                     <Form.Item
                         label="Comment"
                         name="comment"

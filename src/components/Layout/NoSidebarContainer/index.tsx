@@ -15,6 +15,8 @@ interface IContainerProps {
 
 const NoSidebarContainer = (props: IContainerProps) => {
     const [isPopoverHide, setPopoverHide] = useState(false);
+    const casperUser = useSelector((state) => state.pay.data);
+    console.log(casperUser)
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64, display:"flex", flexDirection:"column" }}>
@@ -23,23 +25,25 @@ const NoSidebarContainer = (props: IContainerProps) => {
                         placement="bottom"
                         content={
                             <div>
-                                <p>wallet balance</p>
-                                <Button type="primary" danger>casper logout</Button>
-
+                                <p>Balance: {casperUser.cspr} CSPR (${casperUser.usd})</p>
+                                <p>Hash: {casperUser.hash}</p>
+                                <p>Public key: {casperUser.public}</p>
                             </div>
-
                         }
-                        title="Wallet number"
+                        title={casperUser.public}
                         trigger="click"
                         visible={isPopoverHide}
                         onVisibleChange={()=>setPopoverHide(!isPopoverHide)}
                     >
-                        <Button type="primary">
-                            Wallet Number
-                            {
-                                !isPopoverHide ? <DownOutlined /> : <UpOutlined />
-                            }
-                        </Button>
+                        {casperUser.public ?
+                            <Button type="primary">
+                                {casperUser.public}
+                                {
+                                    !isPopoverHide ? <DownOutlined /> : <UpOutlined />
+                                }
+                            </Button>
+                            : null
+                        }
                     </Popover>
                 </div>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
