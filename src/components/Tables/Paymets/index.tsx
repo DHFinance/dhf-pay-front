@@ -9,6 +9,8 @@ import {wrapper} from "../../../../store/store";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
+import axios from "axios";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 const { Option } = Select;
 
 const columns = [
@@ -54,6 +56,11 @@ const Payments = () => {
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const paymentsLoaded = useSelector((state) => state.payments.isChanged);
 
+    useEffect(async () => {
+        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
+        setCourse(courseUsd.data['casper-network'].usd)
+    }, [])
+
     useEffect(() => {
         if (user?.role === 'admin') {
             dispatch(getPayments())
@@ -80,6 +87,7 @@ const Payments = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [payment, setPayment] = useState(initialState);
     const [currentStore, setCurrentStore] = useState(null);
+    const [course, setCourse] = useState(null);
 
     const [form] = Form.useForm();
 
@@ -171,6 +179,7 @@ const Payments = () => {
                         rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                     >
                         <Input type='number' onChange={onChangePayment('amount')}/>
+                        ${CSPRtoUSD(+payment.amount, +course)}
                     </Form.Item>
                     <Form.Item
                         label="Comment"

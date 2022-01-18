@@ -19,6 +19,8 @@ import Title from "antd/es/typography/Title";
 import {addStore} from "../../../../store/actions/store";
 import {getStores, getUserStores} from "../../../../store/actions/stores";
 import {clearAuth, postRestoreStepEmail} from "../../../../store/actions/auth";
+import axios from "axios";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 
 
 const Payment = () => {
@@ -27,11 +29,19 @@ const Payment = () => {
     const transactions = useSelector((state) => state.transactions.data);
     const paymentsError = useSelector((state) => state.payment.error);
     const user = useSelector((state) => state.auth.data);
+
+
     const dispatch = useDispatch()
 
     const [form] = Form.useForm();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [course, setCourse] = useState(null);
+
+    useEffect(async () => {
+        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
+        setCourse(courseUsd.data['casper-network'].usd)
+    }, [])
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -58,9 +68,7 @@ const Payment = () => {
     useEffect(() => {
         if (router.query.slug) {
             dispatch(getPayment(router.query.slug))
-
         }
-
     }, [])
 
     useEffect(() => {
@@ -68,7 +76,6 @@ const Payment = () => {
             dispatch(getUserTransactions(payments?.store?.apiKey))
         }
     }, [payments])
-
 
     const date = new Date(datetime).toDateString()
 
@@ -78,9 +85,7 @@ const Payment = () => {
 
     function copy() {
         const copyLink = document.getElementById("link");
-
         copyLink.select();
-
         document.execCommand("copy");
     }
 
@@ -121,7 +126,6 @@ const Payment = () => {
                         <td className="container">
                             <div className="content">
                                 <table className="main">
-
                                     <tr>
                                         <td className="wrapper">
                                             <table border="0" cellPadding="0" cellSpacing="0">
@@ -135,7 +139,7 @@ const Payment = () => {
                                                             Store: {store?.name}
                                                         </p>
                                                         <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
-                                                            Amount: {amount} CSPR
+                                                            Amount: {amount} CSPR (${CSPRtoUSD(amount, course)})
                                                         </p>
                                                         <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
                                                             Comment: {comment}
@@ -176,7 +180,7 @@ const Payment = () => {
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={amount} prefix={<AreaChartOutlined />} />
+                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Status" value={status?.replace('_', ' ') || 'none'} prefix={<AreaChartOutlined />} />
