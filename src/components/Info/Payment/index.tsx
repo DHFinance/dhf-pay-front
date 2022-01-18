@@ -181,38 +181,42 @@ const Payment = () => {
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Status" value={status?.replace('_', ' ') || 'none'} prefix={<AreaChartOutlined />} />
             </Col>
-            <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
+            <input type="text" value={billUrl} id="link" style={{
+                position: 'absolute',
+                opacity: 0
+            }}/>
+            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
-            <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
-                <div style={{
-                    paddingBottom: '4px',
-                    color: 'rgba(0, 0, 0, 0.45)',
-                    fontSize: '14px',
-                }}>Link</div>
-            </Col>
-            <input type="text" value={billUrl} id="link" style={{
-                position: 'absolute'
-            }}/>
-            <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
-                    <Link href={`/bill/${id}`}>
-                        <a style={{
-                            fontSize: '24px',
-                        }}
-                           target="_blank" rel="noreferrer">
-                            <CommentOutlined
-                                style={{
-                                    marginRight: '4px',
-                                    color: 'rgba(0, 0, 0, 0.85)',
-                                }}
-                            />
-                            {billUrl}
-                        </a>
-                    </Link>
-                    : null
-                }
-            </Col>
+            {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+            <>
+                <Col span={24} style={{padding: '0px 0 0px 20px', background: 'white'}}>
+                    <div style={{
+                        paddingBottom: '4px',
+                        color: 'rgba(0, 0, 0, 0.45)',
+                        fontSize: '14px',
+                    }}>Link</div>
+                </Col>
+                <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
+                    {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+                        <Link href={`/bill/${id}`}>
+                            <a style={{
+                                fontSize: '24px',
+                            }}
+                               target="_blank" rel="noreferrer">
+                                <CommentOutlined
+                                    style={{
+                                        marginRight: '4px',
+                                        color: 'rgba(0, 0, 0, 0.85)',
+                                    }}
+                                />
+                                {billUrl}
+                            </a>
+                        </Link>
+                        : null
+                    }
+                </Col>
+            </> : null}
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
                 <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
@@ -227,18 +231,6 @@ const Payment = () => {
             </Col>
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
-                {
-                    (domain && id) && <>
-                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
-                           data-text="Casper payment:"
-                           data-url={billUrl}
-                           data-show-count="false">Tweet</a>
-                        <Script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></Script>
-                    </>
-                }
-            </Col>
-
-            <Col span={24} style={{padding: '0px 0 0px 0px'}}>
                 <Button size={'small'}
                         style={{margin: '0px 0 0 0px'
                         }} type="primary">
@@ -250,7 +242,17 @@ const Payment = () => {
 
             </Col>
 
-
+            <Col span={24} style={{padding: '10px 0 0px 0px'}}>
+                {
+                    (domain && id) && <>
+                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
+                           data-text="Casper payment:"
+                           data-url={billUrl}
+                           data-show-count="false">Tweet</a>
+                        <Script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></Script>
+                    </>
+                }
+            </Col>
 
         </WithPageExist>
     );
