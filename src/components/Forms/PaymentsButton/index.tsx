@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, Modal, Select, Table} from "antd";
+import React, {useEffect, useState, useRef} from 'react';
+import {Button, Form, Input, Select,message} from "antd";
 import {useDispatch, useSelector} from "react-redux";
 import Link from "next/link";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 const { Option } = Select;
-import {useRouter} from "next/router";
 import {getUserStores} from "../../../../store/actions/stores";
-import {getPayments, getUserPayments} from "../../../../store/actions/payments";
+import {getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
+
 const columns = [
     {
         title: 'id',
@@ -41,17 +41,14 @@ const buttons = [
     {
         id:1,
         style: {margin: '0 0 20px 0', backgroundColor:"#91d5ff"},
-        classname:""
     },
     {
         id:2,
         style: {margin: '0 0 20px 0', backgroundColor:"#40a9ff",border: "1px black solid", borderRadius:"5px"},
-        classname:""
     },
     {
         id:3,
         style: {margin: '0 0 20px 0', backgroundColor:"#2f54eb",border: "1px black solid"},
-        classname:"three"
     }
 ]
 
@@ -72,6 +69,8 @@ const Buttons = () => {
         style: {},
         classname: ""
     })
+    const [htmlCode, setHtmlCode] = useState("default");
+    const textArea = useRef();
 
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
@@ -92,6 +91,12 @@ const Buttons = () => {
         setCurrentStore(current)
         dispatch(getUserPayments(value))
     }
+    const copyTextToClipboard = () => {
+        const context = document.getElementById("textArea");
+        context.select();
+        document.execCommand("copy");
+        message.success('HTML-code copied');
+    }
     const validateAmount = (rule: any, value: any, callback: any) => {
         if (value < 2500000000) {
             callback("Must be at least 2500000000");
@@ -102,6 +107,10 @@ const Buttons = () => {
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
         setButton({...button, style: itemButton.style, classname: itemButton.classname});
+    }
+    const handleGenerateHTML = () => {
+        const buttonHTML = document.getElementById("resultButton");
+        setHtmlCode(buttonHTML.outerHTML);
     }
     console.log(button);
     return <WithLoadingData data={storesLoaded ?? null}>
@@ -158,7 +167,7 @@ const Buttons = () => {
                 <div className="kind" style={{display: "flex", gap: "30px"}}>
                     {buttons.map((item, index)=>(
                         <div key={item.id} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
-                            <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}} onClick={()=> handleChooseButton(item)} className={`login-form-button ${item.classname}`}>
+                            <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}} onClick={()=> handleChooseButton(item)} className={`login-form-button`}>
                                 Button
                             </Button>
                             <CheckOutlined style={{margin: '0 0 20px 0',color:"#52c41a",fontWeight:"900", display:`${choosenButton === item.id ? "block":"none"}`}} />
@@ -170,14 +179,37 @@ const Buttons = () => {
                 label="Result"
                 name="description"
             >
-                <Button type="primary" style={button.style} className={button.classname}>{button.name}</Button>
+                <Button type="primary" id="resultButton" style={button.style} className={button.classname}>{button.name}</Button>
+            </Form.Item>
+            <Form.Item
+                label="HTML"
+                name="htmlCode"
+            >
+                <div style={{
+                    display:"flex",
+                    flexDirection:"column"
+                }}>
+                    <Input.TextArea id="textArea"
+                                    value={htmlCode}
+                                    readOnly
+                                    autoSize={{ minRows: 2, maxRows: 6 }}
+                                    style={{marginBottom: '20px', resize: 'none', cursor:"not-allowed"}}/>
+                    <div style={{
+                        display:"flex",
+                        justifyContent:"center",
+                        gap:"20px",
+                    }}>
+                    <Button type="primary" onClick={handleGenerateHTML}>Generate html</Button>
+                    <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
+                    </div>
+                </div>
             </Form.Item>
             <div style={{display: "flex", justifyContent:"center", gap: "10px", marginTop:"20px"}}>
-                <Button type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
+                <Button type="primary" style={{margin: '0 0 20px 0', width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
                     Save
                 </Button>
                 <Link href={`/payments`}>
-                    <Button type="primary" style={{margin: '0 0 20px 0', backgroundColor:"#bae7ff"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
+                    <Button type="primary" style={{margin: '0 0 20px 0', backgroundColor:"#bae7ff", width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
                         Back
                     </Button>
                 </Link>

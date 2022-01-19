@@ -6,8 +6,8 @@ import WithAuth from "../../hoc/withAuth";
 import {wrapper} from "../../store/store";
 
 
-const PaymentsPage = () => {
+const InvoicesPage = () => {
     return <WithAuth><SliderContainer><Payments/></SliderContainer></WithAuth>
 }
 
-export default wrapper.withRedux(PaymentsPage)
+export default wrapper.withRedux(InvoicesPage)
