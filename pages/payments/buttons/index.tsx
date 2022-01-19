@@ -1,4 +1,5 @@
 // @ts-nocheck
+import "/styles/Home.module.css";
 import React from "react";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
 import WithAuth from "../../../hoc/withAuth";

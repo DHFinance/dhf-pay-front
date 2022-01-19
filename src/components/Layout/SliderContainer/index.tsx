@@ -14,7 +14,6 @@ import {useRouter} from "next/router";
 import Title from "antd/lib/typography/Title";
 import {postLogout} from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
-
 const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
