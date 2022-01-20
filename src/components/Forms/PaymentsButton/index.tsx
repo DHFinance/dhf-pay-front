@@ -64,7 +64,7 @@ const Buttons = () => {
     const [button, setButton] = useState({
         name: "",
         amount: "",
-        style: {},
+        style:,
         classname: ""
     })
     const [htmlCode, setHtmlCode] = useState("");
