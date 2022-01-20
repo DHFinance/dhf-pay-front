@@ -53,8 +53,8 @@ export default function reducer(state = initialState, action) {
       };
     case  ADD_PAYMENT_SUCCESS:
       return {
-        ...state,
-        // data: action.payload,
+        // ...state,
+        data: action.payload,
         start: false,
         isLoading: false,
         isChanged: true
