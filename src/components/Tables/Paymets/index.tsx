@@ -41,12 +41,6 @@ const columns = [
     },
 ];
 
-const initialState = {
-    amount: '',
-    comment: ''
-}
-
-
 const Payments = () => {
 
     const payments = useSelector((state) => state.payments.data);
@@ -78,31 +72,8 @@ const Payments = () => {
 
 
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [payment, setPayment] = useState(initialState);
     const [currentStore, setCurrentStore] = useState(null);
 
-    const [form] = Form.useForm();
-
-    const onChangePayment = (field: string) => (e: any) => {
-        const value = e.target.value
-        setPayment({
-            ...payment,
-            [field]: value,
-        })
-    }
-
-    const showModal = () => {
-        setIsModalVisible(true);
-    };
-
-    const validateAmount = (rule: any, value: any, callback: any) => {
-        if (value < 2500000000) {
-            callback("Must be at least 2500000000");
-        } else {
-            callback();
-        }
-    };
 
     useEffect(() => {
         if (stores.length && user.role !== 'admin' && activeStores[0]?.apiKey) {
@@ -116,35 +87,10 @@ const Payments = () => {
         }
     }, [activeStores])
 
-    const handleOk = async () => {
-        await form.validateFields()
-            .then(async (res) => {
-                try {
-                    await dispatch(addPayment(payment, currentStore.apiKey))
-                    if (user?.role === 'admin') {
-                        dispatch(getPayments())
-                    }
-                    if (user?.role === 'customer') {
-                        dispatch(getUserPayments(currentStore.apiKey))
-                    }
-                    setPayment(initialState)
-                    form.resetFields();
-                    setIsModalVisible(false);
-                } catch (e) {
-                    console.log(e, 'registration error')
-                }
-            })
-            .catch(async (err) => console.log(err))
-    }
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},
-            onClick: event => router.push(`payments/${record.id}`),
+            onClick: event => router.push(`invoices/${record.id}`),
         };
     }
 
@@ -165,12 +111,6 @@ const Payments = () => {
             }
             {user.role !== 'admin' && activeStores.length && currentStore ?
                 <>
-                    <Button onClick={showModal} type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button">
-                        Add Payment
-                    </Button>
-                    <br/>
-
-                    {console.log(currentStore)}
                     <Select defaultValue={currentStore.name} style={{ width: 120, margin: '0 0 20px 0'}} onChange={handleChange}>
                         {
                             activeStores.map((store) => <Option key={store.id} value={store.apiKey}>{store.name}</Option>)

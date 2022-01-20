@@ -5,8 +5,9 @@ import Link from "next/link";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 const { Option } = Select;
 import {getUserStores} from "../../../../store/actions/stores";
-import {getUserPayments} from "../../../../store/actions/payments";
+import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
+import {addPayment} from "../../../../store/actions/payment";
 
 const columns = [
     {
@@ -53,12 +54,9 @@ const buttons = [
 ]
 
 const initialState = {
-    description: '',
-    name: '',
-    url: '',
-    apiKey: '',
-    wallet: ''
-}
+    amount: '',
+    comment: ''
+};
 
 const Buttons = () => {
     const [currentStore, setCurrentStore] = useState(null);
@@ -69,8 +67,10 @@ const Buttons = () => {
         style: {},
         classname: ""
     })
-    const [htmlCode, setHtmlCode] = useState("default");
-    const textArea = useRef();
+    const [htmlCode, setHtmlCode] = useState("");
+    const [visibleHtmlCode, setVisibleHtmlCode] = useState(false);
+    const [paymentId, setPaymentId] = useState("");
+    const [payment, setPayment] = useState(initialState);
 
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
@@ -80,7 +80,7 @@ const Buttons = () => {
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
-    }, [])
+    }, []);
 
     const [form] = Form.useForm();
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
@@ -88,8 +88,8 @@ const Buttons = () => {
 
     function handleChange(value) {
         const current = stores.filter((store) => store.apiKey === value)[0]
-        setCurrentStore(current)
-        dispatch(getUserPayments(value))
+        setCurrentStore(current);
+        dispatch(getUserPayments(value));
     }
     const copyTextToClipboard = () => {
         const context = document.getElementById("textArea");
@@ -104,6 +104,38 @@ const Buttons = () => {
             callback();
         }
     };
+
+    const handleOk = async () => {
+        await form.validateFields()
+            .then(async (res) => {
+                try {
+                    const currentPayment = await dispatch(addPayment(payment, currentStore.apiKey))
+                    if (user?.role === 'admin') {
+                        dispatch(getPayments())
+                    }
+                    if (user?.role === 'customer') {
+                        dispatch(getUserPayments(currentStore.apiKey))
+                    }
+                    setPaymentId(currentPayment.data.id);
+                    message.success('Payment was added');
+                    setPayment(initialState);
+                    handleGenerateHTML();
+                    setVisibleHtmlCode(true);
+                } catch (e) {
+                    console.log(e, 'registration error')
+                }
+            })
+            .catch(async (err) => console.log(err))
+    };
+
+    const onChangePayment = (field: string) => (e: any) => {
+        const value = e.target.value;
+        setPayment({
+            ...payment,
+            [field]: value,
+        })
+    };
+
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
         setButton({...button, style: itemButton.style, classname: itemButton.classname});
@@ -112,7 +144,7 @@ const Buttons = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
-    console.log(button);
+
     return <WithLoadingData data={storesLoaded ?? null}>
         <Form
             name="basic"
@@ -138,7 +170,7 @@ const Buttons = () => {
                 name="amount"
                 rules={[{ required: true, message: 'Please input amount!' },{ validator: validateAmount }]}
             >
-                <Input />
+                <Input type='number' onChange={onChangePayment('amount')}/>
             </Form.Item>
             {
                 !!activeStores.length && <Form.Item
@@ -155,10 +187,10 @@ const Buttons = () => {
                 </Form.Item>
             }
             <Form.Item
-                label="Description"
-                name="description"
+                label="Comment"
+                name="comment"
             >
-                <Input.TextArea />
+                <Input.TextArea onChange={onChangePayment('comment')}/>
             </Form.Item>
             <Form.Item
                 label="Kind button"
@@ -179,11 +211,14 @@ const Buttons = () => {
                 label="Result"
                 name="description"
             >
-                <Button type="primary" id="resultButton" style={button.style} className={button.classname}>{button.name}</Button>
+                <Button type="primary" href={`http://localhost:4000/bill/${paymentId}`} id="resultButton" style={button.style} className={button.classname}>{button.name}</Button>
             </Form.Item>
             <Form.Item
                 label="HTML"
                 name="htmlCode"
+                style={{
+                    display: `${visibleHtmlCode? "": "none"}`
+                }}
             >
                 <div style={{
                     display:"flex",
@@ -197,23 +232,23 @@ const Buttons = () => {
                     <div style={{
                         display:"flex",
                         justifyContent:"center",
-                        gap:"20px",
                     }}>
-                    <Button type="primary" onClick={handleGenerateHTML}>Generate html</Button>
                     <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
                     </div>
                 </div>
             </Form.Item>
-            <div style={{display: "flex", justifyContent:"center", gap: "10px", marginTop:"20px"}}>
-                <Button type="primary" style={{margin: '0 0 20px 0', width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
-                    Save
-                </Button>
-                <Link href={`/payments`}>
-                    <Button type="primary" style={{margin: '0 0 20px 0', backgroundColor:"#bae7ff", width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
-                        Back
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
+                    <Button type="primary" style={{margin: '0 0 20px 0', width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
+                        Save
                     </Button>
-                </Link>
-            </div>
+                    <Link href={`/payments`}>
+                        <Button type="primary" style={{margin: '0 0 20px 0', backgroundColor:"#bae7ff", width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
+                            Back
+                        </Button>
+                    </Link>
+                </div>
+            </Form.Item>
         </Form>
     </WithLoadingData>
 };
