@@ -21,7 +21,7 @@ const getUsersFailed = (error) => ({
 export const getUsers = () => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getUsersStart());
-  const result = await get('/user', {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get('/user', {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
   try {
     dispatch(getUsersSuccess(result.data));
   } catch (e) {

@@ -21,7 +21,7 @@ const getTransactionsFailed = (error) => ({
 export const getTransactions = () => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionsStart());
-  const result = await get('/transaction', {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get('/transaction', {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
   try {
     dispatch(getTransactionsSuccess(result.data));
   } catch (e) {
@@ -33,7 +33,7 @@ export const getUserTransactions = (apiKey) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   console.log(token)
   dispatch(getTransactionsStart());
-  await get(`/transaction`, {headers: {"Authorization": apiKey, "Authorization-x": token}}).then(async (transactions) => {
+  await get(`/transaction`, {headers: {"Authorization": `Bearer ${apiKey}`}}).then(async (transactions) => {
     dispatch(getTransactionsSuccess(transactions.data))
   }).catch(e => dispatch(getTransactionsFailed(e)));
 };

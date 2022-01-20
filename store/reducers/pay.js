@@ -1,4 +1,4 @@
-import {  POST_PAY_SUCCESS, POST_PAY_FAILED, POST_PAY_START }  from '../actions/pay';
+import {  POST_PAY_SUCCESS, POST_PAY_FAILED, POST_PAY_START, SET_CASPER_SUCCESS }  from '../actions/pay';
 import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
 const initialState = {
@@ -23,7 +23,7 @@ export default function reducer(state = initialState, action) {
     case  POST_PAY_SUCCESS:
       return {
         ...state,
-        data: action.payload,
+        // data: action.payload,
         isLoading: false,
         isChanged: true
       };
@@ -32,6 +32,13 @@ export default function reducer(state = initialState, action) {
         ...state,
         isLoading: false,
         error: action.payload,
+        isChanged: true
+      };
+    case SET_CASPER_SUCCESS:
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
         isChanged: true
       };
     default:

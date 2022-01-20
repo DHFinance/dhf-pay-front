@@ -22,7 +22,7 @@ const getTransactionFailed = (error) => ({
 export const getTransaction = (txHash = '') => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
-  const result = await get(`/transaction/${txHash}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get(`/transaction/${txHash}`, {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
 
   try {
     dispatch(getTransactionSuccess(result.data));
@@ -35,7 +35,7 @@ export const getTransaction = (txHash = '') => async (dispatch, getState) => {
 export const getLastTransaction = (paymentId = '') => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
-  const result = await get(`/transaction/last/${paymentId}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get(`/transaction/last/${paymentId}`, {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
   try {
     dispatch(getTransactionSuccess(result.data));
     return result
