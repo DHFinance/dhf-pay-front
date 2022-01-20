@@ -24,7 +24,7 @@ const getPaymentFailed = (error) => ({
 export const getPayment = (id = '') => async (dispatch, getState) => {
   dispatch(getPaymentStart());
   const token = getState().auth?.data?.token
-  const result = await get(`/payment/${id}`, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await get(`/payment/${id}`, {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
 
   try {
     dispatch(getPaymentSuccess(result.data));
@@ -37,7 +37,7 @@ export const getPayment = (id = '') => async (dispatch, getState) => {
 
 export const sendMailBill = (id, email, billUrl) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
-  const result = await post(`payment/send-mail-bill`, {id, email, billUrl}, {headers: {"Authorization-x": token}}).catch(e => console.log(e));
+  const result = await post(`payment/send-mail-bill`, {id, email, billUrl}, {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
 };
 
 const addPaymentStart = () => ({
@@ -57,7 +57,7 @@ const addPaymentFailed = (error) => ({
 export const addPayment = (data, apiKey) => async (dispatch, getState) => {
   dispatch(addPaymentStart());
   const token = getState().auth?.data?.token
-  const result = await post(`/payment`, data, {headers: {"Authorization": apiKey, "Authorization-x": token}});
+  const result = await post(`/payment`, data, {headers: {"Authorization": `Bearer ${apiKey}`}});
   try {
     dispatch(addPaymentSuccess(result.data));
   } catch (e) {
