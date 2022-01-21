@@ -14,7 +14,6 @@ import {useRouter} from "next/router";
 import Title from "antd/lib/typography/Title";
 import {postLogout} from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
-
 const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
@@ -70,11 +69,26 @@ const SliderContainer = (props: IContainerProps) => {
                                 Transactions
                             </Link>
                         </Menu.Item>
-                        <Menu.Item key="payments" icon={<AreaChartOutlined />}>
-                            <Link href={'/payments'}>
-                                Payments
+                            <Menu.Item key="invoices" icon={<AreaChartOutlined />}>
+                                <Link href={'/invoices'}>
+                                    Invoices
+                                </Link>
+                            </Menu.Item>
+                        <Menu.Item key="invoicesBuilder" icon={<AreaChartOutlined />}>
+                            <Link href={'/invoicesBuilder'}>
+                                Invoices Builder
                             </Link>
                         </Menu.Item>
+                            <Menu.Item key="buttons" icon={<AreaChartOutlined />}>
+                                <Link href={'/buttons'}>
+                                    Buttons
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item key="buttonsBuilder" icon={<AreaChartOutlined />}>
+                                <Link href={'/buttonsBuilder'}>
+                                    Buttons Builder
+                                </Link>
+                            </Menu.Item>
                         <Menu.Item key="logout" onClick={onLogout} icon={<ApiOutlined />}>
                             Logout
                         </Menu.Item>

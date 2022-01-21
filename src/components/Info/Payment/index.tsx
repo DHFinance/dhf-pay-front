@@ -1,5 +1,5 @@
 // @ts-nocheck
-import {Statistic, Row, Col, Button, Modal, Form, Input} from 'antd';
+import {Statistic, Row, Col, Button, Modal, Form, Input, message} from 'antd';
 import Script from 'next/script'
 import {
     AreaChartOutlined,
@@ -15,15 +15,13 @@ import Link from "next/link";
 import {getPayment, sendMailBill} from "../../../../store/actions/payment";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {getUserTransactions} from "../../../../store/actions/transacrions";
-import Title from "antd/es/typography/Title";
-import {addStore} from "../../../../store/actions/store";
-import {getStores, getUserStores} from "../../../../store/actions/stores";
-import {clearAuth, postRestoreStepEmail} from "../../../../store/actions/auth";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {buttons} from "../../../data/buttonsBuilder";
 
 
-const Payment = () => {
+const Payment = ({isButtons}) => {
+    const [htmlCode, setHtmlCode] = useState("");
 
     const payments = useSelector((state) => state.payment.data);
     const transactions = useSelector((state) => state.transactions.data);
@@ -58,11 +56,11 @@ const Payment = () => {
         comment,
         status,
         store,
-        wallet
+        type,
+        text,
     } = payments
 
-    const filterTransactions = transactions.filter((transaction) => transaction.payment.id === id)
-
+    const filterTransactions = transactions.filter((transaction) => transaction.payment.id === id);
     const router = useRouter()
 
     useEffect(() => {
@@ -76,6 +74,11 @@ const Payment = () => {
             dispatch(getUserTransactions(payments?.store?.apiKey))
         }
     }, [payments])
+
+    useEffect(() => {
+        if(isButtons) handleGenerateHTML();
+    }, []);
+
 
     const date = new Date(datetime).toDateString()
 
@@ -113,6 +116,18 @@ const Payment = () => {
             ...userData,
             [field]: value,
         })
+    }
+
+    const copyTextToClipboard = () => {
+        const context = document.getElementById("textArea");
+        context.select();
+        document.execCommand("copy");
+        message.success('HTML-code copied');
+    }
+
+    const handleGenerateHTML = () => {
+        const buttonHTML = document.getElementById("resultButton");
+        setHtmlCode(buttonHTML.outerHTML);
     }
 
     const receiverEmail = userData.email
@@ -220,6 +235,37 @@ const Payment = () => {
                         : null
                     }
                 </Col>
+                {isButtons &&
+                    <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
+                        <a href={`http://localhost:4000/bill/${id}`} target="_blank" id="resultButton"
+                           style={type ? {...buttons[type-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
+                        >
+                            {text}
+                        </a>
+                        <Form.Item
+                            label="HTML"
+                            name="htmlCode"
+                        >
+                            <div style={{
+                                display:"flex",
+                                flexDirection:"column"
+                            }}>
+                                <Input.TextArea id="textArea"
+                                                value={htmlCode}
+                                                readOnly
+                                                autoSize={{ minRows: 2, maxRows: 6 }}
+                                                style={{marginBottom: '20px', resize: 'none', cursor:"not-allowed"}}/>
+                                <div style={{
+                                    display:"flex",
+                                    justifyContent:"center",
+                                }}>
+                                    <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
+                                </div>
+                            </div>
+                        </Form.Item>
+                    </Col>
+                }
+
             </> : null}
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
