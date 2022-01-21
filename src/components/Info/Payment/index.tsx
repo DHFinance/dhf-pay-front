@@ -128,7 +128,6 @@ const Payment = ({isButtons}) => {
     }
 
     const receiverEmail = userData.email
-    console.log(isButtons);
     return (
         <WithPageExist error={paymentsError} data={payments}>
             <Modal title="Create a letter" visible={isModalVisible} onOk={onSubmit} onCancel={handleCancel}>
