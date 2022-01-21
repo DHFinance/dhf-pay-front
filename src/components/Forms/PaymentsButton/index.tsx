@@ -8,6 +8,7 @@ import {getUserStores} from "../../../../store/actions/stores";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
+import {buttons} from "../../../data/buttonsBuilder";
 
 const columns = [
     {
@@ -38,35 +39,17 @@ const columns = [
     },
 ];
 
-const buttons = [
-    {
-        id:1,
-        style: {margin: '0 0 20px 0', backgroundColor:"#91d5ff"},
-    },
-    {
-        id:2,
-        style: {margin: '0 0 20px 0', backgroundColor:"#40a9ff",border: "1px black solid", borderRadius:"5px"},
-    },
-    {
-        id:3,
-        style: {margin: '0 0 20px 0', backgroundColor:"#2f54eb",border: "1px black solid"},
-    }
-]
-
 const initialState = {
     amount: '',
-    comment: ''
+    comment: '',
+    type: null,
+    text: "",
 };
 
 const Buttons = () => {
     const [currentStore, setCurrentStore] = useState(null);
     const [choosenButton, setChoosenButton] = useState(0);
-    const [button, setButton] = useState({
-        name: "",
-        amount: "",
-        style: {},
-        classname: ""
-    })
+
     const [htmlCode, setHtmlCode] = useState("");
     const [visibleHtmlCode, setVisibleHtmlCode] = useState(false);
     const [paymentId, setPaymentId] = useState("");
@@ -75,6 +58,7 @@ const Buttons = () => {
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
+    const currentPayment = useSelector((state) => state.payment.data);
 
     useEffect(() => {
         if (user?.role === 'customer') {
@@ -118,7 +102,6 @@ const Buttons = () => {
                     }
                     setPaymentId(currentPayment.data.id);
                     message.success('Payment was added');
-                    setPayment(initialState);
                     handleGenerateHTML();
                     setVisibleHtmlCode(true);
                 } catch (e) {
@@ -138,13 +121,16 @@ const Buttons = () => {
 
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
-        setButton({...button, style: itemButton.style, classname: itemButton.classname});
+        setPayment(({
+            ...payment,
+            type: itemButton.id,
+        }))
     }
     const handleGenerateHTML = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
-
+    console.log(payment, currentPayment);
     return <WithLoadingData data={storesLoaded ?? null}>
         <Form
             name="basic"
@@ -161,9 +147,8 @@ const Buttons = () => {
                 label="Name"
                 name="name"
                 rules={[{ required: true, message: 'Please input button name!' }]}
-                onChange={(e)=>setButton({...button, name:e.target.value})}
             >
-                <Input/>
+                <Input type="text" onChange={onChangePayment('text')}/>
             </Form.Item>
             <Form.Item
                 label="Amount"
@@ -199,7 +184,8 @@ const Buttons = () => {
                 <div className="kind" style={{display: "flex", gap: "30px"}}>
                     {buttons.map((item, index)=>(
                         <div key={item.id} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
-                            <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}} onClick={()=> handleChooseButton(item)} className={`login-form-button`}>
+                            <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}}
+                                    onClick={()=> handleChooseButton(item)} className="login-form-button">
                                 Button
                             </Button>
                             <CheckOutlined style={{margin: '0 0 20px 0',color:"#52c41a",fontWeight:"900", display:`${choosenButton === item.id ? "block":"none"}`}} />
@@ -207,12 +193,20 @@ const Buttons = () => {
                     ))}
                 </div>
             </Form.Item>
-            <Form.Item
-                label="Result"
-                name="description"
-            >
-                <Button type="primary" href={`http://localhost:4000/bill/${paymentId}`} id="resultButton" style={button.style} className={button.classname}>{button.name}</Button>
-            </Form.Item>
+            {
+                payment.text ?
+                    <Form.Item
+                        label="Result"
+                        name="description"
+                    >
+                        <a href={`http://localhost:4000/bill/${paymentId}`} id="resultButton"
+                        style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
+                >
+                            {payment.text}
+                        </a>
+                    </Form.Item> : null
+            }
+
             <Form.Item
                 label="HTML"
                 name="htmlCode"
@@ -242,11 +236,6 @@ const Buttons = () => {
                     <Button type="primary" style={{margin: '0 0 20px 0', width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
                         Save
                     </Button>
-                    <Link href={`/payments`}>
-                        <Button type="primary" style={{margin: '0 0 20px 0', backgroundColor:"#bae7ff", width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={()=>form.validateFields()}>
-                            Back
-                        </Button>
-                    </Link>
                 </div>
             </Form.Item>
         </Form>
