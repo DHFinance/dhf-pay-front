@@ -136,7 +136,6 @@ const Buttons = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
-    console.log('conflict');
     return <WithLoadingData data={storesLoaded ?? null}>
         <Form
             name="basic"
