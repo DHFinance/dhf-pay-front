@@ -7,7 +7,7 @@ import {wrapper} from "../../store/store";
 import ButtonsForm from "../../src/components/Forms/PaymentsButton";
 
 const ButtonsBuilderPage = () => {
-    return <WithAuth>
+    return <WithAuth isBuilder>
         <SliderContainer>
             <ButtonsForm/>
         </SliderContainer>

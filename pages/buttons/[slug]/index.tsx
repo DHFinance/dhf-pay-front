@@ -4,12 +4,12 @@ import {wrapper} from "../../../store/store";
 // @ts-ignore
 import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
-import InfoButton from "../../../src/components/Info/Payment/button";
+import Payment from "../../../src/components/Info/Payment";
 
 
 const PaymentPage = () => {
 
-    return <WithAuth><SliderContainer><InfoButton/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer><Payment isButtons={true}/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(PaymentPage)
