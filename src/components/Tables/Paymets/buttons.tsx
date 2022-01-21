@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import Payment from "./index";
 import {useSelector} from "react-redux";

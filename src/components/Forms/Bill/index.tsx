@@ -13,6 +13,7 @@ import {getStore} from "../../../../store/actions/store";
 import {getLastTransaction} from "../../../../store/actions/transaction";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {getCourse} from "../../../../store/actions/course";
 
 const initialState = {
     email: '',
@@ -94,6 +95,7 @@ const signerErrors = [
 
 const Bill = () => {
     const isFake = process.env.NEXT_PUBLIC_FAKE_TRANSACTION === '1'
+    const course = useSelector((state) => state.course.data.usd);
     const billInfo = useSelector((state) => state.payment.data);
     const transaction = useSelector((state) => state.transaction.data);
     const billInfoError = useSelector((state) => state.payment.error);
@@ -104,7 +106,7 @@ const Bill = () => {
         const pathname = window.location.pathname.split('/')
         const id = pathname && pathname[pathname.length - 1]
         dispatch(getPayment(id))
-
+        dispatch(getCourse())
     }, [])
     useEffect(() => {
         if (billInfo?.store?.id) {
@@ -114,25 +116,19 @@ const Bill = () => {
     }, [billInfo])
     if (isFake) {
         return <WithPageExist error={billInfoError} data={store} >
-            <FakeBill billInfo={billInfo} store={store} transaction={transaction} dispatch={dispatch} router={router}/>
+            <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
 
-const FakeBill = ({billInfo, transaction, dispatch, router, store}) => {
+const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
 
     const [billData, setBillData] = useState(initialState)
     const [sign, setSign] = useState(false)
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [form] = Form.useForm();
     const defaultTxHash = 'd7DdAC148B97671859946603915175b46ea976e11D3263C28E2A35075D634789'
-    const [course, setCourse] = useState(null);
-
-    useEffect(async () => {
-        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        setCourse(courseUsd.data['casper-network'].usd)
-    }, [])
 
     const deploy = async ()=> {
         await form.validateFields()
@@ -265,19 +261,13 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store}) => {
     );
 };
 
-const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
+const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) => {
 
     const [balance, setBalance] = useState('')
     const [balanceUsd, setBalanceUsd] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
     const [form] = Form.useForm();
-    const [course, setCourse] = useState(null);
-
-    useEffect(async () => {
-        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        setCourse(courseUsd.data['casper-network'].usd)
-    }, [])
 
     const showError = (message: string) => {
         console.log('Signer connection:', message)
