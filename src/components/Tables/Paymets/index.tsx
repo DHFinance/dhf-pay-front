@@ -13,38 +13,8 @@ import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 const { Option } = Select;
 
-const columns = [
-    {
-        title: 'id',
-        dataIndex: 'id',
-        key: 'id',
+const Payments = ({paymentsTable, entity, columns}) => {
 
-    },
-    {
-        title: 'datetime',
-        key: 'datetime',
-        dataIndex: 'datetime',
-    },
-    {
-        title: 'amount',
-        dataIndex: 'amount',
-        key: 'amount',
-    },
-    {
-        title: 'comment',
-        key: 'comment',
-        dataIndex: 'comment',
-    },
-    {
-        title: 'status',
-        key: 'status',
-        dataIndex: 'status',
-    },
-];
-
-const Payments = () => {
-
-    const payments = useSelector((state) => state.payments.data);
     const user = useSelector((state) => state.auth.data);
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
@@ -63,15 +33,6 @@ const Payments = () => {
             dispatch(getUserStores(user.id))
         }
     }, [])
-
-    const paymentsTable = payments.map((payment) => {
-        return {
-            ...payment,
-            status: payment?.status?.replace('_', ' '),
-            store: payment?.store?.name,
-            datetime: new Date(payment?.datetime).toDateString()
-        }
-    }).reverse()
 
     const router = useRouter()
     const dispatch = useDispatch()
@@ -97,7 +58,7 @@ const Payments = () => {
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},
-            onClick: event => router.push(`invoices/${record.id}`),
+            onClick: event => router.push(`${entity}/${record.id}`),
         };
     }
 

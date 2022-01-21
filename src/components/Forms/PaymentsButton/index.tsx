@@ -199,7 +199,7 @@ const Buttons = () => {
                         label="Result"
                         name="description"
                     >
-                        <a href={`http://localhost:4000/bill/${paymentId}`} id="resultButton"
+                        <a href={`http://localhost:4000/bill/${paymentId}`} id="resultButton" target="_blank"
                         style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
                 >
                             {payment.text}
