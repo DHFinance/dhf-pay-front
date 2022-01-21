@@ -76,8 +76,8 @@ const Payment = ({isButtons}) => {
     }, [payments])
 
     useEffect(() => {
-        if(type && text) handleGenerateHTML();
-    }, [type,text]);
+        if(isButtons) handleGenerateHTML();
+    }, []);
 
 
     const date = new Date(datetime).toDateString()
