@@ -63,5 +63,4 @@ export const addPayment = (data, apiKey) => async (dispatch, getState) => {
   } catch (e) {
     dispatch(addPaymentFailed(e));
   }
-  return result;
 };
