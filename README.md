@@ -25,4 +25,4 @@ $ npm run start
 
 ## Документация
 
-https://docs.google.com/document/d/16gjZYStFkGj4mOCMaZ0eakzmvK5DQaYW00nn2JZnmoY/edit
+https://docs.google.com/document/d/1bveOic_rf6OtdadTzrv0UBdDGG2fFGC23vUerUQoBFQ/edit?usp=sharing

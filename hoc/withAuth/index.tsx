@@ -11,7 +11,7 @@ import {wrapper} from "../../store/store";
 import {data} from "browserslist";
 
 
-const WithAuth = ({children, isAdmin}: any) => {
+const WithAuth = ({children, isAdmin, isBuilder}: any) => {
 
     const localToken = localStorage.getItem('token')
     const router = useRouter()
@@ -49,6 +49,11 @@ const WithAuth = ({children, isAdmin}: any) => {
             alignItems: 'center',
             width: '100%',
             height: '100vh'}}/>
+    }
+    if(isBuilder){
+        if (auth.data.role === "admin"){
+            router.push('/').then(r => console.log('you are not found'));
+        }
     }
 
     return children

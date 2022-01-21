@@ -9,7 +9,7 @@ import InvoicesBuilder from "../../src/components/Forms/InvoicesBuilder";
 
 const InvoicesBuilderPage = () => {
 
-    return <WithAuth><SliderContainer><InvoicesBuilder/></SliderContainer></WithAuth>
+    return <WithAuth isBuilder><SliderContainer><InvoicesBuilder/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(InvoicesBuilderPage)

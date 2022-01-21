@@ -74,21 +74,25 @@ const SliderContainer = (props: IContainerProps) => {
                                     Invoices
                                 </Link>
                             </Menu.Item>
-                        <Menu.Item key="invoicesBuilder" icon={<AreaChartOutlined />}>
-                            <Link href={'/invoicesBuilder'}>
-                                Invoices Builder
-                            </Link>
-                        </Menu.Item>
+                            {user.data.role !== "admin"?
+                                <Menu.Item key="invoicesBuilder" icon={<AreaChartOutlined />}>
+                                    <Link href={'/invoicesBuilder'}>
+                                        Invoices Builder
+                                    </Link>
+                                </Menu.Item> : null
+                            }
                             <Menu.Item key="buttons" icon={<AreaChartOutlined />}>
                                 <Link href={'/buttons'}>
                                     Buttons
                                 </Link>
                             </Menu.Item>
+                            {user.data.role !== "admin" ?
                             <Menu.Item key="buttonsBuilder" icon={<AreaChartOutlined />}>
                                 <Link href={'/buttonsBuilder'}>
                                     Buttons Builder
                                 </Link>
                             </Menu.Item>
+                                : null}
                         <Menu.Item key="logout" onClick={onLogout} icon={<ApiOutlined />}>
                             Logout
                         </Menu.Item>

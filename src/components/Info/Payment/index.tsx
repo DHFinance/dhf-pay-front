@@ -22,6 +22,7 @@ import {buttons} from "../../../data/buttonsBuilder";
 
 const Payment = ({isButtons}) => {
     const [htmlCode, setHtmlCode] = useState("");
+    const [isVisibleHtml, setVisibleHtml] = useState(false);
 
     const payments = useSelector((state) => state.payment.data);
     const transactions = useSelector((state) => state.transactions.data);
@@ -75,11 +76,6 @@ const Payment = ({isButtons}) => {
         }
     }, [payments])
 
-    useEffect(() => {
-        if(isButtons) handleGenerateHTML();
-    }, []);
-
-
     const date = new Date(datetime).toDateString()
 
     const domain = location.origin
@@ -127,11 +123,12 @@ const Payment = ({isButtons}) => {
 
     const handleGenerateHTML = () => {
         const buttonHTML = document.getElementById("resultButton");
+        setVisibleHtml(true);
         setHtmlCode(buttonHTML.outerHTML);
     }
 
     const receiverEmail = userData.email
-
+    console.log(isButtons);
     return (
         <WithPageExist error={paymentsError} data={payments}>
             <Modal title="Create a letter" visible={isModalVisible} onOk={onSubmit} onCancel={handleCancel}>
@@ -235,35 +232,55 @@ const Payment = ({isButtons}) => {
                         : null
                     }
                 </Col>
-                {isButtons &&
-                    <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                        <a href={`http://localhost:4000/bill/${id}`} target="_blank" id="resultButton"
-                           style={type ? {...buttons[type-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
-                        >
-                            {text}
-                        </a>
-                        <Form.Item
-                            label="HTML"
-                            name="htmlCode"
-                        >
+                {isButtons ?
+                    <>
+                        <Col span={24} style={{padding: '0px 0 0px 20px', background: 'white'}}>
                             <div style={{
-                                display:"flex",
-                                flexDirection:"column"
-                            }}>
-                                <Input.TextArea id="textArea"
-                                                value={htmlCode}
-                                                readOnly
-                                                autoSize={{ minRows: 2, maxRows: 6 }}
-                                                style={{marginBottom: '20px', resize: 'none', cursor:"not-allowed"}}/>
-                                <div style={{
-                                    display:"flex",
-                                    justifyContent:"center",
-                                }}>
-                                    <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
-                                </div>
-                            </div>
-                        </Form.Item>
-                    </Col>
+                                paddingBottom: '4px',
+                                color: 'rgba(0, 0, 0, 0.45)',
+                                fontSize: '14px',
+                            }}>Button</div>
+                        </Col>
+                        <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
+                            <a href={`http://localhost:4000/bill/${id}`} rel='noreferrer' target="_blank" id="resultButton"
+                               style={type ? {...buttons[type-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
+                            >
+                                {text}
+                            </a>
+                            {
+                                <Col span={24} style={{padding: '0px 0 20px 0px', background: 'white'}}>
+
+                                    {
+                                        !isVisibleHtml ?
+                                        <Button type="primary" style={{display: `${isVisibleHtml ? "none" : ""}` }} onClick={handleGenerateHTML}>Сгенерировать Html</Button>
+                                        :
+                                        <Form.Item
+                                        label="HTML"
+                                        name="htmlCode"
+                                        style={{display: `${isVisibleHtml ? "" : "none"}` }}
+                                        >
+                                        <div style={{
+                                        display:"flex",
+                                        flexDirection:"column"
+                                    }}>
+                                        <Input.TextArea id="textArea"
+                                        value={htmlCode}
+                                        readOnly
+                                        autoSize={{ minRows: 2, maxRows: 6 }}
+                                        style={{marginBottom: '20px', resize: 'none', cursor:"not-allowed"}}/>
+                                        <div style={{
+                                        display:"flex",
+                                        justifyContent:"center",
+                                    }}>
+                                        <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
+                                        </div>
+                                        </div>
+                                        </Form.Item>
+                                    }
+                                </Col>
+                            }
+                        </Col>
+                    </> : null
                 }
 
             </> : null}
