@@ -119,6 +119,10 @@ const Buttons = () => {
         })
     };
 
+    const uslessFunc = () => {
+        return null
+    }
+
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
         setPayment(({
@@ -130,7 +134,7 @@ const Buttons = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
-    console.log(payment, currentPayment);
+    console.log('conflict');
     return <WithLoadingData data={storesLoaded ?? null}>
         <Form
             name="basic"
