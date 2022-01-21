@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {useEffect, useState, useRef} from 'react';
 import {Button, Form, Input, Select,message} from "antd";
 import {useDispatch, useSelector} from "react-redux";
@@ -56,6 +57,7 @@ const Buttons = () => {
     const [payment, setPayment] = useState(initialState);
 
     const stores = useSelector((state) => state.storesData.data);
+    const bill = useSelector((state) => state.payment.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
     const currentPayment = useSelector((state) => state.payment.data);
@@ -93,14 +95,14 @@ const Buttons = () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-                    const currentPayment = await dispatch(addPayment(payment, currentStore.apiKey))
+                    await dispatch(addPayment(payment, currentStore.apiKey))
                     if (user?.role === 'admin') {
                         dispatch(getPayments())
                     }
                     if (user?.role === 'customer') {
                         dispatch(getUserPayments(currentStore.apiKey))
                     }
-                    setPaymentId(currentPayment.data.id);
+                    setPaymentId(bill.id);
                     message.success('Payment was added');
                     handleGenerateHTML();
                     setVisibleHtmlCode(true);
@@ -118,6 +120,10 @@ const Buttons = () => {
             [field]: value,
         })
     };
+
+    const uslessFunc = () => {
+        return null
+    }
 
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
@@ -177,7 +183,7 @@ const Buttons = () => {
                 <Input.TextArea onChange={onChangePayment('comment')}/>
             </Form.Item>
             <Form.Item
-                label="Kind button"
+                label="Button type"
                 name="kind"
             >
                 <div className="kind" style={{display: "flex", gap: "30px"}}>
@@ -193,13 +199,13 @@ const Buttons = () => {
                 </div>
             </Form.Item>
             {
-                payment.text ?
+                bill.id ?
                     <Form.Item
                         label="Result"
                         name="description"
                     >
-                        <a href={`http://localhost:4000/bill/${paymentId}`} id="resultButton" target="_blank"
-                        style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
+                        <a rel='noreferrer' href={`http://localhost:4000/bill/${bill.id}`} id="resultButton" target="_blank"
+                        style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : undefined}
                 >
                             {payment.text}
                         </a>
@@ -232,7 +238,7 @@ const Buttons = () => {
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                 <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
-                    <Button type="primary" style={{margin: '0 0 20px 0', width:"100px", color:"black"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
+                    <Button type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button" onClick={handleOk}>
                         Save
                     </Button>
                 </div>
