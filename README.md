@@ -22,7 +22,3 @@ After run casper-back and casper-processor run casper-front
 $ npm run build
 $ npm run start
 ```
-
-## Документация
-
-https://docs.google.com/document/d/1bveOic_rf6OtdadTzrv0UBdDGG2fFGC23vUerUQoBFQ/edit?usp=sharing
