@@ -1,22 +1,22 @@
-## Установка
+## Istall
 
 ```bash
 $ npm install
 ```
 
 ## Создание .env
-Создайте .env файл (для образца дан env.sample)
+Create .env baset on env.sample
 
 ```bash
-#Адрес casper-back
+#Casper-back url
 NEXT_PUBLIC_API_HOST=http://localhost:3010
-#Режим работы фронта. При значении 0 работает с signer и создает настоящие транзации, зарегистрированные в casper (пока доступно только на localhost). При 1 - фейковый режим для прочих доменов, транзакции захардкожены и создаются без участия signer
+#Fake transaction mode. With a value of 0, it works with signer and creates real transactions registered with casper (only available on localhost for now). If 1 - fake mode for other domains, transactions are hardcoded and created without the participation of signer
 NEXT_PUBLIC_FAKE_TRANSACTION=1
 ```
 
-## Запуск
+## Run
 
-После запуска casper-back и casper-processor нужно запустить casper-front
+After run casper-back and casper-processor run casper-front
 
 ```bash
 $ npm run build
