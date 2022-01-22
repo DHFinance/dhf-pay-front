@@ -4,7 +4,7 @@
 $ npm install
 ```
 
-## Создание .env
+## .env file 
 Create .env baset on env.sample
 
 ```bash
