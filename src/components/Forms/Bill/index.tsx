@@ -475,7 +475,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             {type && text ?
                 <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} />
                 :
-                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !transaction?.txHash && !payment?.transaction?.txHash && !transactionExplorer ?
+                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
                     <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} /> : null
             }
         </>
