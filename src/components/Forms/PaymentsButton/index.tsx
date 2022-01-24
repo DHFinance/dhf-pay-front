@@ -85,8 +85,8 @@ const Buttons = () => {
         message.success('HTML-code copied');
     }
     const validateAmount = (rule: any, value: any, callback: any) => {
-        if (value < 2500000000) {
-            callback("Must be at least 2500000000");
+        if (value < 2.5) {
+            callback("Must be at least 2.5 cspr");
         } else {
             callback();
         }
@@ -115,7 +115,8 @@ const Buttons = () => {
     };
 
     const onChangePayment = (field: string) => (e: any) => {
-        const value = e.target.value;
+        let value = e.target.value;
+        if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
             [field]: value,
