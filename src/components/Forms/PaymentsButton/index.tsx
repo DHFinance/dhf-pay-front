@@ -10,7 +10,6 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
-import {domain} from "../../../data/server";
 
 const columns = [
     {
@@ -68,6 +67,8 @@ const Buttons = () => {
             dispatch(getUserStores(user.id))
         }
     }, []);
+
+    const domain = location.host;
 
     const [form] = Form.useForm();
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
