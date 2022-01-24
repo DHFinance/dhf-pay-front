@@ -75,6 +75,8 @@ const Payment = ({isButtons}) => {
 
     const date = new Date(datetime).toDateString()
 
+    console.log(location)
+
     const billUrl = `${domain}/bill/${id}`;
 
     function copy() {
