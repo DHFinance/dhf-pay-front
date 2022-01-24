@@ -34,12 +34,15 @@ const columns = [
 
 const PaymentsInvoices = () => {
     const payments = useSelector((state) => state.payments.data);
-    const paymentsTable = payments.map((payment) => {
+    const filterTable = payments.filter((item)=>{
+        return !item.type && !item.text;
+    });
+    const paymentsTable = filterTable.map((payment) => {
         return {
             ...payment,
+            datetime: new Date(payment?.datetime).toDateString(),
             status: payment?.status?.replace('_', ' '),
-            store: payment?.store?.name,
-            datetime: new Date(payment?.datetime).toDateString()
+            store: payment?.store?.name
         }
     }).reverse()
     return (

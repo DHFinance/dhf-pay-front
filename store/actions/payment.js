@@ -56,7 +56,7 @@ const addPaymentFailed = (error) => ({
 
 export const addPayment = (data, apiKey) => async (dispatch, getState) => {
   dispatch(addPaymentStart());
-  const token = getState().auth?.data?.token
+  const token = getState().auth?.data?.token;
   const result = await post(`/payment`, data, {headers: {"Authorization": `Bearer ${apiKey}`}});
   try {
     dispatch(addPaymentSuccess(result.data));
