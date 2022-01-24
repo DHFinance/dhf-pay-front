@@ -81,7 +81,7 @@ const Transaction = () => {
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
             </Col>
             {txHash ?
-                <Link href={`https://testnet.cspr.live/deploy/${txHash}`}>
+                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary">
                             Check transaction

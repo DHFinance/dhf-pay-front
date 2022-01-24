@@ -236,7 +236,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
             }
 
             {transactionExplorer ?
-                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transactionExplorer}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                             Check last transaction
@@ -244,7 +244,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
                     </a>
                 </Link>
                 : lastTransaction.length ?
-                    <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -252,7 +252,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
                         </a>
                     </Link>
                     : payment?.transaction?.txHash ?
-                        <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                        <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                             <a target="_blank" rel="noreferrer">
                                 <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                     Check last transaction
@@ -304,7 +304,8 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         });
     };
 
-    const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
+
+    const apiUrl = process.env.NEXT_PUBLIC_CASPER_NODE;
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
 
@@ -445,7 +446,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             }
 
             {transaction?.txHash ?
-                <Link href={`https://testnet.cspr.live/deploy/${transaction?.txHash}`}>
+                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction?.txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                             Check last transaction
@@ -453,7 +454,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                     </a>
                 </Link>
                 : payment?.transaction?.txHash ?
-                    <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -461,7 +462,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         </a>
                     </Link>
                     : transactionExplorer ?
-                        <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                        <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transactionExplorer}`}>
                             <a target="_blank" rel="noreferrer">
                                 <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                     Check last transaction
