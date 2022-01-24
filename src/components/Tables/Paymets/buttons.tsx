@@ -47,12 +47,12 @@ const PaymentsButton = () => {
         return item.type && item.text;
     })
     const paymentsTable = filterTable.map((payment) => {
-        return payment.type && payment.text ? {
+        return {
             ...payment,
             datetime: new Date(payment?.datetime).toDateString(),
             status: payment?.status?.replace('_', ' '),
             store: payment?.store?.name
-        } : null
+        }
     }).reverse()
     return (
         <Payment paymentsTable={paymentsTable} entity={"buttons"} columns={columns}/>

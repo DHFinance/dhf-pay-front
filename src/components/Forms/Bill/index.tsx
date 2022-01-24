@@ -92,6 +92,19 @@ const signerErrors = [
 
 ]
 
+const StatusButtonPay = ({balance, click,deploy}) => {
+    return (
+    !balance ?
+        <Button onClick={click} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+            Sign in Signer
+        </Button>
+        :
+        <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+            Pay
+        </Button>
+    )
+}
+
 const Bill = () => {
     const isFake = process.env.NEXT_PUBLIC_FAKE_TRANSACTION === '1'
     const billInfo = useSelector((state) => state.payment.data);
@@ -156,7 +169,9 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store}) => {
         amount,
         comment,
         status,
-        payment
+        payment,
+        type,
+        text
     } = billInfo
     const date = new Date(datetime).toDateString()
 
@@ -397,7 +412,9 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
         amount,
         comment,
         status,
-        payment
+        payment,
+        type,
+        text
     } = billInfo
     const date = new Date(datetime).toDateString()
 
@@ -464,15 +481,11 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store}) => {
                         : null
             }
 
-            {   status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !transaction?.txHash && !payment?.transaction?.txHash && !transactionExplorer ?
-                (!balance ?
-                    <Button onClick={singInSigner} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                        Sign in Signer
-                    </Button>
-                    :
-                    <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                        Pay
-                    </Button>) : null
+            {type && text ?
+                <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} />
+                :
+                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !transaction?.txHash && !payment?.transaction?.txHash && !transactionExplorer ?
+                    <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} /> : null
             }
         </>
     );
