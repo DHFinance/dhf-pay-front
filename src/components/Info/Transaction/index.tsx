@@ -15,6 +15,7 @@ import {getTransaction} from "../../../../store/actions/transaction";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import axios from "axios";
+import {getCourse} from "../../../../store/actions/course";
 
 interface IUserData {
     name: string,
@@ -36,23 +37,16 @@ const Transaction = () => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-    const [billData, setBillData] = useState(initialState)
-    const [connected, setConnected] = useState(false)
-    const [balance, setBalance] = useState('')
-    const [course, setCourse] = useState(null);
-
-    useEffect(async () => {
-        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        setCourse(courseUsd.data['casper-network'].usd)
-    }, [])
 
     const transaction = useSelector((state) => state.transaction.data);
     const transactionError = useSelector((state) => state.transaction.error);
+    const course = useSelector((state) => state.course.data.usd);
 
     useEffect(() => {
         if (router.query.slug) {
             dispatch(getTransaction(router.query.slug))
         }
+        dispatch(getCourse())
     }, [])
 
     const {

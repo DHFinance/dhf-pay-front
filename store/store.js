@@ -11,6 +11,7 @@ import users from "./reducers/users"
 import user from "./reducers/user"
 import auth from "./reducers/auth";
 import pay from "./reducers/pay";
+import course from "./reducers/course";
 import storeData from "./reducers/store";
 import storesData from "./reducers/stores";
 
@@ -34,6 +35,7 @@ const combinedReducer = combineReducers({
   pay,
   transaction,
   storeData,
+  course,
   storesData,
   user
 });

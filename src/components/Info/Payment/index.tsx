@@ -18,7 +18,7 @@ import {getUserTransactions} from "../../../../store/actions/transacrions";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {buttons} from "../../../data/buttonsBuilder";
-
+import {getCourse} from "../../../../store/actions/course";
 
 const Payment = ({isButtons}) => {
     const [htmlCode, setHtmlCode] = useState("");
@@ -35,12 +35,7 @@ const Payment = ({isButtons}) => {
     const [form] = Form.useForm();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [course, setCourse] = useState(null);
-
-    useEffect(async () => {
-        const courseUsd = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        setCourse(courseUsd.data['casper-network'].usd)
-    }, [])
+    const course = useSelector((state) => state.course.data.usd);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -70,6 +65,7 @@ const Payment = ({isButtons}) => {
         if (router.query.slug) {
             dispatch(getPayment(router.query.slug))
         }
+        dispatch(getCourse())
     }, [])
 
     useEffect(() => {
@@ -128,7 +124,6 @@ const Payment = ({isButtons}) => {
     }
 
     const receiverEmail = userData.email
-    console.log(isButtons);
     return (
         <WithPageExist error={paymentsError} data={payments}>
             <Modal title="Create a letter" visible={isModalVisible} onOk={onSubmit} onCancel={handleCancel}>
