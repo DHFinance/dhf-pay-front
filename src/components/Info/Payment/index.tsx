@@ -18,7 +18,6 @@ import {getUserTransactions} from "../../../../store/actions/transacrions";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {buttons} from "../../../data/buttonsBuilder";
-import {domain} from "../../../data/server";
 
 
 const Payment = ({isButtons}) => {
@@ -63,7 +62,9 @@ const Payment = ({isButtons}) => {
     } = payments
 
     const filterTransactions = transactions.filter((transaction) => transaction.payment.id === id);
-    const router = useRouter()
+    const router = useRouter();
+
+    const domain = location.host;
 
     useEffect(() => {
         if (router.query.slug) {
