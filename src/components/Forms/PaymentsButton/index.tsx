@@ -10,6 +10,7 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
+import {domain} from "../../../data/server";
 
 const columns = [
     {
@@ -196,12 +197,12 @@ const Buttons = () => {
                 </div>
             </Form.Item>
             {
-                bill.id ?
+                paymentId ?
                     <Form.Item
                         label="Result"
                         name="description"
                     >
-                        <a rel='noreferrer' href={`http://localhost:4000/bill/${bill.id}`} id="resultButton" target="_blank"
+                        <a rel='noreferrer' href={`${domain}/bill/${bill.id}`} id="resultButton" target="_blank"
                         style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : undefined}
                 >
                             {payment.text}

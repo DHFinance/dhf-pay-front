@@ -18,6 +18,7 @@ import {getUserTransactions} from "../../../../store/actions/transacrions";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {buttons} from "../../../data/buttonsBuilder";
+import {domain} from "../../../data/server";
 
 
 const Payment = ({isButtons}) => {
@@ -78,9 +79,7 @@ const Payment = ({isButtons}) => {
 
     const date = new Date(datetime).toDateString()
 
-    const domain = location.origin
-
-    const billUrl = `${domain}/bill/${id}`
+    const billUrl = `${domain}/bill/${id}`;
 
     function copy() {
         const copyLink = document.getElementById("link");
@@ -242,7 +241,7 @@ const Payment = ({isButtons}) => {
                             }}>Button</div>
                         </Col>
                         <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                            <a href={`http://localhost:4000/bill/${id}`} rel='noreferrer' target="_blank" id="resultButton"
+                            <a href={`${domain}/bill/${id}`} rel='noreferrer' target="_blank" id="resultButton"
                                style={type ? {...buttons[type-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
                             >
                                 {text}
