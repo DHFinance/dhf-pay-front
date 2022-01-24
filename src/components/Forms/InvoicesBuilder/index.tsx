@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, {useEffect, useState} from 'react';
 import {Form, Input, Modal, Button, Select, Table, message} from "antd";
 import {addPayment} from "../../../../store/actions/payment";
@@ -5,6 +6,7 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {useDispatch, useSelector} from "react-redux";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
+const { Option } = Select;
 
 const initialState = {
     amount: '',
