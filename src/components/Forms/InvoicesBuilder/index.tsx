@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Form, Input, Modal, Button, Select, Table} from "antd";
+import {Form, Input, Modal, Button, Select, Table, message} from "antd";
 import {addPayment} from "../../../../store/actions/payment";
 import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {useDispatch, useSelector} from "react-redux";
@@ -41,15 +41,16 @@ const InvoicesBuilder = () => {
     }, [stores.length]);
 
     const validateAmount = (rule: any, value: any, callback: any) => {
-        if (value < 2500000000) {
-            callback("Must be at least 2500000000");
+        if (value < 2.5) {
+            callback("Must be at least 2.5 cspr");
         } else {
             callback();
         }
     };
 
     const onChangePayment = (field: string) => (e: any) => {
-        const value = e.target.value;
+        let value = e.target.value;
+        if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
             [field]: value,
@@ -68,6 +69,7 @@ const InvoicesBuilder = () => {
                         dispatch(getUserPayments(currentStore.apiKey))
                     }
                     setPayment(initialState);
+                    message.success('Payment was added');
                     form.resetFields();
                 } catch (e) {
                     console.log(e, 'registration error')
