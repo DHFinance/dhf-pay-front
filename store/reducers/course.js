@@ -28,7 +28,7 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         data: {
-          usd: action.payload.data['casper-network'].usd,
+          usd: action.payload['casper-network'].usd,
         },
         start: false,
         error: '',

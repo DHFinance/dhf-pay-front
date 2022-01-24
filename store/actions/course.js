@@ -20,13 +20,10 @@ const getCourseFailed = (error) => ({
 });
 
 export const getCourse = () => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
   dispatch(getCourseStart());
-  const result = await get(`/transaction/${txHash}`, {headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e));
-
+  const result = await get(`https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd`).catch(e => console.log(e));
   try {
     dispatch(getCourseSuccess(result.data));
-    return result
   } catch (e) {
     dispatch(getCourseFailed(e));
   }
