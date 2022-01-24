@@ -1,1 +1,0 @@
-export const domain = "https://pay.dhfi.online";
