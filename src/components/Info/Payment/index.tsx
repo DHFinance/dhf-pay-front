@@ -239,7 +239,7 @@ const Payment = ({isButtons}) => {
                             }}>Button</div>
                         </Col>
                         <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                            <a href={`${domain}/bill/${id}`} rel='noreferrer' target="_blank" id="resultButton"
+                            <a href={`http://${domain}/bill/${id}`} rel='noreferrer' target="_blank" id="resultButton"
                                style={type ? {...buttons[type-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : null}
                             >
                                 {text}
