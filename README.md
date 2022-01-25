@@ -1,7 +1,7 @@
-##Installation using docker
+## Installation using docker
 see https://github.com/DHFinance/dhf-pay-deploy
 
-## Istall apart
+## Install apart
 
 ```bash
 $ npm install
