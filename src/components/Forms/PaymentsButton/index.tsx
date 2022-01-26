@@ -142,14 +142,14 @@ const Buttons = () => {
     return <WithLoadingData data={storesLoaded ?? null}>
         <Form
             name="basic"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 12 }}
             initialValues={{ remember: true }}
             autoComplete="off"
             validateTrigger={'onSubmit'}
             form={form}
             className="payment-buttons"
-            style={{display:"flex", flexDirection:"column", alignItems:"center"}}
+            style={{padding: '0 50px', marginTop: 64}}
         >
             <Form.Item
                 label="Name"
@@ -183,7 +183,7 @@ const Buttons = () => {
                 label="Comment"
                 name="comment"
             >
-                <Input.TextArea onChange={onChangePayment('comment')}/>
+                <Input.TextArea autoSize onChange={onChangePayment('comment')}/>
             </Form.Item>
             <Form.Item
                 label="Button type"
@@ -228,8 +228,7 @@ const Buttons = () => {
                 }}>
                     <Input.TextArea id="textArea"
                                     value={htmlCode}
-                                    readOnly
-                                    autoSize={{ minRows: 2, maxRows: 6 }}
+                                    readOnly autoSize
                                     style={{marginBottom: '20px', resize: 'none', cursor:"not-allowed"}}/>
                     <div style={{
                         display:"flex",
@@ -239,9 +238,9 @@ const Buttons = () => {
                     </div>
                 </div>
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+            <Form.Item wrapperCol={{ offset: 11, span: 12 }}>
                 <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
-                    <Button type="primary" style={{margin: '0 0 20px 0'}} htmlType="submit" className="login-form-button" onClick={handleOk}>
+                    <Button type="primary" style={{padding: "5px 20px"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
                         Save
                     </Button>
                 </div>
