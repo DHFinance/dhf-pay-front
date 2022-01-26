@@ -249,7 +249,7 @@ const Payment = ({isButtons}) => {
 
                                     {
                                         !isVisibleHtml ?
-                                        <Button type="primary" style={{display: `${isVisibleHtml ? "none" : ""}` }} onClick={handleGenerateHTML}>Сгенерировать Html</Button>
+                                        <Button type="primary" style={{display: `${isVisibleHtml ? "none" : ""}` }} onClick={handleGenerateHTML}>Generate Html</Button>
                                         :
                                         <Form.Item
                                         label="HTML"
