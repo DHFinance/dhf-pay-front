@@ -108,6 +108,7 @@ const Payment = ({isButtons}) => {
     }
 
     const copyLink = (id) => {
+        console.log(`${domain}/bill/${id}`);
         const link = document.getElementById(id);
         let textArea = document.createElement("textarea");
         textArea.value = link.textContent;

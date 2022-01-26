@@ -21,55 +21,55 @@ const initialState = {
 }
 
 const signerErrors = [
-    //иногда расширение ломается и перестает вызываться. Помогает только переустановка
+    //sometimes the extension breaks and stops being called. Only reinstall helps.
     {
         message: 'Cannot read properties of undefined (reading \'error\')',
         title: 'Signer error',
         desc: 'Please reinstall Signer'
     },
-    //если не введен пароль в vault
+    //if password is not entered in vault
     {
         message: 'Please unlock the Signer to read key',
         title: 'Signer in locked',
         desc: 'Please unlock the Signer to read key'
     },
-    //если расширение не скачано
+    //if the extension is not downloaded
     {
         message: 'Please download CasperLabs Signer',
         title: 'Signer not found',
         desc: 'Please download CasperLabs Signer'
     },
-    //при отклонении запроса на транзакцию
+    //when a transaction request is rejected
     {
         message: 'User Cancelled Signing',
         title: 'Payment cancelled',
         desc: 'You are cancelled payment in Signer'
     },
-    //при несозданном хранилище, при несозданном аккаунте, при disconnect
+    //with no storage created, with no account created, with disconnect
     {
         message: 'Please connect to the Signer to read key',
         title: 'Signer vault not found',
         desc: 'Please connect to the Signer to read key'
     },
-    //Возникает если пользователь не совершал транзакций либо имеет пустой счет
+    //Occurs if the user has not made any transactions or has an empty account
     {
         message: 'state query failed: ValueNotFound("Failed to find base key at path: Key',
         title: 'User not found',
         desc: 'Try to find a top-up on your wallet and repeat the action'
     },
-    //Ключ, который выдает само расширение неправильный
+    //The key given by the extension itself is incorrect
     {
         message: 'Invalid public key',
         title: 'Invalid public key',
         desc: 'Invalid public key'
     },
-    //Возникает при отключении интернета
+    //Occurs when the Internet is disconnected
     {
         message: 'Failed to fetch',
         title: 'Network error',
         desc: 'Check your internet connection'
     },
-    //Возникает при отключении интернета
+    //Occurs when the Internet is disconnected
     {
         message: 'Network error',
         title: 'Network error',
