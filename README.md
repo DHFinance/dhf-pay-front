@@ -21,9 +21,11 @@ Create .env baset on env.sample
 
 ```bash
 #Casper-back url
-NEXT_PUBLIC_API_HOST=http://localhost:3010
+NEXT_PUBLIC_API_HOST=http://localhost:3001
 #Fake transaction mode. With a value of 0, it works with signer and creates real transactions registered with casper (only available on localhost for now). If 1 - fake mode for other domains, transactions are hardcoded and created without the participation of signer
-NEXT_PUBLIC_FAKE_TRANSACTION=1
+NEXT_PUBLIC_FAKE_TRANSACTION=0
+NEXT_PUBLIC_CASPER_NODE = https://node-clarity-testnet.make.services/rpc
+NEXT_PUBLIC_CASPER_NETWORK = testnet.cspr.live
 ```
 
 ## Run
