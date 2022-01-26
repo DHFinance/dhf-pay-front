@@ -127,12 +127,13 @@ const Bill = () => {
             dispatch(getLastTransaction(billInfo?.id))
         }
     }, [billInfo])
+
     if (isFake) {
         return <WithPageExist error={billInfoError} data={store} >
             <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
+    return <WithPageExist isPayment error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
 
 const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {

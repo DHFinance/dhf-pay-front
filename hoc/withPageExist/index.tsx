@@ -11,8 +11,8 @@ import Error from "next/error";
 import {clearStore} from "../../store/actions/auth";
 
 
-const WithPageExist = ({children, error, data}: any) => {
-
+const WithPageExist = ({children, error, data, isPayment}: any) => {
+    const payment = useSelector((state) => state.payment.data);
     const router = useRouter()
     const dispatch = useDispatch()
 
@@ -27,6 +27,12 @@ const WithPageExist = ({children, error, data}: any) => {
         alignItems: 'center',
         width: '100%',
         height: '100vh'}}/>
+
+
+    if (isPayment && payment.status === "Paid" && !payment.type && !payment.text){
+        router.push('/').then(r => console.log('you are not found'));
+    }
+
 
     return children
 }
