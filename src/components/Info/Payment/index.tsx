@@ -78,18 +78,13 @@ const Payment = ({isButtons}) => {
 
     const billUrl = `${domain}/bill/${id}`;
 
-    function copy() {
-        const copyLink = document.getElementById("link");
-        copyLink.select();
-        document.execCommand("copy");
-    }
-
     const onSubmit = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
                     await dispatch(sendMailBill(id, userData.email, billUrl))
                     setIsModalVisible(false);
+                    message.success('Email sent successfully!');
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
@@ -110,8 +105,19 @@ const Payment = ({isButtons}) => {
         })
     }
 
-    const copyTextToClipboard = () => {
-        const context = document.getElementById("textArea");
+    const copyLink = (id) => {
+        const link = document.getElementById(id);
+        let textArea = document.createElement("textarea");
+        textArea.value = link.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+        message.success('Link was copied');
+    }
+
+    const copyTextToClipboard = (id) => {
+        const context = document.getElementById(id);
         context.select();
         document.execCommand("copy");
         message.success('HTML-code copied');
@@ -192,10 +198,6 @@ const Payment = ({isButtons}) => {
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Status" value={status?.replace('_', ' ') || 'none'} prefix={<AreaChartOutlined />} />
             </Col>
-            <input type="text" value={billUrl} id="link" style={{
-                position: 'absolute',
-                opacity: 0
-            }}/>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
@@ -211,7 +213,7 @@ const Payment = ({isButtons}) => {
                 <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
                     {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
                         <Link href={`/bill/${id}`}>
-                            <a style={{
+                            <a id="link" style={{
                                 fontSize: '24px',
                             }}
                                target="_blank" rel="noreferrer">
@@ -267,7 +269,7 @@ const Payment = ({isButtons}) => {
                                         display:"flex",
                                         justifyContent:"center",
                                     }}>
-                                        <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
+                                        <Button type="primary" onClick={()=>copyTextToClipboard("textArea")}>Copy html</Button>
                                         </div>
                                         </div>
                                         </Form.Item>
@@ -284,7 +286,7 @@ const Payment = ({isButtons}) => {
                 <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
                     Send by mail
                 </Button>
-                <Button onClick={() => copy()} style={{margin: '0px 20px 0 0'}} type="primary">
+                <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
                     Copy link
                 </Button>
                 <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
