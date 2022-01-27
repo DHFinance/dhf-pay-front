@@ -17,8 +17,8 @@ import {useDispatch, useSelector} from "react-redux";
 const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
-    children: JSX.Element | string,
-    title?: string,
+    children: JSX.Element | string
+    title?: string | null
 }
 
 const SliderContainer = (props: IContainerProps) => {

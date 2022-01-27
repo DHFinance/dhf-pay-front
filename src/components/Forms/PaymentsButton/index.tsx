@@ -10,6 +10,8 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {getCourse} from "../../../../store/actions/course";
 
 const columns = [
     {
@@ -61,11 +63,13 @@ const Buttons = () => {
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
     const currentPayment = useSelector((state) => state.payment.data);
+    const course = useSelector((state) => state.course.data.usd);
 
     useEffect(() => {
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
+        dispatch(getCourse())
     }, []);
 
     const domain = location.host;
@@ -164,6 +168,11 @@ const Buttons = () => {
                 rules={[{ required: true, message: 'Please input amount!' },{ validator: validateAmount }]}
             >
                 <Input type='number' onChange={onChangePayment('amount')}/>
+            </Form.Item>
+            <Form.Item
+                label="Amount USD"
+            >
+                {CSPRtoUSD(payment.amount, course)}$
             </Form.Item>
             {
                 !!activeStores.length && <Form.Item
