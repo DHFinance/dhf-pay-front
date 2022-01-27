@@ -11,7 +11,7 @@ import {useRouter} from "next/router";
 const PaymentPage = () => {
     const history = useRouter();
     const slug = history.query.slug;
-    return <WithAuth><SliderContainer title={`Invoices ${slug}`}><Payment/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer title={`Invoice ${slug}`}><Payment/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(PaymentPage)
