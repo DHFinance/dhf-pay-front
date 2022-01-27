@@ -201,7 +201,7 @@ const Payment = ({isButtons}) => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
-            {(isButtons || payments.status !== 'Paid') && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+            {(isButtons || payments.status !== 'Paid') && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
             <>
                 <Col span={24} style={{padding: '0px 0 0px 20px', background: 'white'}}>
                     <div style={{
@@ -211,7 +211,7 @@ const Payment = ({isButtons}) => {
                     }}>Link</div>
                 </Col>
                 <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                    {(isButtons || payments.status !== 'Paid') && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+                    {(isButtons || payments.status !== 'Paid') && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
                         <Link href={`/bill/${id}`}>
                             <a id="link" style={{
                                 fontSize: '24px',
@@ -284,15 +284,16 @@ const Payment = ({isButtons}) => {
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
                 {
-                    payments.status === "Paid" && !isButtons ?
+                    (payments.status === "Paid" && !isButtons) ?
                         <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
                             Back
                         </Button>
                         :
                         <div>
+                            { user.role !== "admin" &&
                             <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
                                 Send by mail
-                            </Button>
+                            </Button>}
                             <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
                                 Copy link
                             </Button>
@@ -303,30 +304,34 @@ const Payment = ({isButtons}) => {
 
                 }
             </Col>
+            {user.role !== "admin" &&
+                <Col span={24} style={{padding: '20px 0 0px 0px'}}>
+                    <Button size={'small'}
+                            style={{
+                                margin: '0px 0 0 0px'
+                            }} type="primary">
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${billUrl}`} style={{color: 'white'}}
+                           rel="noreferrer" data-text={`Casper payment: ${billUrl}`} target="_blank">
+                            <FacebookFilled style={{margin: '0px 3px 0px 0px'}}/>
+                            Share on Facebook
+                        </a>
+                    </Button>
 
-            <Col span={24} style={{padding: '20px 0 0px 0px'}}>
-                <Button size={'small'}
-                        style={{margin: '0px 0 0 0px'
-                        }} type="primary">
-                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${billUrl}`} style={{color: 'white'}} rel="noreferrer" data-text={`Casper payment: ${billUrl}`} target="_blank">
-                        <FacebookFilled style={{margin: '0px 3px 0px 0px'}}/>
-                        Share on Facebook
-                    </a>
-                </Button>
-
-            </Col>
-
-            <Col span={24} style={{padding: '10px 0 0px 0px'}}>
-                {
-                    (domain && id) && <>
-                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
-                           data-text="Casper payment:"
-                           data-url={billUrl}
-                           data-show-count="false">Tweet</a>
-                        <Script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></Script>
-                    </>
-                }
-            </Col>
+                </Col>
+            }
+            {user.role !== "admin" &&
+                <Col span={24} style={{padding: '10px 0 0px 0px'}}>
+                    {
+                        (domain && id) && <>
+                            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
+                               data-text="Casper payment:"
+                               data-url={billUrl}
+                               data-show-count="false">Tweet</a>
+                            <Script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></Script>
+                        </>
+                    }
+                </Col>
+            }
 
         </WithPageExist>
     );
