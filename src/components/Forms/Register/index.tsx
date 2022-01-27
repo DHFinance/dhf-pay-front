@@ -117,7 +117,6 @@ const CreateUserForm = ({auth, setEmail}) => {
         <Form.Item
             label="Company"
             name="company"
-            rules={[{ required: true, message: 'Please input your company name!' }]}
         >
             <Input onChange={onUpdateData('company')}/>
         </Form.Item>
@@ -129,7 +128,7 @@ const CreateUserForm = ({auth, setEmail}) => {
             <Input.Password type="password" onChange={onUpdateData('password')}/>
         </Form.Item>
         <Form.Item
-            label="PasswordConf"
+            label="Confirm Password"
             name="passwordConf"
             rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
         >

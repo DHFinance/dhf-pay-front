@@ -250,7 +250,7 @@ const PasswordForm = ({auth}: any) => {
             <Input.Password name="password" onChange={onUpdateData}/>
         </Form.Item>
         <Form.Item
-            label="PasswordConf"
+            label="Confirm password"
             name="passwordConf"
             rules={[{ required: true, message: 'Please confirm password!' }, { validator: validatePassword }]}
         >
