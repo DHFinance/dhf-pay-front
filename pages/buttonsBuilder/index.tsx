@@ -8,7 +8,7 @@ import ButtonsForm from "../../src/components/Forms/PaymentsButton";
 
 const ButtonsBuilderPage = () => {
     return <WithAuth isBuilder>
-        <SliderContainer>
+        <SliderContainer title="Buttons Builder">
             <ButtonsForm/>
         </SliderContainer>
     </WithAuth>

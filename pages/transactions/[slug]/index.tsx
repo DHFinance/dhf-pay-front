@@ -9,10 +9,12 @@ import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
 import Error from "next/error";
 import {getTransaction} from "../../../store/actions/transaction";
+import {useRouter} from "next/router";
 
 const TransactionPage = () => {
-
-    return <WithAuth><SliderContainer><Transaction/></SliderContainer></WithAuth>
+    const history = useRouter();
+    const slug = history.query.slug;
+    return <WithAuth><SliderContainer title={`Transactions ${slug}`}><Transaction/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(TransactionPage)

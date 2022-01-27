@@ -76,8 +76,6 @@ const Payment = ({isButtons}) => {
 
     const date = new Date(datetime).toDateString()
 
-    console.log(location)
-
     const billUrl = `${domain}/bill/${id}`;
 
     const onSubmit = async () => {
@@ -108,7 +106,6 @@ const Payment = ({isButtons}) => {
     }
 
     const copyLink = (id) => {
-        console.log(`${domain}/bill/${id}`);
         const link = document.getElementById(id);
         let textArea = document.createElement("textarea");
         textArea.value = link.textContent;
@@ -161,7 +158,7 @@ const Payment = ({isButtons}) => {
                                                             Comment: {comment}
                                                         </p>
                                                         <a style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}
-                                                           href={billUrl}>Bill page</a>
+                                                           target="_blank" rel="noreferrer" href={`http://${billUrl}`}>Bill page</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -184,7 +181,7 @@ const Payment = ({isButtons}) => {
                     autoComplete="off"
                 >
                     <Form.Item
-                        label="Email"
+                        label="Buyer's Email"
                         name="email"
                         rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
                     >
@@ -204,7 +201,7 @@ const Payment = ({isButtons}) => {
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
             </Col>
-            {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+            {(isButtons || payments.status !== 'Paid') && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
             <>
                 <Col span={24} style={{padding: '0px 0 0px 20px', background: 'white'}}>
                     <div style={{
@@ -214,7 +211,7 @@ const Payment = ({isButtons}) => {
                     }}>Link</div>
                 </Col>
                 <Col span={24} style={{padding: '0px 0 20px 20px', background: 'white'}}>
-                    {payments.status !== 'Paid' && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'success' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
+                    {(isButtons || payments.status !== 'Paid') && user?.role !== 'admin' && filterTransactions[filterTransactions.length - 1]?.status !== 'processing' ?
                         <Link href={`/bill/${id}`}>
                             <a id="link" style={{
                                 fontSize: '24px',
@@ -286,15 +283,25 @@ const Payment = ({isButtons}) => {
             </> : null}
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
-                <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
-                    Send by mail
-                </Button>
-                <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
-                    Copy link
-                </Button>
-                <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
-                    Back
-                </Button>
+                {
+                    payments.status === "Paid" && !isButtons ?
+                        <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
+                            Back
+                        </Button>
+                        :
+                        <div>
+                            <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
+                                Send by mail
+                            </Button>
+                            <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
+                                Copy link
+                            </Button>
+                            <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
+                                Back
+                            </Button>
+                        </div>
+
+                }
             </Col>
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>

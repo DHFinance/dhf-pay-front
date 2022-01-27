@@ -217,7 +217,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
                         form={form}
                     >
                         <Form.Item
-                            label="Email"
+                            label="Buyer's email"
                             name="email"
                             rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
                         >
@@ -434,7 +434,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         form={form}
                     >
                         <Form.Item
-                            label="Email"
+                            label="Buyer's email"
                             name="email"
                             rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
                         >

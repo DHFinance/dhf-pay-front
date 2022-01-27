@@ -6,6 +6,8 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {useDispatch, useSelector} from "react-redux";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {getCourse} from "../../../../store/actions/course";
 const { Option } = Select;
 
 const initialState = {
@@ -21,6 +23,7 @@ const InvoicesBuilder = () => {
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const paymentsLoaded = useSelector((state) => state.payments.isChanged);
+    const course = useSelector((state) => state.course.data.usd);
 
     const [form] = Form.useForm();
     const dispatch = useDispatch();
@@ -34,6 +37,7 @@ const InvoicesBuilder = () => {
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
+        dispatch(getCourse())
     }, []);
 
     useEffect(() => {
@@ -113,6 +117,11 @@ const InvoicesBuilder = () => {
                             rules={[{ required: true, message: 'Please input amount!' }, { validator: validateAmount }]}
                         >
                             <Input type='number' onChange={onChangePayment('amount')}/>
+                        </Form.Item>
+                        <Form.Item
+                            label="Amount USD"
+                        >
+                            {CSPRtoUSD(payment.amount, course)}$
                         </Form.Item>
                         <Form.Item
                             label="Comment"

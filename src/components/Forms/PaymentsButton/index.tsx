@@ -10,6 +10,8 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
+import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {getCourse} from "../../../../store/actions/course";
 
 const columns = [
     {
@@ -61,11 +63,13 @@ const Buttons = () => {
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
     const currentPayment = useSelector((state) => state.payment.data);
+    const course = useSelector((state) => state.course.data.usd);
 
     useEffect(() => {
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
+        dispatch(getCourse())
     }, []);
 
     const domain = location.host;
@@ -165,6 +169,11 @@ const Buttons = () => {
             >
                 <Input type='number' onChange={onChangePayment('amount')}/>
             </Form.Item>
+            <Form.Item
+                label="Amount USD"
+            >
+                {CSPRtoUSD(payment.amount, course)}$
+            </Form.Item>
             {
                 !!activeStores.length && <Form.Item
                     label="Store"
@@ -194,7 +203,7 @@ const Buttons = () => {
                         <div key={item.id} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
                             <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}}
                                     onClick={()=> handleChooseButton(item)} className="login-form-button">
-                                Button
+                                {item.name}
                             </Button>
                             <CheckOutlined style={{margin: '0 0 20px 0',color:"#52c41a",fontWeight:"900", display:`${choosenButton === item.id ? "block":"none"}`}} />
                         </div>

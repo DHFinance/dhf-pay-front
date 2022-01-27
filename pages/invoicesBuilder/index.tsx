@@ -8,8 +8,7 @@ import InvoicesBuilder from "../../src/components/Forms/InvoicesBuilder";
 
 
 const InvoicesBuilderPage = () => {
-
-    return <WithAuth isBuilder><SliderContainer><InvoicesBuilder/></SliderContainer></WithAuth>
+    return <WithAuth isBuilder><SliderContainer title="Invoices Builder"><InvoicesBuilder/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(InvoicesBuilderPage)

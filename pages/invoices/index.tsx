@@ -7,7 +7,7 @@ import PaymentsInvoices from "../../src/components/Tables/Paymets/invoices";
 
 
 const InvoicesPage = () => {
-    return <WithAuth><SliderContainer><PaymentsInvoices/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer title={"Invoices"}><PaymentsInvoices/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(InvoicesPage)

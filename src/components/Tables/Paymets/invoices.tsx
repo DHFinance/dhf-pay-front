@@ -5,28 +5,28 @@ import {useSelector} from "react-redux";
 
 const columns = [
     {
-        title: 'id',
+        title: 'ID',
         dataIndex: 'id',
         key: 'id',
 
     },
     {
-        title: 'datetime',
+        title: 'Datetime',
         key: 'datetime',
         dataIndex: 'datetime',
     },
     {
-        title: 'amount',
+        title: 'Amount',
         dataIndex: 'amount',
         key: 'amount',
     },
     {
-        title: 'comment',
+        title: 'Comment',
         key: 'comment',
         dataIndex: 'comment',
     },
     {
-        title: 'status',
+        title: 'Status',
         key: 'status',
         dataIndex: 'status',
     },

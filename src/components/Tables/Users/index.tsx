@@ -10,22 +10,22 @@ import {useRouter} from "next/router";
 
 const columns = [
     {
-        title: 'name',
+        title: 'Name',
         dataIndex: 'name',
         key: 'name',
     },
     {
-        title: 'last name',
+        title: 'Last Name',
         dataIndex: 'lastName',
         key: 'lastName',
     },
     {
-        title: 'email',
+        title: 'Email',
         dataIndex: 'email',
         key: 'email',
     },
     {
-        title: 'company',
+        title: 'Company',
         dataIndex: 'company',
         key: 'company',
     },

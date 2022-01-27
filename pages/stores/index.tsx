@@ -7,7 +7,7 @@ import Stores from "../../src/components/Tables/Stores";
 
 const StoresPage = () => {
     return <WithAuth>
-        <SliderContainer>
+        <SliderContainer title={`Stores`}>
             <Stores/>
         </SliderContainer>
     </WithAuth>
