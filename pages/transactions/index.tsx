@@ -9,7 +9,7 @@ import {wrapper} from "../../store/store";
 
 const TransactionsPage = () => {
     return <WithAuth>
-        <SliderContainer>
+        <SliderContainer title={`Transactions`}>
             <Transactions/>
         </SliderContainer>
     </WithAuth>

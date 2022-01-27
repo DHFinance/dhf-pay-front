@@ -6,7 +6,7 @@ import {wrapper} from "../../store/store";
 
 
 const RegisterPage = () => {
-    return <WithoutAuth><SliderContainer>
+    return <WithoutAuth><SliderContainer title={"Register"}>
         <Register/>
     </SliderContainer></WithoutAuth>
 }

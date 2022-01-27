@@ -7,7 +7,7 @@ import PaymentsButton from "../../src/components/Tables/Paymets/buttons";
 
 
 const InvoicesPage = () => {
-    return <WithAuth><SliderContainer><PaymentsButton/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer title={"Buttons"}><PaymentsButton/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(InvoicesPage)

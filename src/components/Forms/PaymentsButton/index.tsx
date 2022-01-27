@@ -194,7 +194,7 @@ const Buttons = () => {
                         <div key={item.id} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
                             <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}}
                                     onClick={()=> handleChooseButton(item)} className="login-form-button">
-                                Button
+                                {item.name}
                             </Button>
                             <CheckOutlined style={{margin: '0 0 20px 0',color:"#52c41a",fontWeight:"900", display:`${choosenButton === item.id ? "block":"none"}`}} />
                         </div>

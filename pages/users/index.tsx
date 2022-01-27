@@ -6,7 +6,7 @@ import WithAuth from "../../hoc/withAuth";
 
 
 const UsersPage = () => {
-    return <WithAuth><SliderContainer><Users/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer title={`Users`}><Users/></SliderContainer></WithAuth>
 }
 
 export default UsersPage
