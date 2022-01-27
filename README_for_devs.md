@@ -17,9 +17,9 @@ Create .env baset on env.sample
 NEXT_PUBLIC_API_HOST=http://localhost:3010
 #Fake transaction mode. With a value of 0, it works with signer and creates real transactions registered with casper (only available on localhost for now). If 1 - fake mode for other domains, transactions are hardcoded and created without the participation of signer
 NEXT_PUBLIC_FAKE_TRANSACTION=1
-#Casper узел, на котором происходят транзакции
+#Casper node where transactions take place
 NEXT_PUBLIC_CASPER_NODE = https://node-clarity-testnet.make.services/rpc
-#Домен сети каспер, где будут просматриваться транзакции
+#Casper network domain where transactions will be viewed
 NEXT_PUBLIC_CASPER_NETWORK = testnet.cspr.live
 ```
 
