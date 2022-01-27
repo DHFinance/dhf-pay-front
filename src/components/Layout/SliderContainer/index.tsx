@@ -18,7 +18,7 @@ const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
     children: JSX.Element | string,
-    title: string,
+    title?: string,
 }
 
 const SliderContainer = (props: IContainerProps) => {
