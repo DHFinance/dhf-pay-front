@@ -26,14 +26,17 @@ const pushPayment = (data) => ({
 });
 
 export const pay = (data) => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
-  dispatch(payStart());
-  await post('/transaction', data, {headers: {"Authorization": `Bearer ${token}`}}).then((result => {
-    dispatch(paySuccess(result.data.data));
-    dispatch(pushPayment(result.data.data));
-  })).catch(e => {
-    dispatch(payFailed(e));
-  });
+  const loading = getState().pay.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    dispatch(payStart());
+    await post('/transaction', data, {headers: {"Authorization": `Bearer ${token}`}}).then((result => {
+      dispatch(paySuccess(result.data.data));
+      dispatch(pushPayment(result.data.data));
+    })).catch(e => {
+      dispatch(payFailed(e));
+    });
+  }
 };
 
 export const setCasperData = (data) => {
