@@ -11,22 +11,22 @@ const { Option } = Select;
 
 const columns = [
     {
-        title: 'id',
+        title: 'ID',
         dataIndex: 'id',
         key: 'id',
     },
     {
-        title: 'txHash',
+        title: 'TxHash',
         dataIndex: 'txHash',
         key: 'txHash',
     },
     {
-        title: 'status',
+        title: 'Status',
         dataIndex: 'status',
         key: 'status',
     },
     {
-        title: 'sender',
+        title: 'Sender',
         key: 'sender',
         dataIndex: 'sender'
     },

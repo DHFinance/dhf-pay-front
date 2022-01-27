@@ -7,7 +7,7 @@ import {wrapper} from "../../store/store";
 
 const RestorePage = () => {
     return <WithoutAuth>
-        <SliderContainer>
+        <SliderContainer title={"Restore"}>
             <Restore/>
         </SliderContainer>
     </WithoutAuth>

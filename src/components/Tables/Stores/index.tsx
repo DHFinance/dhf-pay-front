@@ -14,27 +14,27 @@ import {CLPublicKey} from "casper-js-sdk";
 
 const columns = [
     {
-        title: 'id',
+        title: 'ID',
         dataIndex: 'id',
         key: 'id',
     },
     {
-        title: 'name',
+        title: 'Name',
         dataIndex: 'name',
         key: 'name',
     },
     {
-        title: 'description',
+        title: 'Description',
         dataIndex: 'description',
         key: 'description',
     },
     {
-        title: 'user',
+        title: 'User',
         key: 'user',
         dataIndex: 'user',
     },
     {
-        title: 'wallet',
+        title: 'Wallet',
         key: 'wallet',
         dataIndex: 'wallet',
         cursor: 'pointer',

@@ -5,11 +5,13 @@ import {wrapper} from "../../../store/store";
 import Payment from "../../../src/components/Info/Payment";
 import WithAuth from "../../../hoc/withAuth";
 import SliderContainer from "../../../src/components/Layout/SliderContainer";
+import {useRouter} from "next/router";
 
 
 const PaymentPage = () => {
-
-    return <WithAuth><SliderContainer><Payment/></SliderContainer></WithAuth>
+    const history = useRouter();
+    const slug = history.query.slug;
+    return <WithAuth><SliderContainer title={`Invoices ${slug}`}><Payment/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(PaymentPage)

@@ -29,6 +29,7 @@ const SliderContainer = (props: IContainerProps) => {
     const history = useRouter()
     const title = history.asPath.replace(/\//g, ' ').toUpperCase()
 
+
     const goLoginPage = () => {
         router.push('/login')
     }
@@ -122,7 +123,7 @@ const SliderContainer = (props: IContainerProps) => {
                         minHeight: 280,
                     }}
                 >
-                    <Title style={{width: '100%', textAlign: 'center'}}>{title}</Title>
+                    <Title style={{width: '100%', textAlign: 'center'}}>{props.title ?? title}</Title>
                     {props.children}
                 </Content>
             </Layout>

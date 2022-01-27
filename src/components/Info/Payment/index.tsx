@@ -76,8 +76,6 @@ const Payment = ({isButtons}) => {
 
     const date = new Date(datetime).toDateString()
 
-    console.log(location)
-
     const billUrl = `${domain}/bill/${id}`;
 
     const onSubmit = async () => {
@@ -108,7 +106,6 @@ const Payment = ({isButtons}) => {
     }
 
     const copyLink = (id) => {
-        console.log(`${domain}/bill/${id}`);
         const link = document.getElementById(id);
         let textArea = document.createElement("textarea");
         textArea.value = link.textContent;
