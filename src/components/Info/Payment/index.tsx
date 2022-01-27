@@ -158,7 +158,7 @@ const Payment = ({isButtons}) => {
                                                             Comment: {comment}
                                                         </p>
                                                         <a style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}
-                                                           href={`http://${billUrl}`}>Bill page</a>
+                                                           target="_blank" rel="noreferrer" href={`http://${billUrl}`}>Bill page</a>
                                                     </td>
                                                 </tr>
                                             </table>

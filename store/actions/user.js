@@ -42,7 +42,13 @@ const blockUserFailed = (error) => ({
 });
 
 export const blockUser = (id, blocked) => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
-  dispatch(blockUserStart());
-  await post(`/user/block`, {id, blocked}, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(blockUserSuccess(result.data))).catch(e => dispatch(blockUserFailed(e)));
+  const loading = getState().user.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    dispatch(blockUserStart());
+    await post(`/user/block`, {
+      id,
+      blocked
+    }, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(blockUserSuccess(result.data))).catch(e => dispatch(blockUserFailed(e)));
+  }
 };
