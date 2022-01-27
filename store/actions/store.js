@@ -28,10 +28,13 @@ const editStoreFailed = (error) => ({
 });
 
 export const editStore = (id = '', data) => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
-  if (id) {
-    dispatch(editStoreStart());
-    await patch(`/store/${id}`, data, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(editStoreSuccess(result.data))).catch(e => dispatch(editStoreFailed(e)));
+  const loading = getState().store.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    if (id) {
+      dispatch(editStoreStart());
+      await patch(`/store/${id}`, data, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(editStoreSuccess(result.data))).catch(e => dispatch(editStoreFailed(e)));
+    }
   }
 };
 
@@ -71,9 +74,15 @@ const addStoreFailed = (error) => ({
 });
 
 export const addStore = (data) => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
-  dispatch(addStoreStart());
-  const result = await post(`/store`, {...data, blocked: false}, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(addStoreSuccess(result.data))).catch(e => dispatch(addStoreFailed(e)));
+  const loading = getState().store.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    dispatch(addStoreStart());
+    const result = await post(`/store`, {
+      ...data,
+      blocked: false
+    }, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(addStoreSuccess(result.data))).catch(e => dispatch(addStoreFailed(e)));
+  }
 };
 
 const blockStoreStart = () => ({
@@ -91,7 +100,13 @@ const blockStoreFailed = (error) => ({
 });
 
 export const blockStore = (id, blocked) => async (dispatch, getState) => {
-  const token = getState().auth?.data?.token
-  dispatch(blockStoreStart());
-  await post(`/store/block`, {id, blocked}, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(blockStoreSuccess(result.data))).catch(e => dispatch(blockStoreFailed(e)));
+  const loading = getState().store.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    dispatch(blockStoreStart());
+    await post(`/store/block`, {
+      id,
+      blocked
+    }, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(blockStoreSuccess(result.data))).catch(e => dispatch(blockStoreFailed(e)));
+  }
 };
