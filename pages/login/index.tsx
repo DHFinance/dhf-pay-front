@@ -7,7 +7,7 @@ import {wrapper} from "../../store/store";
 
 const AuthPage = () => {
     return <WithoutAuth>
-        <SliderContainer title={"Login"}>
+        <SliderContainer title={'Login'}>
             <Login/>
         </SliderContainer>
     </WithoutAuth>

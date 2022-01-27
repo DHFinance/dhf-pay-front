@@ -17,7 +17,8 @@ import {useDispatch, useSelector} from "react-redux";
 const { Header, Sider, Content } = Layout;
 
 interface IContainerProps {
-    children: JSX.Element | string
+    children: JSX.Element | string,
+    title: string,
 }
 
 const SliderContainer = (props: IContainerProps) => {
@@ -27,7 +28,7 @@ const SliderContainer = (props: IContainerProps) => {
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
-    const title = history.asPath.replace(/\//g, ' ').toUpperCase()
+    const titlePath = history.asPath.replace(/\//g, ' ').toUpperCase()
 
 
     const goLoginPage = () => {
@@ -123,7 +124,7 @@ const SliderContainer = (props: IContainerProps) => {
                         minHeight: 280,
                     }}
                 >
-                    <Title style={{width: '100%', textAlign: 'center'}}>{props.title ?? title}</Title>
+                    <Title style={{width: '100%', textAlign: 'center'}}>{title ?? titlePath}</Title>
                     {props.children}
                 </Content>
             </Layout>
