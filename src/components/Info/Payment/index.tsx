@@ -161,7 +161,7 @@ const Payment = ({isButtons}) => {
                                                             Comment: {comment}
                                                         </p>
                                                         <a style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}
-                                                           href={billUrl}>Bill page</a>
+                                                           href={`http://${billUrl}`}>Bill page</a>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -184,7 +184,7 @@ const Payment = ({isButtons}) => {
                     autoComplete="off"
                 >
                     <Form.Item
-                        label="Email"
+                        label="Buyer's Email"
                         name="email"
                         rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
                     >
