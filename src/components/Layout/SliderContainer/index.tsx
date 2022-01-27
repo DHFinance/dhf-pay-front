@@ -124,7 +124,7 @@ const SliderContainer = (props: IContainerProps) => {
                         minHeight: 280,
                     }}
                 >
-                    <Title style={{width: '100%', textAlign: 'center'}}>{title ?? titlePath}</Title>
+                    <Title style={{width: '100%', textAlign: 'center'}}>{props.title ?? titlePath}</Title>
                     {props.children}
                 </Content>
             </Layout>
