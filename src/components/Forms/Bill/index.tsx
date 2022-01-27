@@ -21,55 +21,55 @@ const initialState = {
 }
 
 const signerErrors = [
-    //иногда расширение ломается и перестает вызываться. Помогает только переустановка
+    //sometimes the extension breaks and stops being called. Only reinstall helps.
     {
         message: 'Cannot read properties of undefined (reading \'error\')',
         title: 'Signer error',
         desc: 'Please reinstall Signer'
     },
-    //если не введен пароль в vault
+    //if password is not entered in vault
     {
         message: 'Please unlock the Signer to read key',
         title: 'Signer in locked',
         desc: 'Please unlock the Signer to read key'
     },
-    //если расширение не скачано
+    //if the extension is not downloaded
     {
         message: 'Please download CasperLabs Signer',
         title: 'Signer not found',
         desc: 'Please download CasperLabs Signer'
     },
-    //при отклонении запроса на транзакцию
+    //when a transaction request is rejected
     {
         message: 'User Cancelled Signing',
         title: 'Payment cancelled',
         desc: 'You are cancelled payment in Signer'
     },
-    //при несозданном хранилище, при несозданном аккаунте, при disconnect
+    //with no storage created, with no account created, with disconnect
     {
         message: 'Please connect to the Signer to read key',
         title: 'Signer vault not found',
         desc: 'Please connect to the Signer to read key'
     },
-    //Возникает если пользователь не совершал транзакций либо имеет пустой счет
+    //Occurs if the user has not made any transactions or has an empty account
     {
         message: 'state query failed: ValueNotFound("Failed to find base key at path: Key',
         title: 'User not found',
         desc: 'Try to find a top-up on your wallet and repeat the action'
     },
-    //Ключ, который выдает само расширение неправильный
+    //The key given by the extension itself is incorrect
     {
         message: 'Invalid public key',
         title: 'Invalid public key',
         desc: 'Invalid public key'
     },
-    //Возникает при отключении интернета
+    //Occurs when the Internet is disconnected
     {
         message: 'Failed to fetch',
         title: 'Network error',
         desc: 'Check your internet connection'
     },
-    //Возникает при отключении интернета
+    //Occurs when the Internet is disconnected
     {
         message: 'Network error',
         title: 'Network error',
@@ -236,7 +236,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
             }
 
             {transactionExplorer ?
-                <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transactionExplorer}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                             Check last transaction
@@ -244,7 +244,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
                     </a>
                 </Link>
                 : lastTransaction.length ?
-                    <Link href={`https://testnet.cspr.live/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -252,7 +252,7 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
                         </a>
                     </Link>
                     : payment?.transaction?.txHash ?
-                        <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                        <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                             <a target="_blank" rel="noreferrer">
                                 <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                     Check last transaction
@@ -304,7 +304,8 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         });
     };
 
-    const apiUrl = 'https://node-clarity-testnet.make.services/rpc';
+
+    const apiUrl = process.env.NEXT_PUBLIC_CASPER_NODE;
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
 
@@ -445,7 +446,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             }
 
             {transaction?.txHash ?
-                <Link href={`https://testnet.cspr.live/deploy/${transaction?.txHash}`}>
+                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction?.txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                             Check last transaction
@@ -453,7 +454,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                     </a>
                 </Link>
                 : payment?.transaction?.txHash ?
-                    <Link href={`https://testnet.cspr.live/deploy/${payment?.transaction?.txHash}`}>
+                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -461,7 +462,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         </a>
                     </Link>
                     : transactionExplorer ?
-                        <Link href={`https://testnet.cspr.live/deploy/${transactionExplorer}`}>
+                        <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transactionExplorer}`}>
                             <a target="_blank" rel="noreferrer">
                                 <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                     Check last transaction
@@ -474,7 +475,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             {type && text ?
                 <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} />
                 :
-                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !transaction?.txHash && !payment?.transaction?.txHash && !transactionExplorer ?
+                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
                     <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} /> : null
             }
         </>

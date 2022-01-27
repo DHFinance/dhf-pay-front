@@ -4,7 +4,7 @@ import WithAuth from "../hoc/withAuth";
 
 const Home: NextPage = () => {
   return (
-    <WithAuth><SliderContainer>Это стартовая страница, контент пока что отсутствует</SliderContainer></WithAuth>
+    <WithAuth><SliderContainer>This is the start page, no content yet</SliderContainer></WithAuth>
   )
 }
 
