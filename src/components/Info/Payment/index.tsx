@@ -323,6 +323,7 @@ const Payment = ({isButtons}) => {
             {
                 user.role !== "admin" &&
                 <Col span={24} style={{padding: '10px 0 0px 0px'}}>
+
                     {
                         (domain && id) && <>
                             <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" className="twitter-share-button"
