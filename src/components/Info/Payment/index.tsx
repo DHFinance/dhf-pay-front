@@ -61,13 +61,19 @@ const Payment = ({isButtons}) => {
 
     const domain = location.host;
 
+    /**
+     * @description load data
+     */
     useEffect(() => {
+        /** @description if is query id, then get payment by id */
         if (router.query.slug) {
             dispatch(getPayment(router.query.slug))
         }
+        /** @description get the current exchange rate */
         dispatch(getCourse())
     }, [])
 
+    /** @description get transaction by store api key */
     useEffect(() => {
         if (payments?.store) {
             dispatch(getUserTransactions(payments?.store?.apiKey))
@@ -78,6 +84,9 @@ const Payment = ({isButtons}) => {
 
     const billUrl = `${domain}/bill/${id}`;
 
+    /**
+     * @description sending email with a link billUrl
+     */
     const onSubmit = async () => {
         await form.validateFields()
             .then(async (res) => {
@@ -96,6 +105,10 @@ const Payment = ({isButtons}) => {
         email: ''
     })
 
+    /**
+     * @description set data into user object
+     * @param {object} e - event
+     */
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -105,6 +118,9 @@ const Payment = ({isButtons}) => {
         })
     }
 
+    /**
+     * @description copying link of payment
+     */
     const copyLink = (id) => {
         const link = document.getElementById(id);
         let textArea = document.createElement("textarea");
@@ -116,6 +132,9 @@ const Payment = ({isButtons}) => {
         message.success('Link was copied');
     }
 
+    /**
+     * @description copying html code of button payment
+     */
     const copyTextToClipboard = (id) => {
         const context = document.getElementById(id);
         context.select();
@@ -123,6 +142,7 @@ const Payment = ({isButtons}) => {
         message.success('HTML-code copied');
     }
 
+    /** @description generating html code of button payment */
     const handleGenerateHTML = () => {
         const buttonHTML = document.getElementById("resultButton");
         setVisibleHtml(true);

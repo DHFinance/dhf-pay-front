@@ -21,6 +21,11 @@ interface IContainerProps {
     title?: string | null
 }
 
+/**
+ * @description Layout for the pages with a sidebar
+ * @param props
+ * @constructor
+ */
 const SliderContainer = (props: IContainerProps) => {
 
     const user = useSelector((state) => state.auth);
@@ -30,11 +35,16 @@ const SliderContainer = (props: IContainerProps) => {
     const history = useRouter()
     const titlePath = history.asPath.replace(/\//g, ' ').toUpperCase()
 
-
+    /**
+     * @description go to login page
+     */
     const goLoginPage = () => {
         router.push('/login')
     }
 
+    /**
+     * @description logout and go to login page
+     */
     const onLogout = async () => {
       await dispatch(postLogout(goLoginPage))
     }

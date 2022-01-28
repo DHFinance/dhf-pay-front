@@ -54,6 +54,9 @@ const Stores = () => {
     const stores = useSelector((state) => state.storesData.data);
     const user = useSelector((state) => state.auth.data);
 
+    /**
+     * @description data for the table in right format
+     */
     const storesTable = stores.map((store) => {
         return {
             ...store,
@@ -71,15 +74,25 @@ const Stores = () => {
 
     const [form] = Form.useForm();
 
+     /**
+     * @description function to load data
+     */
     useEffect(() => {
+        /** @description For admin get all stores */
         if (user.role === 'admin') {
             dispatch(getStores())
         }
         if (user.role === 'customer') {
+             /** @description for customer get stores created by a specific user */
             dispatch(getUserStores(user.id))
         }
     }, [user.role])
 
+    /**
+     * @description set data into store object
+     * @param {object} e - event
+     * @param {string} field - field name
+     */
     const onChangeStore = (field: string) => (e: any) => {
         const value = e.target.value
         setStore({
@@ -92,7 +105,11 @@ const Stores = () => {
         setIsModalVisible(true);
     };
 
+    /**
+     * @description add new the store
+     */
     const handleOk = async () => {
+        /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -120,6 +137,9 @@ const Stores = () => {
         setIsModalVisible(false);
     };
 
+    /**
+     * @description generating store key
+     */
     const generateKey = () => {
         function randomString(len) {
             const charSet =
@@ -144,6 +164,11 @@ const Stores = () => {
         })
     };
 
+    /**
+     * @description handling every row,applying styles and a click event handler to it
+     * @param {object} record - element of array entity
+     * @param rowIndex
+     */
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},
@@ -151,7 +176,14 @@ const Stores = () => {
         };
     }
 
+    /**
+     * @description wallet validation. Occurs with the help of the CLPublicKey.fromHex function, which returns an error if the wallet is not valid
+     * @param {object} rule - object field wallet
+     * @param {any} value - value wallet
+     * @param {function} callback - executed after successful validation of the wallet field
+     */
     const validateWallet = (rule: any, value: any, callback: any) => {
+        /** @description if value isn't empty, then verify wallet */
         if (value) {
             try {
                 CLPublicKey.fromHex(value)

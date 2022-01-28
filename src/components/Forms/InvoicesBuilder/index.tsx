@@ -9,7 +9,7 @@ import {getUserStores} from "../../../../store/actions/stores";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {getCourse} from "../../../../store/actions/course";
 const { Option } = Select;
-
+/** @description initial state of a payment object */
 const initialState = {
     amount: '',
     comment: ''
@@ -29,18 +29,27 @@ const InvoicesBuilder = () => {
     const dispatch = useDispatch();
 
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked);
-
+    /**
+     * @description function to load data
+     */
     useEffect(() => {
+        /** @description For admin get all payments */
         if (user?.role === 'admin') {
             dispatch(getPayments())
         }
+        /** @description for customer get stores created by a specific user */
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
+        /** @description get the current exchange rate */
         dispatch(getCourse())
     }, []);
 
+    /**
+     * @description function to load payments of a specific store by apiKey
+     */
     useEffect(() => {
+        /** @description if the stores are not empty and the user does not have the admin role, get payments */
         if (stores.length && user.role !== 'admin' && activeStores[0]?.apiKey) {
             dispatch(getUserPayments(activeStores[0]?.apiKey))
         }
@@ -54,8 +63,13 @@ const InvoicesBuilder = () => {
         }
     };
 
+    /**
+     * @param {string} field - name of property payment object
+     * @description set values to the payment object
+     */
     const onChangePayment = (field: string) => (e: any) => {
         let value = e.target.value;
+        /** @description for property amount convert into the right shape */
         if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
@@ -63,7 +77,11 @@ const InvoicesBuilder = () => {
         })
     };
 
+    /**
+     * @description save the payment and return the response
+     */
     const handleOk = async () => {
+        /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -84,6 +102,10 @@ const InvoicesBuilder = () => {
             .catch(async (err) => console.log(err))
     };
 
+    /**
+     * @param {string} value - store api key
+     * @description set current store and get payments of a selected store
+     */
     function handleChange(value) {
         const current = stores.filter((store) => store.apiKey === value)[0];
         setCurrentStore(current);

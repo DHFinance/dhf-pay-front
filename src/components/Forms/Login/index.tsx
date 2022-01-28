@@ -13,6 +13,7 @@ interface IUserData {
     password: string,
 }
 
+/** @description initial state of a user object */
 const initialState = {
     email: '',
     password: '',
@@ -33,6 +34,10 @@ const Login = () => {
     const fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
 
+    /**
+     * @description set data into user object
+     * @param {object} e - event
+     */
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -42,13 +47,24 @@ const Login = () => {
         })
     }
 
+    /**
+     * @description validations elements of form
+     */
     useEffect(() => {
+        /** @description if have no authorization errors and the form fields aren't empty */
         if (fieldError && userData.email !== '' && userData.password !== '') {
             form.validateFields(["email", 'password'])
         }
     }, [fieldError])
 
+    /**
+     * @description validations of password
+     * @param {object} rule - object field password
+     * @param {any} value - value password
+     * @param {function} callback - executed after successful validation of the password field
+     */
     const validatePassword = (rule: any, value: any, callback: any) => {
+        /** @description if password field has error return error message */
         if (fieldError === 'password') {
             callback(errorMessage);
             dispatch(clearAuth())
@@ -57,7 +73,14 @@ const Login = () => {
         }
     };
 
+    /**
+     * @description validations of email
+     * @param {object} rule - object field email
+     * @param {any} value - value email
+     * @param {function} callback - executed after successful validation of the email field
+     */
     const validateEmail = (rule: any, value: any, callback: any) => {
+        console.log(rule, value, callback);
         if (fieldError === 'email') {
             callback(errorMessage);
             dispatch(clearAuth())
@@ -66,10 +89,14 @@ const Login = () => {
         }
     };
 
+    /**
+     * @description authorization of user
+     */
     const onSubmit = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    /** @description after successful authorization go to the home page */
                     await dispatch(postLogin(userData, goStartPage))
                 } catch (e) {
                     console.log(e, 'registration error')

@@ -33,6 +33,11 @@ const CreateUserForm = ({auth, setEmail}) => {
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
+    /**
+     * @description set data into user object
+     * @param {string} field - name of field form
+     * @param {object} e - event
+     */
     const onUpdateData = (field: string) => (e: any) => {
         const value = e.target.value
         setUserData({
@@ -41,7 +46,14 @@ const CreateUserForm = ({auth, setEmail}) => {
         })
     }
 
+    /**
+     * @description checking that the entered two passwords match
+     * @param {object} rule - object field password
+     * @param {any} value - value password
+     * @param {function} callback - executed after successful validation of the password field
+     */
     const validatePassword = (rule: any, value: any, callback: any) => {
+        /** @description if password field hasn't empty, but does not match the first password return a callback with an error  */
         if (value && value !== userData.password) {
             callback("Passwords do not match");
         } else {
@@ -52,13 +64,23 @@ const CreateUserForm = ({auth, setEmail}) => {
     const fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
 
+    /**
+     * @description validations of field email
+     */
     useEffect(() => {
         if (fieldError) {
             form.validateFields(["email"])
         }
     }, [fieldError])
 
+    /**
+     * @description validations of email
+     * @param {object} rule - object field email
+     * @param {any} value - value email
+     * @param {function} callback - executed after successful validation of the email field
+     */
     const validateEmail = (rule: any, value: any, callback: any) => {
+         /** @description if email field has error return error message */
         if (fieldError === 'email') {
             callback(errorMessage);
             dispatch(clearAuth())
@@ -67,7 +89,11 @@ const CreateUserForm = ({auth, setEmail}) => {
         }
     };
 
+    /**
+     * @description registration of user
+     */
     const onSubmit = async () => {
+        /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -159,11 +185,14 @@ const VerifyForm = ({email}) => {
 
     const [code, setCode] = useState('')
 
+    /**
+     * @description verification of user by code
+     */
     const onVerify = async () => {
-
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    /** @description after successful verification go to the home page */
                     await dispatch(postVerify(email, code, goStartPage))
                 } catch (e) {
                     console.log(e, 'registration error')
@@ -174,13 +203,23 @@ const VerifyForm = ({email}) => {
 
     const onChangeCode = (e) => setCode(e.target.value)
 
+    /**
+     * @description validations field code
+     */
     useEffect(() => {
         if (fieldError) {
             form.validateFields(["code"])
         }
     }, [auth])
 
+    /**
+     * @description validations of email
+     * @param {object} rule - object field code
+     * @param {any} value - value code
+     * @param {function} callback - executed after successful validation of the code field
+     */
     const validateCode = (rule: any, value: any, callback: any) => {
+         /** @description if code field has error return error message */
         if (fieldError === 'code') {
             callback(errorMessage);
             dispatch(clearAuthError())
@@ -221,6 +260,7 @@ const Register = () => {
     const auth = useSelector((state) => state.auth);
     const [email, setEmail] = useState('')
 
+    /** @description if the user is not verified, display the registration form, else display the code receipt form */
     if (!auth.verify) {
         return <CreateUserForm auth={auth} setEmail={setEmail}/>
     } else {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 export const API_HOST = process.env.NEXT_PUBLIC_API_HOST
+
 class Api {
   constructor() {
 
@@ -7,7 +8,6 @@ class Api {
       baseURL: API_HOST + '/api' || 'http://localhost:3001/api',
     });
   }
-
   post = async (url, data, params) => {
     return await this.client.post(url, data, params);
   };

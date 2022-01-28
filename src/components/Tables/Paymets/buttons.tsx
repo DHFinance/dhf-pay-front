@@ -47,6 +47,9 @@ const PaymentsButton = () => {
     const filterTable = payments.filter((item)=>{
         return item.type && item.text;
     })
+    /**
+     * @description data for the table in right format
+     */
     const paymentsTable = filterTable.map((payment) => {
         return {
             ...payment,

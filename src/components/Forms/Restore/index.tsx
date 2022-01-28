@@ -39,6 +39,7 @@ const initialStatePassword = {
     passwordConf: '',
 }
 
+/** @description steps for the reset of password */
 enum EnumForms {
     EMAIL ,
     CODE ,
@@ -50,6 +51,10 @@ const EmailForm = ({auth}: any) => {
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
     const dispatch = useDispatch();
 
+    /**
+     * @description set data into user object
+     * @param {object} e - event
+     */
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -64,13 +69,23 @@ const EmailForm = ({auth}: any) => {
 
     const [form] = Form.useForm();
 
+    /**
+     * @description validations of field email
+     */
     useEffect(() => {
         if (fieldError) {
             form.validateFields(["email"])
         }
     }, [fieldError])
 
+    /**
+     * @description validations of email
+     * @param {object} rule - object field email
+     * @param {any} value - value email
+     * @param {function} callback - executed after successful validation of the email field
+     */
     const validateEmail = (rule: any, value: any, callback: any) => {
+          /** @description if email field has error return error message */
         if (fieldError === 'email') {
             callback(errorMessage);
             dispatch(clearAuth())
@@ -79,7 +94,11 @@ const EmailForm = ({auth}: any) => {
         }
     };
 
+    /**
+     * @description send email of user
+     */
     const onSubmit = async () => {
+        /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -123,6 +142,10 @@ const CodeForm = ({auth}: any) => {
     const [userData, setUserData] = useState<IRestoreDataCode>(initialStateCode)
     const dispatch = useDispatch();
 
+    /**
+     * @description set data into user object
+     * @param {object} e - event
+     */
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -137,13 +160,23 @@ const CodeForm = ({auth}: any) => {
 
     const [form] = Form.useForm();
 
+    /**
+     * @description validation of field code
+     */
     useEffect(() => {
         if (fieldError) {
             form.validateFields(["code"])
         }
     }, [auth])
 
+    /**
+     * @description validation of code
+     * @param {object} rule - object field code
+     * @param {any} value - value code
+     * @param {function} callback - executed after successful validation of the code field
+     */
     const validateCode = (rule: any, value: any, callback: any) => {
+        /** @description if code field has error return error message */
         if (fieldError === 'code') {
             callback(errorMessage);
             dispatch(clearAuthError())
@@ -152,7 +185,9 @@ const CodeForm = ({auth}: any) => {
         }
     };
 
-
+    /**
+     * @description sending code for change password
+     */
     const onSubmit = async () => {
         await form.validateFields()
             .then(async (res) => {
@@ -202,6 +237,10 @@ const PasswordForm = ({auth}: any) => {
     const dispatch = useDispatch();
     const [form] = Form.useForm();
 
+    /**
+     * @description set data into user object
+     * @param {object} e - event
+     */
     const onUpdateData = (e: any) => {
         const value = e.target.value
         const field = e.target.name
@@ -211,10 +250,14 @@ const PasswordForm = ({auth}: any) => {
         })
     }
 
+    /**
+     * @description saving new password
+     */
     const onSubmit = async () => {
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    /** @description after successful change password go to the home page */
                     await dispatch(postRestoreStepPassword({password: userData.password, email: auth.data.email}, goStartPage))
                 } catch (e) {
                     console.log(e, 'registration error: Code step')
@@ -222,8 +265,14 @@ const PasswordForm = ({auth}: any) => {
             })
             .catch(async (err) => console.log(err))
     }
-
+    /**
+     * @description checking that the entered two passwords match
+     * @param {object} rule - object field password
+     * @param {any} value - value password
+     * @param {function} callback - executed after successful validation of the password field
+     */
     const validatePassword = (rule: any, value: any, callback: any) => {
+        /** @description if password field doesn't match the first password return a callback with an error  */
         if (userData.passwordConf !== userData.password) {
             callback("Passwords do not match");
         } else {
@@ -269,6 +318,7 @@ const Restore = () => {
 
     const auth = useSelector((state) => state.auth);
 
+    /** @description set steps based on state auth  */
     useEffect(() => {
         if (auth.data.resetEnabled) {
             setForm(EnumForms.PASSWORD)
@@ -281,6 +331,9 @@ const Restore = () => {
 
     const [form, setForm] = useState<EnumForms>(EnumForms.EMAIL)
 
+    /** @description displaying components based on user steps
+     * @param {number} form - step user, which resetting password
+     * */
     switch (form) {
         case EnumForms.EMAIL: return <EmailForm auth={auth}/>
         case EnumForms.CODE: return <CodeForm auth={auth}/>
