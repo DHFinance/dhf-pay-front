@@ -9,6 +9,11 @@ import {useRouter} from "next/router";
 import {Spin} from "antd";
 
 
+/**
+ *
+ * @param children {JSX}
+ * @description Nextjs creates pages before getting localstorage. This hoc prevents components from rendering until localstorage is received.
+ */
 const WithLoading = ({children}: any) => {
 
     const [storageLoaded, setStorageLoaded] = useState(false)

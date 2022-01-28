@@ -41,6 +41,11 @@ const Users = () => {
         dispatch(getUsers())
     }, [])
 
+    /**
+     * @description handling every row,applying styles and a click event handler to it
+     * @param {object} record - element of array entity
+     * @param rowIndex
+     */
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},

@@ -1,3 +1,6 @@
+/**
+ * @description array styled buttons for the select style of button payment
+ */
 export const buttons = [
     {
         id:1,

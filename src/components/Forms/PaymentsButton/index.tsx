@@ -2,7 +2,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {Button, Form, Input, Select,message} from "antd";
 import {useDispatch, useSelector} from "react-redux";
-import Link from "next/link";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 const { Option } = Select;
 import {getUserStores} from "../../../../store/actions/stores";
@@ -12,35 +11,6 @@ import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {getCourse} from "../../../../store/actions/course";
-
-const columns = [
-    {
-        title: 'id',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: 'name',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'description',
-        dataIndex: 'description',
-        key: 'description',
-    },
-    {
-        title: 'user',
-        key: 'user',
-        dataIndex: 'user',
-    },
-    {
-        title: 'wallet',
-        key: 'wallet',
-        dataIndex: 'wallet',
-        cursor: 'pointer',
-    },
-];
 
 const initialState = {
     amount: '',
@@ -65,24 +35,38 @@ const Buttons = () => {
     const currentPayment = useSelector((state) => state.payment.data);
     const course = useSelector((state) => state.course.data.usd);
 
+    /**
+     * @description function to load data
+     */
     useEffect(() => {
+        /** @description for customer get stores created by a specific user */
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
+        /** @description usd to cspr exchange rate */
         dispatch(getCourse())
     }, []);
 
+    /** @description name of current domain */
     const domain = location.host;
 
     const [form] = Form.useForm();
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const dispatch = useDispatch();
 
+    /**
+     * @param {string} value - store api key
+     * @description set current store and get payments of a selected store
+     */
     function handleChange(value) {
         const current = stores.filter((store) => store.apiKey === value)[0]
         setCurrentStore(current);
         dispatch(getUserPayments(value));
     }
+
+    /**
+     * @description copying html code of button payment
+     */
     const copyTextToClipboard = () => {
         const context = document.getElementById("textArea");
         context.select();
@@ -97,7 +81,11 @@ const Buttons = () => {
         }
     };
 
+    /**
+     * @description save the payment and return the response
+     */
     const handleOk = async () => {
+        /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
@@ -110,6 +98,7 @@ const Buttons = () => {
                     }
                     setPaymentId(bill.id);
                     message.success('Payment was added');
+                    /** @description generating and showing html code of button payment */
                     handleGenerateHTML();
                     setVisibleHtmlCode(true);
                 } catch (e) {
@@ -119,8 +108,13 @@ const Buttons = () => {
             .catch(async (err) => console.log(err))
     };
 
+    /**
+     * @param {string} field - name of property payment object
+     * @description set values to the payment object
+     */
     const onChangePayment = (field: string) => (e: any) => {
         let value = e.target.value;
+        /** @description for property amount convert into the right shape */
         if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
@@ -128,10 +122,10 @@ const Buttons = () => {
         })
     };
 
-    const uslessFunc = () => {
-        return null
-    }
-
+    /**
+     * @description selecting of style button
+     * @param {object} itemButton - object of selected button
+     */
     const handleChooseButton = (itemButton) => {
         setChoosenButton(itemButton.id);
         setPayment(({
@@ -139,6 +133,8 @@ const Buttons = () => {
             type: itemButton.id,
         }))
     }
+
+    /** @description generating html code of button payment */
     const handleGenerateHTML = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);

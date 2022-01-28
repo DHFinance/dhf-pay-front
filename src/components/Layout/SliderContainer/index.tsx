@@ -21,6 +21,11 @@ interface IContainerProps {
     title?: string | null
 }
 
+/**
+ * @description Layout for the pages with a sidebar
+ * @param props
+ * @constructor
+ */
 const SliderContainer = (props: IContainerProps) => {
 
     const user = useSelector((state) => state.auth);
@@ -28,13 +33,18 @@ const SliderContainer = (props: IContainerProps) => {
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false)
     const history = useRouter()
-    const title = history.asPath.replace(/\//g, ' ').toUpperCase()
+    const titlePath = history.asPath.replace(/\//g, ' ').toUpperCase()
 
-
+    /**
+     * @description go to login page
+     */
     const goLoginPage = () => {
         router.push('/login')
     }
 
+    /**
+     * @description logout and go to login page
+     */
     const onLogout = async () => {
       await dispatch(postLogout(goLoginPage))
     }
@@ -124,7 +134,7 @@ const SliderContainer = (props: IContainerProps) => {
                         minHeight: 280,
                     }}
                 >
-                    <Title style={{width: '100%', textAlign: 'center'}}>{props.title ?? title}</Title>
+                    <Title style={{width: '100%', textAlign: 'center'}}>{props.title ?? titlePath}</Title>
                     {props.children}
                 </Content>
             </Layout>

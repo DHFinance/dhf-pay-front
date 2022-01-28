@@ -21,7 +21,11 @@ const User = () => {
     const dispatch = useDispatch()
     const router = useRouter()
 
+    /**
+     * @description load data
+     */
     useEffect(() => {
+         /** @description if is query id, then get user by id */
         if (router.query.slug) {
             dispatch(getUser(router.query.slug))
         }

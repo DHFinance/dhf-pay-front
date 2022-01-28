@@ -28,7 +28,7 @@ const editStoreFailed = (error) => ({
 });
 
 export const editStore = (id = '', data) => async (dispatch, getState) => {
-  const loading = getState().store.isLoading
+  const loading = getState().storeData.isLoading
   if (!loading) {
     const token = getState().auth?.data?.token
     if (id) {
@@ -74,7 +74,9 @@ const addStoreFailed = (error) => ({
 });
 
 export const addStore = (data) => async (dispatch, getState) => {
-  const loading = getState().store.isLoading
+  console.log(getState())
+  const loading = getState().storeData.isLoading
+
   if (!loading) {
     const token = getState().auth?.data?.token
     dispatch(addStoreStart());
@@ -100,7 +102,7 @@ const blockStoreFailed = (error) => ({
 });
 
 export const blockStore = (id, blocked) => async (dispatch, getState) => {
-  const loading = getState().store.isLoading
+  const loading = getState().storeData.isLoading
   if (!loading) {
     const token = getState().auth?.data?.token
     dispatch(blockStoreStart());

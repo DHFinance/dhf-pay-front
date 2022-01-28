@@ -11,6 +11,13 @@ import Error from "next/error";
 import {clearStore} from "../../store/actions/auth";
 
 
+/**
+ *
+ * @param children {JSX}
+ * @param error {string} - error while requesting an object from the server
+ * @param data {object} - data of the object that will be loaded from the server, the existence of which needs to be checked
+ * @description used on specific post pages (/user/[slug] store/[slug]). If the slug contains an entry id that does not exist in the database, redirects the user to the start page
+ */
 const WithPageExist = ({children, error, data}: any) => {
 
     const router = useRouter()

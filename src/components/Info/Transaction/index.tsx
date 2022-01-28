@@ -42,10 +42,17 @@ const Transaction = () => {
     const transactionError = useSelector((state) => state.transaction.error);
     const course = useSelector((state) => state.course.data.usd);
 
+    /**
+     * @description load data
+     */
     useEffect(() => {
+         /** @description if is query id, then get transaction by id */
         if (router.query.slug) {
             dispatch(getTransaction(router.query.slug))
         }
+        /**
+         * @description usd to cspr exchange rate
+         */
         dispatch(getCourse())
     }, [])
 

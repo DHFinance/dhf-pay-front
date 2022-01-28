@@ -44,10 +44,15 @@ const Transactions = () => {
     const router = useRouter();
     const dispatch = useDispatch();
 
+    /**
+     * @description function to load data
+     */
     useEffect(() => {
+        /** @description For admin get all transactions */
         if (user?.role === 'admin') {
             dispatch(getTransactions())
         }
+        /** @description for customer get stores created by a specific user */
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
@@ -59,6 +64,11 @@ const Transactions = () => {
         }
     }, [stores.length])
 
+    /**
+     * @description handling every row,applying styles and a click event handler to it
+     * @param {object} record - element of array entity
+     * @param rowIndex
+     */
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},
@@ -66,6 +76,10 @@ const Transactions = () => {
         };
     }
 
+    /**
+     * @description handling change of select store and get transactions by a specific store api key
+     * @param {string} value - store api key
+     */
     function handleChange(value) {
         dispatch(getUserTransactions(value))
     }

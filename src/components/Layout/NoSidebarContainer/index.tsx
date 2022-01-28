@@ -13,10 +13,15 @@ interface IContainerProps {
     children: JSX.Element | string
 }
 
+/**
+ * @description Layout for the pages without a sidebar
+ * @param props
+ * @constructor
+ */
 const NoSidebarContainer = (props: IContainerProps) => {
     const [isPopoverHide, setPopoverHide] = useState(false);
     const casperUser = useSelector((state) => state.pay.data);
-    console.log(casperUser)
+
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64, display:"flex", flexDirection:"column" }}>

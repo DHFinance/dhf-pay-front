@@ -20,6 +20,13 @@ const initialState = {
     wallet: ''
 }
 
+
+/**
+ * @description List of known bugs
+ * @message {string} - the string or part of a string returned by the signer extension. It is searched in an array
+ * @title {string} - alert title
+ * @desc {string} - description of the solution to the problem
+ */
 const signerErrors = [
     //sometimes the extension breaks and stops being called. Only reinstall helps.
     {
@@ -93,6 +100,12 @@ const signerErrors = [
 
 ]
 
+/**
+ * @description Payment button component. Changes its functionality depending on the state of connection with signer
+ * @param balance {string} - the balance of the user authorized through the signer in cspr. If there is a balance, then the user has connected to the site through casper signer and can make a transaction
+ * @param click {function} - the signer connection function is passed here
+ * @param deploy {function} - the payment function in signer is passed here
+ */
 const StatusButtonPay = ({balance, click,deploy}) => {
     return (
     !balance ?
@@ -106,6 +119,10 @@ const StatusButtonPay = ({balance, click,deploy}) => {
     )
 }
 
+/**
+ *
+ * @description wrapper component. Depending on the value of NEXT_PUBLIC_FAKE_TRANSACTION, it will issue a fake payment component (without using a signer) or a real one (capable of working with the signer extension)
+ */
 const Bill = () => {
     const isFake = process.env.NEXT_PUBLIC_FAKE_TRANSACTION === '1'
     const course = useSelector((state) => state.course.data.usd);
@@ -115,15 +132,30 @@ const Bill = () => {
     const store = useSelector((state) => state.storeData.data);
     const dispatch = useDispatch();
     const router = useRouter();
+    /**
+     * @description getting data from the server
+     */
     useEffect(() => {
         const pathname = window.location.pathname.split('/')
         const id = pathname && pathname[pathname.length - 1]
+        /**
+         * @description receipt of the payment on the basis of which the check is drawn up
+         */
         dispatch(getPayment(id))
+        /**
+         * @description getting cspr rate to usd
+         */
         dispatch(getCourse())
     }, [])
     useEffect(() => {
         if (billInfo?.store?.id) {
+            /**
+             * @description receiving the store that owns the payment
+             */
             dispatch(getStore(billInfo?.store?.id))
+            /**
+             * @description receiving the last transaction made for this payment
+             */
             dispatch(getLastTransaction(billInfo?.id))
         }
     }, [billInfo])
@@ -134,16 +166,36 @@ const Bill = () => {
     }
     return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
-
-const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
+/**
+ * @description fake component. Used if you need to test applications without the ability to establish a connection with the signer
+ * @param billInfo {id,
+        datetime,
+        amount,
+        comment,
+        status,
+        payment,
+        type,
+        text} - information about the payment on the basis of which the receipt was created
+ * @param transaction - last transaction for this payment
+ * @param course - usd to cspr exchange rate
+ */
+const FakeBill = ({billInfo, transaction, dispatch, course}) => {
 
     const [billData, setBillData] = useState(initialState)
     const [sign, setSign] = useState(false)
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [form] = Form.useForm();
+
+
+    /**
+     * @description hardcoded transaction hash
+     */
     const defaultTxHash = 'd7DdAC148B97671859946603915175b46ea976e11D3263C28E2A35075D634789'
 
-    const deploy = async ()=> {
+    /**
+     * @description creating a transaction bypassing casper. Uses only hardcoded data received from the server
+     */
+    const deploy = async () => {
         await form.validateFields()
             .then(async (res) => {
                 await dispatch(pay({
@@ -169,8 +221,14 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
         type,
         text
     } = billInfo
+
+
     const date = new Date(datetime).toDateString()
 
+
+    /**
+     * @description wallet validation. Occurs with the help of the CLPublicKey.fromHex function, which returns an error if the wallet is not valid
+     */
     const validateWallet = (rule: any, value: any, callback: any) => {
         if (value) {
             try {
@@ -184,6 +242,9 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
         }
     };
 
+    /**
+     * @description writing form data to state
+     */
     const onChangeBillData = (field: string) => (e: any) => {
         const value = e.target.value
         setBillData({
@@ -276,6 +337,21 @@ const FakeBill = ({billInfo, transaction, dispatch, router, store, course}) => {
     );
 };
 
+
+/**
+ * @param billInfo {id,
+        datetime,
+        amount,
+        comment,
+        status,
+        payment,
+        type,
+        text} - information about the payment on the basis of which the receipt was created
+ * @param transaction - last transaction for this payment
+ * @param store - the store that owns the payment
+ * @param course - cspr to usd exchange rate
+ * @description A component that allows you to work with casper signer
+ */
 const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) => {
 
     const [balance, setBalance] = useState('')
@@ -284,11 +360,23 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
     const [email, setEmail] = useState('')
     const [form] = Form.useForm();
 
+    /**
+     * @description - call alerts on casper signer extension errors
+     * @param message {string} is the response returned by signer. It searches for matches in signerErrors
+     */
     const showError = (message: string) => {
         console.log('Signer connection:', message)
+        /**
+         *
+         * @description search for matches in signerErrors
+         */
         const errors = signerErrors.filter(error => {
             return message.includes(error.message)
         })
+        /**
+         *
+         * @description if the error is known - trigger an alert with a method to solve it. Otherwise trigger an alert with title = 'Unknown error' desc = 'Unknown error'
+         */
         if (errors.length) {
             return openNotification(errors[0].title, errors[0].desc)
         } else {
@@ -296,6 +384,12 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         }
     }
 
+
+    /**
+     * @description call singer error or status alert
+     * @param title {string} - title
+     * @param desc {string} - description or method for solving errors
+     */
     const openNotification = (title = 'Unknown error', desc = 'Unknown error') => {
 
         notification.open({
@@ -304,11 +398,18 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         });
     };
 
-
+    /**
+     * @const apiUrl {string} - url of the node where completed operations will be processed
+     * @const casperService - allows us to get user data from the casper signer extension
+     * @const casperClient - allows us to work with the casper network
+     */
     const apiUrl = process.env.NEXT_PUBLIC_CASPER_NODE;
     const casperService = new CasperServiceByJsonRPC(apiUrl);
     const casperClient = new CasperClient(apiUrl);
 
+    /**
+     * @description sign in and connect with signer. Accesses the signer extension and opens it in a new browser window. Must be called twice if signer is not unlocked. Throws errors with showError. If the user has allowed the connection - asks for the balance
+     */
     const singInSigner = async () => {
         if (window.casperlabsHelper) {
             try {
@@ -321,17 +422,40 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         }
     };
 
+    /**
+     * @description payment payment function. Passes all data from billInfo and store to casper, which generates an invoice for payment
+     * @const to {string} - the recipient's unique wallet entered when creating the store
+     * @const ttl {num} - time spent on the transaction in milliseconds
+     * @const gasPrice {num} - transaction fee
+     * @const id {num} - transaction id in the casper network
+     */
     const deploy = async ()=> {
-
         const to = store.wallet;
         const amountStr = amount.toString()
         const amountNum = amount;
         const id = 287821;
         const gasPrice = 1;
         const ttl = 1800000;
+        /**
+         * @description checking the validity of the entered payer email. The transaction can be carried out only if the email is specified and valid
+         */
         await form.validateFields()
             .then(async () => {
                 try {
+                    /**
+                     * @description create or get all the data needed for the transaction
+                     * @const publicKeyHex - getting the payer's public key from his casper signer
+                     * @const publicKey - key decryption
+                     * @const deployParams - generation of payment parameters
+                     * @const toPublicKey - recipient's public key. Stored in the store that owns the payment
+                     * @const session - session creation
+                     * @const payment - creating a payment in casper network
+                     * @const deploy - payment deployment in casper network
+                     * @const json - convert to json
+                     * @const signature - call a window in the signer extension with information about the generated payment in the casper network
+                     * @const deployObject - conversion from json
+                     * @const signed - confirmation and sending the payment for processing to the casper network
+                     */
                     const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
                     const publicKey = CLPublicKey.fromHex(publicKeyHex)
                     let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
@@ -351,6 +475,14 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         openNotification('Transaction error', 'Your transaction has not been completed, please try again')
                     }
                     try {
+                        /**
+                         * @description after a successful transaction, a record about it is created in the database
+                         * @param txHash {string} - transaction hash. You can track the transaction on it.
+                         * @param status {string} - payment status. Always processing. It is set on the front, since only the front knows which bill mode is enabled (casper or fake)
+                         * @param email {string} - payer's email address
+                         * @param payment {payment || id} - data on the payment for which the transaction took place
+                         * @param sender {string} - payer's public key
+                         */
                         await dispatch(pay({
                             txHash: signed,
                             status: "processing",
@@ -370,6 +502,12 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             .catch(async (err) => console.log(err))
     };
 
+    /**
+     * @description getting balance
+     * @const publicKeyHex - getting the payer's public key from his casper signer
+     * @const balance - recipient's balance in cspr. Use .toString() to convert to readable format
+     * @const CSPRtoUSD - balance conversion from cspr to usd
+     */
     const getBalance = async () => {
         const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
 
@@ -397,6 +535,15 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         dispatch(setCasperData({usd: CSPRtoUSD, cspr: balance.toString(), hash, public: publicKeyHex}))
     };
 
+    /**
+     * @description getting balance
+     * @const datetime {date} - last update time payment
+     * @const amount {string} - payment amount in cspr
+     * @const comment {string} - payment comment
+     * @const status {string} - payment status Paid, Not_Paid, Particularly_Paid
+     * @const type {number} - button style type id (if any). If there is a button, a transaction for this payment can be made an unlimited number of times
+     * @const text {string} - button text (if any). If there is a button, the transaction can be made an unlimited number of times
+     */
     const {
         id,
         datetime,
@@ -407,6 +554,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         type,
         text
     } = billInfo
+
     const date = new Date(datetime).toDateString()
 
     return (
@@ -445,7 +593,11 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                 : null
             }
 
-            {transaction?.txHash ?
+            {
+                /**
+                 * @description If there is already a completed transaction, a button is displayed that allows you to view this transaction in the casper network
+                 */
+                transaction?.txHash ?
                 <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction?.txHash}`}>
                     <a target="_blank" rel="noreferrer">
                         <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
@@ -472,7 +624,12 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         : null
             }
 
-            {type && text ?
+
+            {
+                /**
+                 * @description for payments with a button attached to them, you can make an infinite number of transactions. For invoices, you can make only one transaction, after which it is forbidden to make new transactions. Another transaction can be made only if the previous transaction was unsuccessful
+                 */
+                type && text ?
                 <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} />
                 :
                 status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?

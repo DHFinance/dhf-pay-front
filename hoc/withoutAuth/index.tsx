@@ -9,6 +9,11 @@ import {Spin} from "antd";
 import {reAuth} from "../../store/actions/auth";
 
 
+/**
+ *
+ * @param children {JSX}
+ * @description hoc for authorization pages (login, restore, registration), where authorized users should not enter. If the user has a token in localstorage - redirects him to the start page
+ */
 const WithoutAuth = ({children}: any) => {
 
     const localToken = localStorage.getItem('token')

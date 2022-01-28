@@ -9,6 +9,12 @@ import {useRouter} from "next/router";
 import {Spin} from "antd";
 
 
+/**
+ *
+ * @param data {any} - load data the component is waiting for
+ * @param children {JSX}
+ * @constructor data hoc will not render the component until data is loaded
+ */
 const WithLoadingData = ({data, children}) => {
 
 
