@@ -20,7 +20,10 @@ const getStoresFailed = (error) => ({
 });
 
 
-
+/**
+ * @description Получение списка всех магазинов.
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getStores = () => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getStoresStart());
@@ -29,6 +32,11 @@ export const getStores = () => async (dispatch, getState) => {
   }).catch((e) => dispatch(getStoresFailed(e)));
 };
 
+/**
+ * @description Получение списка магазинов определенного пользователя.
+ * @param userId - уникальное значение пользователя
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getUserStores = (userId) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getStoresStart());

@@ -20,7 +20,10 @@ const getPaymentsFailed = (error) => ({
 });
 
 
-
+/**
+ * @description Получение платежей.  Возвращаются все сущуествующие платежи. После операции выполняется success|failed метод
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getPayments = () => async (dispatch, getState) => {
   dispatch(getPaymentsStart());
   const token = getState().auth?.data?.token
@@ -32,7 +35,11 @@ export const getPayments = () => async (dispatch, getState) => {
     dispatch(getPaymentsFailed(e));
   }
 };
-
+/**
+ * @description Получение платежей. Возвращаются платежи магазина соответствующего переданному ключу. После операции выполняется success|failed метод
+ * @param apiKey {string} - Уникальный ключ магазина, хранящийся в базе данных
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getUserPayments = (apiKey) => async (dispatch, getState) => {
   dispatch(getPaymentsStart());
   const token = getState().auth?.data?.token

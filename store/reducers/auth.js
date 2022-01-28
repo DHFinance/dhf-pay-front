@@ -29,6 +29,12 @@ const initialState = {
   isChanged: false
 };
 
+/**
+ * @description reducer аутентификации пользователя
+ * @param state - состояние reducer авторизации, котоое изначально равно initialState
+ * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @returns {{isLoading: boolean, data: {lastName: string,resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}|{isLoading: boolean, data: {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error}|{isLoading: boolean, data: {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}|{isLoading: boolean, data: (*&{lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}), isChanged: boolean, verify: boolean, error: string}}
+ */
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case  CLEAR_AUTH:
@@ -44,6 +50,9 @@ export default function reducer(state = initialState, action) {
         isLoading: true,
         isChanged: true
       };
+      /**
+       * @description вызывается при успешном выходе пользователя, удаляет токен пользователя
+       */
     case  POST_LOGOUT_SUCCESS:
       localStorage.removeItem('token');
       return initialState;
@@ -80,6 +89,9 @@ export default function reducer(state = initialState, action) {
         isLoading: true,
         isChanged: true
       };
+      /**
+       * @description вызывается при успешной верификации пользователя, если токен передан в action.payload, то устанавливается этот токен
+       */
     case  POST_VERIFY_SUCCESS:
       if (action.payload.token) {
         localStorage.setItem('token', action.payload.token);
@@ -106,6 +118,9 @@ export default function reducer(state = initialState, action) {
         isLoading: true,
         isChanged: true
       };
+      /**
+       * @description вызывается при успешном сбросе пароля пользователя, если токен передан в action.payload, то устанавливается этот токен
+       */
     case  POST_RESTORE_SUCCESS:
       if (action.payload.token) {
         localStorage.setItem('token', action.payload.token);
@@ -132,6 +147,9 @@ export default function reducer(state = initialState, action) {
         isLoading: true,
         isChanged: true
       };
+      /**
+       * @description вызывается при успешной аунтефикации пользователя, если токен передан в action.payload, то устанавливается этот токен
+       */
     case  POST_LOGIN_SUCCESS:
       if (action.payload.token) {
         localStorage.setItem('token', action.payload.token);

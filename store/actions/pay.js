@@ -25,6 +25,11 @@ const pushPayment = (data) => ({
   payload: data
 });
 
+/**
+ * @description Оплата платежа. Оплата происходит по токену пользователя, после которой вызывается success|failed метод
+ * @param data {object} данные, необходимые для указания в теле запроса, соответствующие модели Transactions
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const pay = (data) => async (dispatch, getState) => {
   const loading = getState().pay.isLoading
   if (!loading) {

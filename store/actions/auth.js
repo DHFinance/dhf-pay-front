@@ -47,6 +47,11 @@ const postRegistrationFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Регистрация пользователя, этап 1. Получает данные пользователя, отправляет код для подтверждения в письме на указанную email
+ * @param data {object} - данные, передаваемые в теле запроса, соответствующие модели User
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postRegistration = (data) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
@@ -73,6 +78,13 @@ const postVerifyFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Регистрация пользователя, этап 2. принимает код подтвержения, сравнивает его с тем, что записан на беке. Если код верен - на этом пользователе можно авторизироваться
+ * @param email
+ * @param code
+ * @param goStartPage - callback для перехода на главную страницу сайта
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postVerify = (email, code, goStartPage) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
@@ -102,6 +114,11 @@ const postLoginFailed = (error) => {
   }
 }
 
+/**
+ * @description проверка существования пользователя в базе данных. Происходит при каждой перезагрузке страницы
+ * @param token {string} - уникальная строка в формате JWT. определяющая токен пользователя
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const reAuth = (token) => async (dispatch, getState) => {
   dispatch(postLoginStart());
   await get(`auth/reAuth?token=${token}`).then((result) => {
@@ -111,6 +128,12 @@ export const reAuth = (token) => async (dispatch, getState) => {
   });
 };
 
+/**
+ * @description вход в систему. ищет пользователя по email и сверяет пароль. Если все данные верны - выдает токен
+ * @param data {object} - данные, передаваемые в теле запроса, соответствующие модели User
+ * @param goStartPage - callback для перехода на главную страницу сайта
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postLogin = (data, goStartPage) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
@@ -138,6 +161,11 @@ const postLogoutFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Выход пользователя пользователь. После выхода пользователь перемещается на главную страницу сайта и записывается success|error state
+ * @param goLoginPage - callback для перехода на страницу авторизации
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postLogout = (goLoginPage) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
@@ -165,6 +193,11 @@ const postRestoreFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Восстановление пароля этап 1. ищет пользователя по email отправляет на почту код. Return true для перехода к следующему этапу
+ * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
@@ -180,6 +213,11 @@ export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
   }
 };
 
+/**
+ * @description Восстановление пароля этап 2. Сравнение кода, пришедшего с фронта и кода из записи пользователя. Если коды совпадают - переходит к следующему этапу
+ * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postRestoreStepCode = (data) => async (dispatch, getState) => {
   const auth = getState().auth
   
@@ -195,6 +233,12 @@ export const postRestoreStepCode = (data) => async (dispatch, getState) => {
   }
 };
 
+/**
+ * @description Восстановление пароля этап 3. Замена пароля, получает новый пароль и заменяет им текущий. Отправляет данные пользователя
+ * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
+ * @param goStartPage - callback для перехода на главную страницу сайта
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const postRestoreStepPassword = (data, goStartPage) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {

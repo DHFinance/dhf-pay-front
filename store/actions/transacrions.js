@@ -18,6 +18,10 @@ const getTransactionsFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Получение списка всех транзакций
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getTransactions = () => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionsStart());
@@ -29,6 +33,11 @@ export const getTransactions = () => async (dispatch, getState) => {
   }
 };
 
+/**
+ * @description Получение списка всех транзакций, созданных через определенный магазин
+ * @param apiKey - ключ магазина
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getUserTransactions = (apiKey) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   console.log(token)

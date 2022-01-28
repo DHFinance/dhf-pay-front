@@ -21,6 +21,11 @@ const getUserFailed = (error) => ({
   payload: error
 });
 
+/**
+ *
+ * @param id
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getUser = (id) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getUserStart());

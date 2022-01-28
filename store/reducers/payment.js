@@ -14,6 +14,12 @@ const initialState = {
   isChanged: false
 };
 
+/**
+ * @description reducer действий с платежом
+ * @param state - состояние reducer платежа, котоое изначально равно initialState
+ * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @returns {{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data, isChanged: boolean, start: boolean}|{isLoading: boolean, data, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error}}
+ */
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case  CLEAR_STORE:

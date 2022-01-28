@@ -21,6 +21,11 @@ const getPaymentFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Получение платежа по определенному id. Происходит по токену магазина, после которой вызывается success|failed метод
+ * @param id {number} - id платежа
+ * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
+ */
 export const getPayment = (id = '') => async (dispatch, getState) => {
   dispatch(getPaymentStart());
   const token = getState().auth?.data?.token
@@ -35,6 +40,13 @@ export const getPayment = (id = '') => async (dispatch, getState) => {
 
 };
 
+/**
+ * @description Отправка письма по почте. Происходит по токену магазина с переданным телом запроса.
+ * @param id - payment id
+ * @param email - email name
+ * @param billUrl - ссылка на страницу оплаты платежа
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const sendMailBill = (id, email, billUrl) => async (dispatch, getState) => {
   const loading = getState().payment.isLoading
   if (!loading) {
@@ -61,6 +73,12 @@ const addPaymentFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Добавление платежа. Происходит по токену магазина, после которой вызывается success|failed метод
+ * @param data {object} - тело запроса, соответствующее модели Payment
+ * @param apiKey {string} - Уникальный ключ магазина, хранящийся в базе данных
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const addPayment = (data, apiKey) => async (dispatch, getState) => {
   const loading = getState().payment.isLoading
   if (!loading) {

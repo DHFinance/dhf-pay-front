@@ -19,6 +19,11 @@ const getTransactionFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Получение определенной транзакции по хешу
+ * @param txHash - ункальное значение транзакции
+ * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
+ */
 export const getTransaction = (txHash = '') => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
@@ -32,6 +37,11 @@ export const getTransaction = (txHash = '') => async (dispatch, getState) => {
   }
 };
 
+/**
+ * @description Получение последней транзакции для payment с переданным id
+ * @param paymentId - уникальное значение платежа (по умолчанию = "")
+ * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
+ */
 export const getLastTransaction = (paymentId = '') => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getTransactionStart());
