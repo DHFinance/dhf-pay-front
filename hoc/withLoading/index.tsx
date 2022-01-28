@@ -9,6 +9,11 @@ import {useRouter} from "next/router";
 import {Spin} from "antd";
 
 
+/**
+ *
+ * @param children {JSX}
+ * @description Nextjs создает страницы раньше, чем получает localstorage. Этот hoc позволяет не рендерить компоненты, пока не получен localstorage
+ */
 const WithLoading = ({children}: any) => {
 
     const [storageLoaded, setStorageLoaded] = useState(false)

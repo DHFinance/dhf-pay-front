@@ -11,6 +11,13 @@ import Error from "next/error";
 import {clearStore} from "../../store/actions/auth";
 
 
+/**
+ *
+ * @param children {JSX}
+ * @param error {string} - ошибка при запросе объекта с сервера
+ * @param data {object} - данные объекта, который будет загружен с сервера, существование которого нужно проверить
+ * @description используется на страницах конкретной записи (/user/[slug] store/[slug]). Если в slug указан id записи, которой не существует в базе данных - переадресует пользователя на стартовую страницу
+ */
 const WithPageExist = ({children, error, data}: any) => {
 
     const router = useRouter()
