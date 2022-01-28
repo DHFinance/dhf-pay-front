@@ -26,6 +26,9 @@ const Store = () => {
     const router = useRouter()
     const [form] = Form.useForm();
 
+    /**
+     * @description generating store key
+     */
     const generateKey = () => {
         function randomString(len) {
             const charSet =
@@ -50,6 +53,11 @@ const Store = () => {
         })
     };
 
+    /**
+     * @description set data into store object
+     * @param {object} e - event
+     * @param {string} field - field name
+     */
     const onChangeStore = (field: string) => (e: any) => {
         const value = e.target.value
         setStoreEdit({
@@ -58,7 +66,11 @@ const Store = () => {
         })
     }
 
+    /**
+     * @description load data
+     */
     useEffect(() => {
+         /** @description if is query id, then get store by id */
         if (router.query.slug) {
             dispatch(getStore(router.query.slug))
         }
@@ -77,10 +89,15 @@ const Store = () => {
         setEdit(true)
     }
 
+    /**
+     * @description get store
+     */
     const handleOk = async () => {
+         /** @description validations of fields form */
         await form.validateFields()
             .then(async (res) => {
                 try {
+                    /** @description change current store */
                     await dispatch(editStore(router.query.slug, storeEdit))
                     form.resetFields();
                     setEdit(false);
@@ -105,7 +122,14 @@ const Store = () => {
         setStoreEdit(store)
     }, [store])
 
+    /**
+     * @description wallet validation. Occurs with the help of the CLPublicKey.fromHex function, which returns an error if the wallet is not valid
+     * @param {object} rule - object field wallet
+     * @param {any} value - value wallet
+     * @param {function} callback - executed after successful validation of the wallet field
+     */
     const validateWallet = (rule: any, value: any, callback: any) => {
+        /** @description if value isn't empty, then verify wallet */
         if (value) {
             try {
                 CLPublicKey.fromHex(value)

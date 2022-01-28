@@ -12,6 +12,13 @@ import {getUserStores} from "../../../../store/actions/stores";
 import {getCourse} from "../../../../store/actions/course";
 const { Option } = Select;
 
+/**
+ * @description Page for display table of payments
+ * @param {object} paymentsTable - data of table
+ * @param {string} entity - invoices | buttons
+ * @param {object} columns
+ * @constructor
+ */
 const Payments = ({paymentsTable, entity, columns}) => {
 
     const user = useSelector((state) => state.auth.data);
@@ -19,10 +26,15 @@ const Payments = ({paymentsTable, entity, columns}) => {
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const paymentsLoaded = useSelector((state) => state.payments.isChanged);
 
+    /**
+     * @description function to load data
+     */
     useEffect(() => {
+         /** @description For admin get all payments */
         if (user?.role === 'admin') {
             dispatch(getPayments())
         }
+          /** @description for customer get stores created by a specific user */
         if (user?.role === 'customer') {
             dispatch(getUserStores(user.id))
         }
@@ -35,8 +47,11 @@ const Payments = ({paymentsTable, entity, columns}) => {
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const [currentStore, setCurrentStore] = useState(null);
 
-
+    /**
+     * @description function to load payments of a specific store by apiKey
+     */
     useEffect(() => {
+        /** @description if the stores are not empty and the user does not have the admin role, get payments */
         if (stores.length && user.role !== 'admin' && activeStores[0]?.apiKey) {
             dispatch(getUserPayments(activeStores[0]?.apiKey))
         }
@@ -48,6 +63,11 @@ const Payments = ({paymentsTable, entity, columns}) => {
         }
     }, [activeStores])
 
+    /**
+     * @description handling every row,applying styles and a click event handler to it
+     * @param {object} record - element of array entity
+     * @param rowIndex
+     */
     const onRow=(record, rowIndex) => {
         return {
             style: {cursor: "pointer"},
@@ -55,6 +75,10 @@ const Payments = ({paymentsTable, entity, columns}) => {
         };
     }
 
+    /**
+     * @description handling change of select store
+     * @param {string} value
+     */
     function handleChange(value) {
         const current = stores.filter((store) => store.apiKey === value)[0]
         setCurrentStore(current)
