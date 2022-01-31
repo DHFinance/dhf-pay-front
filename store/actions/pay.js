@@ -26,8 +26,8 @@ const pushPayment = (data) => ({
 });
 
 /**
- * @description Оплата платежа. Оплата происходит по токену пользователя, после которой вызывается success|failed метод
- * @param data {object} данные, необходимые для указания в теле запроса, соответствующие модели Transactions
+ * @description Payment payment. Payment is made by the user's token, after which the success|failed method is called
+ * @param data {object} data required to be specified in the request body, corresponding to the Transactions model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const pay = (data) => async (dispatch, getState) => {

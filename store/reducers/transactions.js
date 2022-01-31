@@ -9,9 +9,9 @@ const initialState = {
 };
 
 /**
- * @description reducer действий с транзакциями
- * @param state - состояние reducer транзакций, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @description reducer of actions with transactions
+ * @param state - the state of the transaction reducer, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: *[], isChanged: boolean, error: string}|{isLoading: boolean, data: [], isChanged: boolean, error}|{isLoading: boolean, data, isChanged: boolean, error: string}|{isLoading: boolean, data: [], isChanged: boolean, error: string}}
  */
 export default function reducer(state = initialState, action) {

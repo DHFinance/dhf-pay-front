@@ -21,7 +21,7 @@ const getStoresFailed = (error) => ({
 
 
 /**
- * @description Получение списка всех магазинов.
+ * @description Get a list of all stores.
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getStores = () => async (dispatch, getState) => {
@@ -33,8 +33,8 @@ export const getStores = () => async (dispatch, getState) => {
 };
 
 /**
- * @description Получение списка магазинов определенного пользователя.
- * @param userId - уникальное значение пользователя
+ * @description Get a list of stores for a specific user.
+ * @param userId - unique user value
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getUserStores = (userId) => async (dispatch, getState) => {

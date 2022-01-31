@@ -22,8 +22,8 @@ const getUserFailed = (error) => ({
 });
 
 /**
- *
- * @param id
+ * @description Getting a user by id
+ * @param id - the unique value of the user
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getUser = (id) => async (dispatch, getState) => {
@@ -46,6 +46,12 @@ const blockUserFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Changing a user's ban status
+ * @param id - unique user value
+ * @param blocked - blocking status
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const blockUser = (id, blocked) => async (dispatch, getState) => {
   const loading = getState().user.isLoading
   if (!loading) {

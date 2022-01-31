@@ -9,9 +9,9 @@ const initialState = {
 };
 
 /**
- * @description reducer действий с магазинами
- * @param state - состояние reducer магазинов, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @description shop action reducer
+ * @param state - store reducer state, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: *[], isChanged: boolean, error: string}|{isLoading: boolean, data: [], isChanged: boolean, error}|{isLoading: boolean, data: [], isChanged: boolean, error: string}|{isLoading: boolean, data: *, isChanged: boolean, error: string}}
  */
 export default function reducer(state = initialState, action) {
@@ -27,7 +27,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
       /**
-       * @description получение магазинов списком, отсортированным по убываанию
+       * @description getting stores in a list sorted in descending order
        */
     case  GET_STORES_SUCCESS:
       return {

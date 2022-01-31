@@ -15,9 +15,9 @@ const initialState = {
 };
 
 /**
- * @description reducer действий с магазином
- * @param state - состояние reducer магазином, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @description store action reducer
+ * @param state - the state of the reducer by the store, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error}}
  */
 export default function reducer(state = initialState, action) {

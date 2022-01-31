@@ -30,10 +30,10 @@ const initialState = {
 };
 
 /**
- * @description reducer аутентификации пользователя
- * @param state - состояние reducer авторизации, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
- * @returns {{isLoading: boolean, data: {lastName: string,resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}|{isLoading: boolean, data: {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error}|{isLoading: boolean, data: {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}|{isLoading: boolean, data: (*&{lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}), isChanged: boolean, verify: boolean, error: string}}
+ * @description user authentication reducer
+ * @param state - the state of the authorization reducer, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
+ * @returns {{isLoading: boolean, data: {lastName: string,resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}| {isLoading: boolean, data: {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error}|{isLoading: boolean, data : {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}, isChanged: boolean, verify: boolean, error: string}|{isLoading: boolean, data: (*& {lastName: string, resetEnabled: boolean, name: string, company: string, email: string, token: string}), isChanged: boolean, verify: boolean, error: string}}
  */
 export default function reducer(state = initialState, action) {
   switch (action.type) {
@@ -51,7 +51,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
       /**
-       * @description вызывается при успешном выходе пользователя, удаляет токен пользователя
+       * @description called when the user successfully logs out, deletes the user's token
        */
     case  POST_LOGOUT_SUCCESS:
       localStorage.removeItem('token');
@@ -90,7 +90,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
       /**
-       * @description вызывается при успешной верификации пользователя, если токен передан в action.payload, то устанавливается этот токен
+       * @description called upon successful user verification, if the token is passed to action.payload, then this token is set
        */
     case  POST_VERIFY_SUCCESS:
       if (action.payload.token) {
@@ -119,7 +119,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
       /**
-       * @description вызывается при успешном сбросе пароля пользователя, если токен передан в action.payload, то устанавливается этот токен
+       * @description called upon successful reset of the user's password, if the token is passed to action.payload, then this token is set
        */
     case  POST_RESTORE_SUCCESS:
       if (action.payload.token) {
@@ -148,7 +148,7 @@ export default function reducer(state = initialState, action) {
         isChanged: true
       };
       /**
-       * @description вызывается при успешной аунтефикации пользователя, если токен передан в action.payload, то устанавливается этот токен
+       * @description called upon successful user authentication, if the token is passed to action.payload, then this token is set
        */
     case  POST_LOGIN_SUCCESS:
       if (action.payload.token) {

@@ -9,9 +9,9 @@ const initialState = {
 };
 
 /**
- * @description reducer оплаты платежа
- * @param state - состояние reducer оплаты, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @description payment payment reducer
+ * @param state - the state of the payment reducer, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error}|{isLoading: boolean, data, isChanged: boolean, error: string}}
  */
 export default function reducer(state = initialState, action) {

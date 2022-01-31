@@ -20,8 +20,8 @@ const getTransactionFailed = (error) => ({
 });
 
 /**
- * @description Получение определенной транзакции по хешу
- * @param txHash - ункальное значение транзакции
+ * @description Getting a specific transaction by hash
+ * @param txHash - the unique value of the transaction
  * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
  */
 export const getTransaction = (txHash = '') => async (dispatch, getState) => {
@@ -38,8 +38,8 @@ export const getTransaction = (txHash = '') => async (dispatch, getState) => {
 };
 
 /**
- * @description Получение последней транзакции для payment с переданным id
- * @param paymentId - уникальное значение платежа (по умолчанию = "")
+ * @description Get the last transaction for payment with the given id
+ * @param paymentId - unique payment value (default = "")
  * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
  */
 export const getLastTransaction = (paymentId = '') => async (dispatch, getState) => {

@@ -22,8 +22,8 @@ const getPaymentFailed = (error) => ({
 });
 
 /**
- * @description Получение платежа по определенному id. Происходит по токену магазина, после которой вызывается success|failed метод
- * @param id {number} - id платежа
+ * @description Receiving a payment by a specific id. Occurs on the store token, after which the success|failed method is called
+ * @param id {number} - payment id
  * @returns {(function(*, *): Promise<AxiosResponse<any>|void|undefined>)|*}
  */
 export const getPayment = (id = '') => async (dispatch, getState) => {
@@ -41,10 +41,10 @@ export const getPayment = (id = '') => async (dispatch, getState) => {
 };
 
 /**
- * @description Отправка письма по почте. Происходит по токену магазина с переданным телом запроса.
+ * @description Sending a letter by mail. Occurs on the store token with the passed request body.
  * @param id - payment id
- * @param email - email name
- * @param billUrl - ссылка на страницу оплаты платежа
+ * @param email - user email
+ * @param billUrl - link to payment page
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const sendMailBill = (id, email, billUrl) => async (dispatch, getState) => {
@@ -74,9 +74,9 @@ const addPaymentFailed = (error) => ({
 });
 
 /**
- * @description Добавление платежа. Происходит по токену магазина, после которой вызывается success|failed метод
- * @param data {object} - тело запроса, соответствующее модели Payment
- * @param apiKey {string} - Уникальный ключ магазина, хранящийся в базе данных
+ * @description Adding a payment. Occurs on the store token, after which the success|failed method is called
+ * @param data {object} - request body corresponding to the Payment model
+ * @param apiKey {string} - Unique store key stored in the database
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const addPayment = (data, apiKey) => async (dispatch, getState) => {

@@ -18,6 +18,10 @@ const getUsersFailed = (error) => ({
   payload: error
 });
 
+/**
+ * @description Getting all users
+ * @returns {(function(*, *): Promise<void>)|*}
+ */
 export const getUsers = () => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getUsersStart());

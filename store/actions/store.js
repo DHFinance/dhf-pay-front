@@ -28,9 +28,9 @@ const editStoreFailed = (error) => ({
 });
 
 /**
- * @description Изменение определенного поля(столбца) в состоянии магазина.
- * @param id - уникальное значение магазина ( по умалчанию = "")
- * @param data - данные, передоваемые в теле запроса, соответствующее модели Store
+ * @description Changing a specific field (column) in the shop state.
+ * @param id - store unique value (default = "")
+ * @param data - data passed in the request body, corresponding to the Store model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const editStore = (id = '', data) => async (dispatch, getState) => {
@@ -59,8 +59,8 @@ const getStoreFailed = (error) => ({
 });
 
 /**
- * @@description Получение конкретного магазина по id
- * @param id - уникальное значение магазина ( по умалчанию = "")
+ * @@description Getting a specific store by id
+ * @param id - store unique value (default = "")
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getStore = (id = '') => async (dispatch, getState) => {
@@ -85,8 +85,8 @@ const addStoreFailed = (error) => ({
 });
 
 /**
- * @description Добавление магазина.
- * @param data - данные, передоваемые в теле запроса, соответствующее модели Store
+ * @description Adding a store.
+ * @param data - data passed in the request body, corresponding to the Store model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const addStore = (data) => async (dispatch, getState) => {
@@ -118,9 +118,9 @@ const blockStoreFailed = (error) => ({
 });
 
 /**
- * @description Блокировка определенного магазина.
- * @param id - уникальное значение магазина
- * @param blocked - состояние true|false
+ * @description Blocking a specific store.
+ * @param id - store unique value
+ * @param blocked - true|false state
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const blockStore = (id, blocked) => async (dispatch, getState) => {

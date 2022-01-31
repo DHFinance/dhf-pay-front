@@ -19,7 +19,7 @@ const getTransactionsFailed = (error) => ({
 });
 
 /**
- * @description Получение списка всех транзакций
+ * @description Getting a list of all transactions
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getTransactions = () => async (dispatch, getState) => {
@@ -34,8 +34,8 @@ export const getTransactions = () => async (dispatch, getState) => {
 };
 
 /**
- * @description Получение списка всех транзакций, созданных через определенный магазин
- * @param apiKey - ключ магазина
+ * @description Getting a list of all transactions created through a specific store
+ * @param apiKey - shop key
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getUserTransactions = (apiKey) => async (dispatch, getState) => {

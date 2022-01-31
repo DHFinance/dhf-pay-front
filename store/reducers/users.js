@@ -9,9 +9,9 @@ const initialState = {
 };
 
 /**
- * @description reducer действий с пользователями
- * @param state - состояние reducer пользователями, котоое изначально равно initialState
- * @param action - объект, котоырй включает себя тип и данные соответсвующего экшена
+ * @description user action reducer
+ * @param state - the state of the reducer by the users, which is initially equal to initialState
+ * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: *[], isChanged: boolean, error: string}|{isLoading: boolean, data: [], isChanged: boolean, error}|{isLoading: boolean, data, isChanged: boolean, error: string}|{isLoading: boolean, data: [], isChanged: boolean, error: string}}
  */
 export default function reducer(state = initialState, action) {

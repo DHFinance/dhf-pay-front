@@ -21,7 +21,7 @@ const getPaymentsFailed = (error) => ({
 
 
 /**
- * @description Получение платежей.  Возвращаются все сущуествующие платежи. После операции выполняется success|failed метод
+ * @description Receiving payments. All existing payments are returned. After the operation, the success|failed method is executed
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getPayments = () => async (dispatch, getState) => {
@@ -36,8 +36,8 @@ export const getPayments = () => async (dispatch, getState) => {
   }
 };
 /**
- * @description Получение платежей. Возвращаются платежи магазина соответствующего переданному ключу. После операции выполняется success|failed метод
- * @param apiKey {string} - Уникальный ключ магазина, хранящийся в базе данных
+ * @description Receiving payments. The payments of the store corresponding to the passed key are returned. After the operation, the success|failed method is executed
+ * @param apiKey {string} - Unique store key stored in the database
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const getUserPayments = (apiKey) => async (dispatch, getState) => {

@@ -48,8 +48,8 @@ const postRegistrationFailed = (error) => ({
 });
 
 /**
- * @description Регистрация пользователя, этап 1. Получает данные пользователя, отправляет код для подтверждения в письме на указанную email
- * @param data {object} - данные, передаваемые в теле запроса, соответствующие модели User
+ * @description User registration, stage 1. Receives user data, sends a confirmation code in a letter to the specified email
+ * @param data {object} - data passed in the request body, corresponding to the User model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postRegistration = (data) => async (dispatch, getState) => {
@@ -79,10 +79,10 @@ const postVerifyFailed = (error) => ({
 });
 
 /**
- * @description Регистрация пользователя, этап 2. принимает код подтвержения, сравнивает его с тем, что записан на беке. Если код верен - на этом пользователе можно авторизироваться
- * @param email
- * @param code
- * @param goStartPage - callback для перехода на главную страницу сайта
+ * @description User registration, stage 2. receives the confirmation code, compares it with what is written on the back. If the code is correct, you can log in to this user
+ * @param email - user email
+ * @param code - confirmation code
+ * @param goStartPage - callback to go to the main page of the site
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postVerify = (email, code, goStartPage) => async (dispatch, getState) => {
@@ -115,8 +115,8 @@ const postLoginFailed = (error) => {
 }
 
 /**
- * @description проверка существования пользователя в базе данных. Происходит при каждой перезагрузке страницы
- * @param token {string} - уникальная строка в формате JWT. определяющая токен пользователя
+ * @description check if the user exists in the database. Occurs every time the page is reloaded
+ * @param token {string} - unique string in JWT format. defining user token
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const reAuth = (token) => async (dispatch, getState) => {
@@ -129,9 +129,9 @@ export const reAuth = (token) => async (dispatch, getState) => {
 };
 
 /**
- * @description вход в систему. ищет пользователя по email и сверяет пароль. Если все данные верны - выдает токен
- * @param data {object} - данные, передаваемые в теле запроса, соответствующие модели User
- * @param goStartPage - callback для перехода на главную страницу сайта
+ * @description login. searches for a user by email and checks the password. If all data is correct - issues a token
+ * @param data {object} - data passed in the request body, corresponding to the User model
+ * @param goStartPage - callback to go to the main page of the site
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postLogin = (data, goStartPage) => async (dispatch, getState) => {
@@ -162,8 +162,8 @@ const postLogoutFailed = (error) => ({
 });
 
 /**
- * @description Выход пользователя пользователь. После выхода пользователь перемещается на главную страницу сайта и записывается success|error state
- * @param goLoginPage - callback для перехода на страницу авторизации
+ * @description User exit user. After logging out, the user is redirected to the main page of the site and the success|error state is recorded
+ * @param goLoginPage - callback to go to the authorization page
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postLogout = (goLoginPage) => async (dispatch, getState) => {
@@ -194,8 +194,8 @@ const postRestoreFailed = (error) => ({
 });
 
 /**
- * @description Восстановление пароля этап 1. ищет пользователя по email отправляет на почту код. Return true для перехода к следующему этапу
- * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
+ * @description Password recovery stage 1. searches for a user by email sends a code to the mail. Return true to move to the next step
+ * @param data {object} - data required to be specified in the request body, corresponding to the User model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
@@ -214,8 +214,8 @@ export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
 };
 
 /**
- * @description Восстановление пароля этап 2. Сравнение кода, пришедшего с фронта и кода из записи пользователя. Если коды совпадают - переходит к следующему этапу
- * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
+ * @description Password recovery stage 2. Comparison of the code that came from the front and the code from the user's record. If the codes match, move on to the next step.
+ * @param data {object} - data required to be specified in the request body, corresponding to the User model
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postRestoreStepCode = (data) => async (dispatch, getState) => {
@@ -234,9 +234,9 @@ export const postRestoreStepCode = (data) => async (dispatch, getState) => {
 };
 
 /**
- * @description Восстановление пароля этап 3. Замена пароля, получает новый пароль и заменяет им текущий. Отправляет данные пользователя
- * @param data {object} - данные, необходимые для указания в теле запроса, соответствующие модели User
- * @param goStartPage - callback для перехода на главную страницу сайта
+ * @description Password recovery stage 3. Password change, receives a new password and replaces the current one with it. Sends user data
+ * @param data {object} - data required to be specified in the request body, corresponding to the User model
+ * @param goStartPage - callback to go to the main page of the site
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postRestoreStepPassword = (data, goStartPage) => async (dispatch, getState) => {
