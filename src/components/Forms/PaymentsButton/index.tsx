@@ -138,6 +138,13 @@ const Buttons = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
+
+    const handleResetForm = () => {
+        form.resetFields();
+        setPaymentId(null);
+        setVisibleHtmlCode(false);
+    }
+
     return <WithLoadingData data={storesLoaded ?? null}>
         { !activeStores.length && user.role !== 'admin' &&
         <p>
@@ -250,9 +257,16 @@ const Buttons = () => {
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 11, span: 12 }}>
                 <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
-                    <Button type="primary" style={{padding: "5px 20px"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
-                        Save
-                    </Button>
+                    {
+                        paymentId ?
+                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="button" className="login-form-button" onClick={handleResetForm}>
+                                Reset
+                            </Button>
+                            :
+                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
+                                Save
+                            </Button>
+                    }
                 </div>
             </Form.Item>
         </Form>
