@@ -139,10 +139,12 @@ const Buttons = () => {
         setHtmlCode(buttonHTML.outerHTML);
     }
 
-    const handleResetForm = () => {
+    const handleResetForm = (event) => {
+        event.preventDefault();
         form.resetFields();
         setPaymentId(null);
         setVisibleHtmlCode(false);
+        setChoosenButton(0);
     }
 
     return <WithLoadingData data={storesLoaded ?? null}>
@@ -259,7 +261,7 @@ const Buttons = () => {
                 <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
                     {
                         paymentId ?
-                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="button" className="login-form-button" onClick={handleResetForm}>
+                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="button" className="login-form-button" onClick={(e) => handleResetForm(e)}>
                                 Reset
                             </Button>
                             :
