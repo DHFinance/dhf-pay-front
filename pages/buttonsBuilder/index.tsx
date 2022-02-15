@@ -4,12 +4,12 @@ import React from "react";
 import SliderContainer from "../../src/components/Layout/SliderContainer";
 import WithAuth from "../../hoc/withAuth";
 import {wrapper} from "../../store/store";
-import ButtonsForm from "../../src/components/Forms/PaymentsButton";
+import Buttons from "../../src/components/Forms/PaymentsButton";
 
 const ButtonsBuilderPage = () => {
     return <WithAuth isBuilder>
         <SliderContainer title="Buttons Builder">
-            <ButtonsForm/>
+            <Buttons/>
         </SliderContainer>
     </WithAuth>
 }

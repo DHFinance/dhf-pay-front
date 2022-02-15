@@ -304,33 +304,40 @@ const Payment = ({isButtons}) => {
 
             <Col span={24} style={{padding: '20px 0 0px 0px'}}>
                 {
-                    (payments.status === "Paid" && !isButtons) ?
+                    payments.status === "Paid" && !isButtons ?
                         <Button onClick={() => router.back()} style={{margin: '0px 0 0 0'}} type="primary">
                             Back
                         </Button>
                         :
                         <div>
-                            { user.role !== "admin" &&
-                            <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
-                                Send by mail
-                            </Button>}
+                            <Button onClick={() => router.back()} style={{margin: '0px 20px 0 0'}} type="primary">
+                                Back
+                            </Button>
                             {
                                 user.role !== "admin" && <Button onClick={() => showModal()} style={{margin: '0px 20px 0 0'}} type="primary">
                                     Send by mail
                                 </Button>
                             }
+                            <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
+                                Copy link
+                            </Button>
                         </div>
+
                 }
             </Col>
-            {user.role !== "admin" &&
+            {
+                user.role !== "admin" &&
                 <Col span={24} style={{padding: '20px 0 0px 0px'}}>
                     <Button size={'small'}
-                            style={{
-                                margin: '0px 0 0 0px'
+                            style={{margin: '0px 0 0 0px'
                             }} type="primary">
-                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${billUrl}`} style={{color: 'white'}}
-                           rel="noreferrer" data-text={`Casper payment: ${billUrl}`} target="_blank">
-                        </a></Button></Col>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${billUrl}`} style={{color: 'white'}} rel="noreferrer" data-text={`Casper payment: ${billUrl}`} target="_blank">
+                            <FacebookFilled style={{margin: '0px 3px 0px 0px'}}/>
+                            Share on Facebook
+                        </a>
+                    </Button>
+
+                </Col>
             }
             {user.role !== "admin" &&
                 <Col span={24} style={{padding: '10px 0 0px 0px'}}>

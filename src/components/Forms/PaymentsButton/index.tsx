@@ -25,11 +25,10 @@ const Buttons = () => {
 
     const [htmlCode, setHtmlCode] = useState("");
     const [visibleHtmlCode, setVisibleHtmlCode] = useState(false);
-    const [paymentId, setPaymentId] = useState("");
+    const [paymentId, setPaymentId] = useState(null);
     const [payment, setPayment] = useState(initialState);
 
     const stores = useSelector((state) => state.storesData.data);
-    const bill = useSelector((state) => state.payment.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const user = useSelector((state) => state.auth.data);
     const currentPayment = useSelector((state) => state.payment.data);
@@ -96,7 +95,7 @@ const Buttons = () => {
                     if (user?.role === 'customer') {
                         dispatch(getUserPayments(currentStore.apiKey))
                     }
-                    setPaymentId(bill.id);
+                    setPaymentId(currentPayment.id);
                     message.success('Payment was added');
                     /** @description generating and showing html code of button payment */
                     handleGenerateHTML();
@@ -139,7 +138,22 @@ const Buttons = () => {
         const buttonHTML = document.getElementById("resultButton");
         setHtmlCode(buttonHTML.outerHTML);
     }
+
+    const handleResetForm = (event) => {
+        event.preventDefault();
+        form.resetFields();
+        setPaymentId(null);
+        setVisibleHtmlCode(false);
+        setChoosenButton(0);
+    }
+
     return <WithLoadingData data={storesLoaded ?? null}>
+        { !activeStores.length && user.role !== 'admin' &&
+        <p>
+            Create a store to be able to create payments
+        </p>
+        }
+        {user.role !== 'admin' && !!activeStores.length &&
         <Form
             name="basic"
             labelCol={{ span: 6 }}
@@ -212,9 +226,9 @@ const Buttons = () => {
                         label="Result"
                         name="description"
                     >
-                        <a rel='noreferrer' href={`http://${domain}/bill/${bill.id}`} id="resultButton" target="_blank"
-                        style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : undefined}
-                >
+                        <a rel='noreferrer' href={`http://${domain}/bill/${currentPayment.id}`} id="resultButton" target="_blank"
+                           style={payment.type ? {...buttons[choosenButton-1].style,appearance: "button",textDecoration: "none", color:"white", padding:"5px 15px"} : undefined}
+                        >
                             {payment.text}
                         </a>
                     </Form.Item> : null
@@ -239,18 +253,26 @@ const Buttons = () => {
                         display:"flex",
                         justifyContent:"center",
                     }}>
-                    <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
+                        <Button type="primary" onClick={copyTextToClipboard}>Copy html</Button>
                     </div>
                 </div>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 11, span: 12 }}>
                 <div style={{display: "flex", gap: "10px", marginTop:"20px"}}>
-                    <Button type="primary" style={{padding: "5px 20px"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
-                        Save
-                    </Button>
+                    {
+                        paymentId ?
+                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="button" className="login-form-button" onClick={(e) => handleResetForm(e)}>
+                                Reset
+                            </Button>
+                            :
+                            <Button type="primary" style={{padding: "5px 20px"}} htmlType="submit" className="login-form-button" onClick={handleOk}>
+                                Save
+                            </Button>
+                    }
                 </div>
             </Form.Item>
         </Form>
+        }
     </WithLoadingData>
 };
 
