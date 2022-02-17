@@ -5,7 +5,8 @@
     "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -24,14 +25,21 @@
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "redux-devtools-extension": "^2.13.9",
+    "redux-mock-store": "^1.5.4",
     "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "@types/jest": "^27.4.0",
     "@types/node": "16.11.7",
     "@types/react": "17.0.34",
     "eslint": "7",
     "eslint-config-next": "12.0.3",
+    "fetch-mock": "^9.11.0",
+    "jest": "^27.5.1",
     "jsdoc": "^3.6.10",
+    "moxios": "^0.4.0",
+    "redux-mock-store": "^1.5.4",
     "typescript": "4.4.4"
   }
 }

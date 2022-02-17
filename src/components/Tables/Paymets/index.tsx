@@ -46,6 +46,7 @@ const Payments = ({paymentsTable, entity, columns}) => {
 
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const [currentStore, setCurrentStore] = useState(null);
+    const [currentTable, setCurrentTable] = useState(paymentsTable);
 
     /**
      * @description function to load payments of a specific store by apiKey
@@ -63,6 +64,13 @@ const Payments = ({paymentsTable, entity, columns}) => {
         }
     }, [activeStores])
 
+    useEffect(()=>{
+        const table  = paymentsTable.filter((item)=>{
+            return item?.store === currentStore?.name
+        })
+        return setCurrentTable(table);
+    }, [currentStore])
+    console.log(paymentsTable, currentStore);
     /**
      * @description handling every row,applying styles and a click event handler to it
      * @param {object} record - element of array entity
@@ -81,10 +89,9 @@ const Payments = ({paymentsTable, entity, columns}) => {
      */
     function handleChange(value) {
         const current = stores.filter((store) => store.apiKey === value)[0]
-        setCurrentStore(current)
+        setCurrentStore(current);
         dispatch(getUserPayments(value))
     }
-
     return <>
         <WithLoadingData data={(user.role === 'admin' ? paymentsLoaded : storesLoaded)}>
             { !activeStores.length && user.role !== 'admin' ?
@@ -106,7 +113,7 @@ const Payments = ({paymentsTable, entity, columns}) => {
                 </>
             : null
             }
-            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={paymentsTable} />
+            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={currentTable} />
         </WithLoadingData>
     </>
 }

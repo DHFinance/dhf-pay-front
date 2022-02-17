@@ -7,7 +7,7 @@ import {
 } from '../actions/payment';
 import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
-const initialState = {
+export const initialState = {
   data: {},
   isLoading: false,
   error: '',
@@ -20,7 +20,7 @@ const initialState = {
  * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data, isChanged: boolean, start: boolean}|{isLoading: boolean, data, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error}}
  */
-export default function reducer(state = initialState, action) {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case  CLEAR_STORE:
       return initialState;
@@ -76,3 +76,5 @@ export default function reducer(state = initialState, action) {
       return state
   }
 }
+
+export default reducer;

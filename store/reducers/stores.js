@@ -1,7 +1,7 @@
 import {GET_STORES_START, GET_STORES_SUCCESS, GET_STORES_FAILED} from '../actions/stores';
 import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
-const initialState = {
+export const initialState = {
   data: [],
   isLoading: false,
   error: '',

@@ -13,7 +13,7 @@ export const BlOCK_STORE_START = 'BlOCK_STORE_START';
 export const BlOCK_STORE_SUCCESS = 'BlOCK_STORE_SUCCESS';
 export const BlOCK_STORE_FAILED = 'BlOCK_STORE_FAILED';
 
-const editStoreStart = () => ({
+export const editStoreStart = () => ({
   type: EDIT_STORE_START,
 });
 
