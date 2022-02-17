@@ -36,3 +36,20 @@ After run casper-back and casper-processor run casper-front
 $ npm run build
 $ npm run start
 ```
+
+## Run a specific test file
+To run a separate file with tests, for example store.reducer.spec.ts in the test folder
+```bash
+jest test/store.reducer.spec.ts
+```
+
+## Run action test 
+To run an action test, such as the payment.action.spec.ts file in the tests folder, you need to enable the server, since this test sends a request to the server and adds payment
+
+
+
+## Run tests
+To run the tests, enter at the root of the project
+```bash
+npm run test
+```
