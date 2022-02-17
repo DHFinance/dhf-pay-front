@@ -5,9 +5,11 @@ import {
   ADD_STORE_START,
   ADD_STORE_SUCCESS, ADD_STORE_FAILED, EDIT_STORE_SUCCESS, EDIT_STORE_FAILED, EDIT_STORE_START, BlOCK_STORE_FAILED, BlOCK_STORE_START, BlOCK_STORE_SUCCESS
 } from '../actions/store';
-import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
+import {POST_LOGOUT_SUCCESS,CLEAR_STORE} from "../actions/auth.js";
 
-const initialState = {
+
+
+export const initialState = {
   data: {},
   isLoading: false,
   error: '',
@@ -20,13 +22,13 @@ const initialState = {
  * @param action - an object that includes the type and data of the corresponding action
  * @returns {{isLoading: boolean, data: {}, isChanged: boolean, error: string}|{isLoading: boolean, data, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, start: boolean, error: string}|{isLoading: boolean, data: {}, isChanged: boolean, error}}
  */
-export default function reducer(state = initialState, action) {
+const storeData = (state = initialState, action) => {
   switch (action.type) {
-    case  CLEAR_STORE:
+    case CLEAR_STORE:
       return initialState;
-    case  POST_LOGOUT_SUCCESS:
+    case POST_LOGOUT_SUCCESS:
       return initialState;
-    case  EDIT_STORE_START:
+    case EDIT_STORE_START:
       return {
         ...state,
         start: true,
@@ -119,3 +121,5 @@ export default function reducer(state = initialState, action) {
       return state
   }
 }
+
+export default storeData;
