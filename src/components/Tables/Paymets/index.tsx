@@ -10,6 +10,8 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
 import {getCourse} from "../../../../store/actions/course";
+import PaymentsButton from "./buttons";
+import PaymentsInvoices from "./invoices";
 const { Option } = Select;
 
 /**
@@ -19,12 +21,22 @@ const { Option } = Select;
  * @param {object} columns
  * @constructor
  */
-const Payments = ({paymentsTable, entity, columns}) => {
+const Payments = ({isButtons, entity}) => {
 
     const user = useSelector((state) => state.auth.data);
     const stores = useSelector((state) => state.storesData.data);
     const storesLoaded = useSelector((state) => state.storesData.isChanged);
     const paymentsLoaded = useSelector((state) => state.payments.isChanged);
+    const payments = useSelector((state) => state.payments.data);
+
+    const paymentsTable = payments.map((payment) => {
+        return {
+            ...payment,
+            datetime: new Date(payment?.datetime).toDateString(),
+            status: payment?.status?.replace('_', ' '),
+            store: payment?.store?.id
+        }
+    }).reverse()
 
     /**
      * @description function to load data
@@ -46,7 +58,6 @@ const Payments = ({paymentsTable, entity, columns}) => {
 
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const [currentStore, setCurrentStore] = useState(null);
-    const [currentTable, setCurrentTable] = useState(paymentsTable);
 
     /**
      * @description function to load payments of a specific store by apiKey
@@ -64,13 +75,6 @@ const Payments = ({paymentsTable, entity, columns}) => {
         }
     }, [activeStores])
 
-    useEffect(()=>{
-        const table  = paymentsTable.filter((item)=>{
-            return item?.store === currentStore?.name
-        })
-        return setCurrentTable(table);
-    }, [currentStore])
-    console.log(paymentsTable, currentStore);
     /**
      * @description handling every row,applying styles and a click event handler to it
      * @param {object} record - element of array entity
@@ -92,6 +96,11 @@ const Payments = ({paymentsTable, entity, columns}) => {
         setCurrentStore(current);
         dispatch(getUserPayments(value))
     }
+
+    /**
+     * @description data for the table in right format
+     */
+
     return <>
         <WithLoadingData data={(user.role === 'admin' ? paymentsLoaded : storesLoaded)}>
             { !activeStores.length && user.role !== 'admin' ?
@@ -113,7 +122,9 @@ const Payments = ({paymentsTable, entity, columns}) => {
                 </>
             : null
             }
-            <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={currentTable} />
+            {
+                isButtons ? <PaymentsButton currentTable={paymentsTable} onRow={onRow} /> : <PaymentsInvoices currentTable={paymentsTable} onRow={onRow} />
+            }
         </WithLoadingData>
     </>
 }
