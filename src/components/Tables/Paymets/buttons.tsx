@@ -44,7 +44,6 @@ const columns = [
 ];
 
 const PaymentsButton = ({currentTable, onRow}) => {
-    console.log("currentTable",currentTable);
     const filterTable = currentTable.filter((item)=>{
         return item.type && item.text;
     })

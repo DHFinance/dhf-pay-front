@@ -25,7 +25,7 @@ const Buttons = () => {
 
     const [htmlCode, setHtmlCode] = useState("");
     const [visibleHtmlCode, setVisibleHtmlCode] = useState(false);
-    const [paymentId, setPaymentId] = useState(null);
+    const [paymentId, setPaymentId] = useState(false);
     const [payment, setPayment] = useState(initialState);
 
     const stores = useSelector((state) => state.storesData.data);
@@ -53,6 +53,10 @@ const Buttons = () => {
     const activeStores = stores.filter((store) => store.apiKey && !store.blocked)
     const dispatch = useDispatch();
 
+    const validate = async (nameField) => {
+      await form.validateFields([nameField])
+    }
+
     /**
      * @param {string} value - store api key
      * @description set current store and get payments of a selected store
@@ -61,6 +65,7 @@ const Buttons = () => {
         const current = stores.filter((store) => store.apiKey === value)[0]
         setCurrentStore(current);
         dispatch(getUserPayments(value));
+        validate("store");
     }
 
     /**
@@ -80,6 +85,14 @@ const Buttons = () => {
         }
     };
 
+    const validateKind = (rule: any, value: any, callback: any) => {
+      if (choosenButton === 0) {
+          callback("Please select a button style");
+      } else{
+        callback()
+      }
+  };
+
     /**
      * @description save the payment and return the response
      */
@@ -90,12 +103,12 @@ const Buttons = () => {
                 try {
                     await dispatch(addPayment(payment, currentStore.apiKey))
                     if (user?.role === 'admin') {
-                        dispatch(getPayments())
+                        await dispatch(getPayments())
                     }
                     if (user?.role === 'customer') {
-                        dispatch(getUserPayments(currentStore.apiKey))
+                        await dispatch(getUserPayments(currentStore.apiKey))
                     }
-                    setPaymentId(currentPayment.id);
+                    setPaymentId(true);
                     message.success('Payment was added');
                     /** @description generating and showing html code of button payment */
                     handleGenerateHTML();
@@ -119,6 +132,7 @@ const Buttons = () => {
             ...payment,
             [field]: value,
         })
+        validate(field);
     };
 
     /**
@@ -131,6 +145,7 @@ const Buttons = () => {
             ...payment,
             type: itemButton.id,
         }))
+        form.setFieldsValue({kind:itemButton.id});
     }
 
     /** @description generating html code of button payment */
@@ -142,7 +157,7 @@ const Buttons = () => {
     const handleResetForm = (event) => {
         event.preventDefault();
         form.resetFields();
-        setPaymentId(null);
+        setPaymentId(false);
         setVisibleHtmlCode(false);
         setChoosenButton(0);
     }
@@ -167,7 +182,7 @@ const Buttons = () => {
         >
             <Form.Item
                 label="Name"
-                name="name"
+                name="text"
                 rules={[{ required: true, message: 'Please input button name!' }]}
             >
                 <Input type="text" onChange={onChangePayment('text')}/>
@@ -207,11 +222,12 @@ const Buttons = () => {
             <Form.Item
                 label="Button type"
                 name="kind"
+                rules={[{ validator: validateKind }]}
             >
                 <div className="kind" style={{display: "flex", gap: "30px"}}>
                     {buttons.map((item, index)=>(
-                        <div key={item.id} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
-                            <Button type="primary" style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}}
+                        <div key={item.id} value={item} className="kind-div" style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                            <Button type="primary" value={item} style={choosenButton === item.id ? {...item.style, border:"2px #52c41a solid"} : {...item.style}}
                                     onClick={()=> handleChooseButton(item)} className="login-form-button">
                                 {item.name}
                             </Button>

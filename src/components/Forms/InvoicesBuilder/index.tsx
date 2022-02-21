@@ -55,6 +55,10 @@ const InvoicesBuilder = () => {
         }
     }, [stores.length]);
 
+    const validate = async (nameField) => {
+          await form.validateFields([nameField])
+    }
+
     const validateAmount = (rule: any, value: any, callback: any) => {
         if (value < 2.5) {
             callback("Must be at least 2.5 cspr");
@@ -75,6 +79,7 @@ const InvoicesBuilder = () => {
             ...payment,
             [field]: value,
         })
+        validate("amount");
     };
 
     /**
@@ -110,6 +115,7 @@ const InvoicesBuilder = () => {
         const current = stores.filter((store) => store.apiKey === value)[0];
         setCurrentStore(current);
         dispatch(getUserPayments(value));
+        validate("store");
     }
 
     return (
