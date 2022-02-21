@@ -2,6 +2,7 @@
 import React from 'react';
 import Payment from "./index";
 import {useSelector} from "react-redux";
+import {Table} from "antd";
 
 const columns = [
     {
@@ -42,24 +43,12 @@ const columns = [
     },
 ];
 
-const PaymentsButton = () => {
-    const payments = useSelector((state) => state.payments.data);
-    const filterTable = payments.filter((item)=>{
+const PaymentsButton = ({currentTable, onRow}) => {
+    const filterTable = currentTable.filter((item)=>{
         return item.type && item.text;
     })
-    /**
-     * @description data for the table in right format
-     */
-    const paymentsTable = filterTable.map((payment) => {
-        return {
-            ...payment,
-            datetime: new Date(payment?.datetime).toDateString(),
-            status: payment?.status?.replace('_', ' '),
-            store: payment?.store?.name
-        }
-    }).reverse()
     return (
-        <Payment paymentsTable={paymentsTable} entity={"buttons"} columns={columns}/>
+        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable} />
     );
 };
 
