@@ -6,23 +6,11 @@ import expect from 'expect'
 // @ts-ignore
 import configureMockStore from 'redux-mock-store';
 import * as actions from '../store/actions/payment';
-import {addPayment, getPayment} from "../store/actions/payment";
-
+import {getPayment} from "../store/actions/payment";
 
 const middlewares = [thunk]
 
 const mockStore = configureMockStore(middlewares);
-
-
-const addPaymentMock = {
-    "amount": "2500000000",
-    "status": "Not_paid",
-    "comment": "Tips",
-    "type": 1,
-    "text": "Pay",
-}
-
-const apiKey = "FL1f0BNoBB3qRQ4dKtzwNgmdT95qJniM89Ak";
 
 describe('Payment actions', () => {
     beforeEach(function () {
@@ -31,26 +19,6 @@ describe('Payment actions', () => {
 
     afterEach(function () {
         moxios.uninstall();
-    });
-
-    it('add payment ',  () => {
-        moxios.wait(() => {
-            moxios.stubRequest({
-                status: 200,
-                response: {id:expect.any(Number)}
-            })
-        });
-
-        const expectedActions = [
-            { type: actions.ADD_PAYMENT_START },
-            { type: actions.ADD_PAYMENT_SUCCESS, payload: {id:expect.any(Number)} },
-        ];
-        const store = mockStore({})
-
-        return store.dispatch(addPayment(addPaymentMock,apiKey)).then(() => {
-            // return of async actions
-            expect(store.getActions()).toEqual(expectedActions);
-        });
     });
 
     it('get all payments', () => {
