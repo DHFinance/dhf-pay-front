@@ -7,7 +7,7 @@ import Payments from "../../src/components/Tables/Paymets";
 
 
 const InvoicesPage = () => {
-  return <WithAuth><SliderContainer title={"Buttons"}><Payments isButtons entity={"buttons"}/></SliderContainer></WithAuth>
+    return <WithAuth><SliderContainer title={"Buttons"}><Payments isButtons entity={"buttons"}/></SliderContainer></WithAuth>
 }
 
 export default wrapper.withRedux(InvoicesPage)
