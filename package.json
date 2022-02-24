@@ -19,7 +19,7 @@
     "next-redux-wrapper": "^7.0.5",
     "node-fetch": "^3.2.0",
     "npm": "^7.24.2",
-    "postcss": "^8.4.5",
+    "postcss": "7.0.36",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "^7.2.6",
