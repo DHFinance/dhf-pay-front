@@ -18,7 +18,7 @@ const getPaymentSuccess = (data) => ({
 
 const getPaymentFailed = (error) => ({
   type: GET_PAYMENT_FAILED,
-  payload: error
+  payload: error.message
 });
 
 /**

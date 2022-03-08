@@ -1,12 +1,12 @@
-// @ts-ignore
-import moxios from "moxios";
-import axios from "axios"
+import {GET_TRANSACTION_FAILED, GET_TRANSACTION_START, getTransaction} from "../store/actions/transaction";
+
+
 export const API_ROOT = process.env.NEXT_PUBLIC_API_HOST
 import thunk from 'redux-thunk'
 import expect from 'expect'
 // @ts-ignore
 import configureMockStore from 'redux-mock-store';
-import * as actions from '../store/actions/payment';
+import * as actions from '../store/actions/transaction';
 import {getPayment} from "../store/actions/payment";
 import api from "./../api/index"
 
@@ -18,18 +18,18 @@ jest.mock('./../api/index');
 
 
 
-describe('Payment actions', () => {
+describe('Transactions actions', () => {
     beforeEach(function () {
     });
 
     afterEach(function () {
     });
 
-    it('get all payments', async () => {
+    it('getTransaction returns data', async () => {
 
         const expectedActions = [
-            {type: actions.GET_PAYMENT_START},
-            {type: actions.GET_PAYMENT_SUCCESS, payload: expect.any(Array)},
+            {type: actions.GET_TRANSACTION_START},
+            {type: actions.GET_TRANSACTION_SUCCESS, payload: expect.any(Array)},
         ];
 
         const store = mockStore({
@@ -49,17 +49,17 @@ describe('Payment actions', () => {
         }));
 
 
-        await store.dispatch(getPayment());
+        await store.dispatch(getTransaction('0x0sdfsdfsd'));
         expect(await store.getActions()).toEqual(expectedActions);
     });
 
 
-
-    it('fires GET_PAYMENT_FAILED if server not available', async () => {
+    //
+    it('fires GET_TRANSACTION_FAILED on fail', async () => {
 
         const expectedActions = [
-            {type: actions.GET_PAYMENT_START},
-            {type: actions.GET_PAYMENT_FAILED, payload: expect.any(String)},
+            {type: actions.GET_TRANSACTION_START},
+            {type: actions.GET_TRANSACTION_FAILED, payload: expect.any(String)},
         ];
 
         const store = mockStore({
@@ -75,8 +75,10 @@ describe('Payment actions', () => {
         api.get.mockImplementation(() => Promise.reject({}));
 
 
-        await store.dispatch(getPayment());
-        expect(store.getActions()).toEqual(expectedActions);
+        await store.dispatch(getTransaction('0x0sdfsdf'));
+
+
+        expect(await store.getActions()).toEqual(expectedActions);
     });
 
 

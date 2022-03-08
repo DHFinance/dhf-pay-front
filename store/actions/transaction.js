@@ -33,7 +33,7 @@ export const getTransaction = (txHash = '') => async (dispatch, getState) => {
     dispatch(getTransactionSuccess(result.data));
     return result
   } catch (e) {
-    dispatch(getTransactionFailed(e));
+    dispatch(getTransactionFailed(e.message));
   }
 };
 
