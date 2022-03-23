@@ -14,6 +14,11 @@ import {getLastTransaction} from "../../../../store/actions/transaction";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {getCourse} from "../../../../store/actions/course";
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import CasperApp from '@zondax/ledger-casper';
+import * as CasperServices from "@casperholders/core"
+
+console.log(CasperServices)
 
 const initialState = {
     email: '',
@@ -557,6 +562,28 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
     const date = new Date(datetime).toDateString()
 
+    const connectWallet = async (event: any)=>{
+        const transport = await TransportWebUSB.create();
+        console.log(transport)
+
+        const app = new CasperApp(transport);
+        const pdAddr = await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0')
+        // const key = `02${(await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0')).publicKey.toString('hex')}`;
+        console.log(pdAddr.publicKey.toString('hex'))
+
+        let services = CasperServices;
+
+        const client = new CasperServices.ClientCasper("https://node-clarity-testnet.make.services/rpc")
+        const balanceService = new CasperServices.Balance({
+            activeKey: pdAddr.publicKey.toString('hex')
+        }, client);
+        const balance = await balanceService.fetchBalanceOfPublicKey(`02${pdAddr.publicKey.toString('hex')}`);
+        debugger
+
+        console.log("app", app)
+        console.log("balance", balance)
+    }
+
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
@@ -635,6 +662,9 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                 status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
                     <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} /> : null
             }
+
+            <button onClick={connectWallet}>Sign with ledger</button>
+
         </>
     );
 };
