@@ -563,22 +563,79 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
     const date = new Date(datetime).toDateString()
 
     const connectWallet = async (event: any)=>{
+
+
+        const isValid = await form.validateFields();
+
         const transport = await TransportWebUSB.create();
-        console.log(transport)
 
         const app = new CasperApp(transport);
-        const pdAddr = await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0')
-        // const key = `02${(await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0')).publicKey.toString('hex')}`;
-        console.log(pdAddr.publicKey.toString('hex'))
-
-        let services = CasperServices;
-
+        const pdAddr = await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0');
+        if(!pdAddr?.publicKey){
+            openNotification('Please select casper app in ledger')
+            return
+        }
+        const ledgerPbId = `02${pdAddr.publicKey.toString('hex')}`;
         const client = new CasperServices.ClientCasper("https://node-clarity-testnet.make.services/rpc")
         const balanceService = new CasperServices.Balance({
             activeKey: pdAddr.publicKey.toString('hex')
         }, client);
-        const balance = await balanceService.fetchBalanceOfPublicKey(`02${pdAddr.publicKey.toString('hex')}`);
-        debugger
+        const balance = await balanceService.fetchBalanceOfPublicKey(ledgerPbId);
+
+
+        const to = store.wallet;
+        const amountStr = amount.toString()
+        const id = 287821;
+
+
+        const publicKeyHex = pdAddr.publicKey.toString('hex');
+
+        const CS = CasperServices;
+
+        const transferDeployParameters = new CasperServices.TransferDeployParameters(
+            ledgerPbId, //'020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657', //from
+            "casper-test", //network
+            amountStr,//"25", // amount is cspr
+            to,//'01a35887f3962a6a232e8e11fa7d4567b6866d68850974aad7289ef287676825f6', //to
+            "1200", // memo
+            '2' ) // ttl
+
+
+        const deploy = transferDeployParameters.makeDeploy;
+        const deploySigned = await CS.LedgerSigner.sign(deploy, {
+            app: app,
+            publicKey: '020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657',
+            keyPath: '0'
+        });
+        const signed = await casperClient.putDeploy(deploySigned);
+        console.log(signed)
+
+        if (signed) {
+            openNotification('Transaction completed', 'The transaction will be processed as soon as possible')
+        } else {
+            openNotification('Transaction error', 'Your transaction has not been completed, please try again')
+        }
+        try {
+            /**
+             * @description after a successful transaction, a record about it is created in the database
+             * @param txHash {string} - transaction hash. You can track the transaction on it.
+             * @param status {string} - payment status. Always processing. It is set on the front, since only the front knows which bill mode is enabled (casper or fake)
+             * @param email {string} - payer's email address
+             * @param payment {payment || id} - data on the payment for which the transaction took place
+             * @param sender {string} - payer's public key
+             */
+            await dispatch(pay({
+                txHash: signed,
+                status: "processing",
+                email,
+                payment: billInfo,
+                sender: publicKeyHex
+            }))
+            await dispatch(ge)
+        } catch (e) {
+            showError('Transaction aborted')
+        }
+        setTransactionExplorer(signed || '')
 
         console.log("app", app)
         console.log("balance", balance)
