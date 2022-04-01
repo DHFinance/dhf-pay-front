@@ -1,5 +1,5 @@
 // @ts-nocheck
-import {Statistic, Row, Col, Button, notification, Form, Input} from 'antd';
+import {Statistic, Row, Col, Button, notification, Form, Input, Select} from 'antd';
 import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined, UserOutlined} from '@ant-design/icons';
 import Link from 'next/link'
 import {useDispatch, useSelector} from "react-redux";
@@ -18,7 +18,7 @@ import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 import CasperApp from '@zondax/ledger-casper';
 import * as CasperServices from "@casperholders/core"
 
-console.log(CasperServices)
+const {Option} = Select;
 
 const initialState = {
     email: '',
@@ -111,16 +111,17 @@ const signerErrors = [
  * @param click {function} - the signer connection function is passed here
  * @param deploy {function} - the payment function in signer is passed here
  */
-const StatusButtonPay = ({balance, click,deploy}) => {
+const StatusButtonPay = ({balance, click, deploy}) => {
+
     return (
-    !balance ?
-        <Button onClick={click} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-            Sign in Signer
-        </Button>
-        :
-        <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-            Pay
-        </Button>
+        !balance ?
+            <Button onClick={click} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                Sign in Signer
+            </Button>
+            :
+            <Button onClick={deploy} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                Pay
+            </Button>
     )
 }
 
@@ -165,11 +166,15 @@ const Bill = () => {
         }
     }, [billInfo])
     if (isFake) {
-        return <WithPageExist error={billInfoError} data={store} >
-            <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch} router={router}/>
+        return <WithPageExist error={billInfoError} data={store}>
+            <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch}
+                      router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course} store={store} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course}
+                                                                         store={store} transaction={transaction}
+                                                                         dispatch={dispatch}
+                                                                         router={router}/></WithPageExist>
 }
 /**
  * @description fake component. Used if you need to test applications without the ability to establish a connection with the signer
@@ -261,40 +266,46 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Your Balance" value={'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
+                <Statistic title="Your Balance" value={'Sign in Signer to get balance'} prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<AreaChartOutlined />} />
+                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined/>}/>
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`}
+                           prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Comment" value={comment} prefix={<CommentOutlined />} />
+                <Statistic title="Comment" value={comment} prefix={<CommentOutlined/>}/>
             </Col>
             {status !== 'Paid' ?
                 <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                     <Form
                         name="email"
-                        initialValues={{ remember: true }}
-                        labelCol={{ span: 1 }}
-                        wrapperCol={{ span: 12 }}
+                        initialValues={{remember: true}}
+                        labelCol={{span: 1}}
+                        wrapperCol={{span: 12}}
                         validateTrigger={'onSubmit'}
                         form={form}
                     >
                         <Form.Item
                             label="Buyer's email"
                             name="email"
-                            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                            rules={[{required: true, message: 'Please input your email!'}, {
+                                type: 'email',
+                                message: 'Please enter a valid email!'
+                            }]}
                         >
-                            <Input name="email" style={{width: 400}} onChange={onChangeBillData('email')} placeholder="Email" />
+                            <Input name="email" style={{width: 400}} onChange={onChangeBillData('email')}
+                                   placeholder="Email"/>
                         </Form.Item>
                         <Form.Item
                             label="Wallet"
                             name="wallet"
-                            rules={[{ required: true, message: 'Please input wallet!' }, { validator: validateWallet }] }
+                            rules={[{required: true, message: 'Please input wallet!'}, {validator: validateWallet}]}
                         >
-                            <Input style={{width: 400}} onChange={onChangeBillData('wallet')} placeholder="Your wallet"/>
+                            <Input style={{width: 400}} onChange={onChangeBillData('wallet')}
+                                   placeholder="Your wallet"/>
                         </Form.Item>
                     </Form>
                 </Col>
@@ -310,7 +321,8 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
                     </a>
                 </Link>
                 : lastTransaction.length ?
-                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
+                    <Link
+                        href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${lastTransaction[lastTransaction.length - 1].txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -318,7 +330,8 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
                         </a>
                     </Link>
                     : payment?.transaction?.txHash ?
-                        <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
+                        <Link
+                            href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                             <a target="_blank" rel="noreferrer">
                                 <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                     Check last transaction
@@ -328,9 +341,10 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
                         : null
             }
 
-            {   status !== 'Paid' && !transaction?.id && !payment?.transaction?.txHash ?
+            {status !== 'Paid' && !transaction?.id && !payment?.transaction?.txHash ?
                 (!sign ?
-                    <Button onClick={() => setSign(true)} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                    <Button onClick={() => setSign(true)} style={{margin: '20px 20px 0 0'}} type="primary"
+                            size={'large'}>
                         Sign in Signer
                     </Button>
                     :
@@ -360,6 +374,9 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
 const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) => {
 
     const [balance, setBalance] = useState('')
+    const [ledgerWallets, setLedgerWallets] = useState([]);
+    const [currentLedgerPath, setCurrentLedgerPath] = useState(-1);
+    const [isLedgerLoading, setIsLedgerLoading] = useState(false);
     const [balanceUsd, setBalanceUsd] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
     const [email, setEmail] = useState('')
@@ -434,7 +451,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
      * @const gasPrice {num} - transaction fee
      * @const id {num} - transaction id in the casper network
      */
-    const deploy = async ()=> {
+    const deploy = async () => {
         const to = store.wallet;
         const amountStr = amount.toString()
         const amountNum = amount;
@@ -463,13 +480,13 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                      */
                     const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
                     const publicKey = CLPublicKey.fromHex(publicKeyHex)
-                    let deployParams = new DeployUtil.DeployParams(publicKey,"casper-test",gasPrice,ttl );
+                    let deployParams = new DeployUtil.DeployParams(publicKey, "casper-test", gasPrice, ttl);
                     const toPublicKey = CLPublicKey.fromHex(to);
-                    const session = DeployUtil.ExecutableDeployItem.newTransfer( amountStr,toPublicKey,null,id);
+                    const session = DeployUtil.ExecutableDeployItem.newTransfer(amountStr, toPublicKey, null, id);
                     const payment = DeployUtil.standardPayment(amountNum);
                     const deploy = DeployUtil.makeDeploy(deployParams, session, payment);
                     const json = DeployUtil.deployToJson(deploy)
-                    const signature = await window.casperlabsHelper.sign(json,publicKeyHex,to)
+                    const signature = await window.casperlabsHelper.sign(json, publicKeyHex, to)
                     const deployObject = DeployUtil.deployFromJson(signature)
 
                     // @ts-ignore
@@ -533,7 +550,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             balanceUref
         );
         const course = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        const CSPRtoUSD = ((balance/1000000000) * course.data['casper-network'].usd).toFixed(2)
+        const CSPRtoUSD = ((balance / 1000000000) * course.data['casper-network'].usd).toFixed(2)
         setBalanceUsd(CSPRtoUSD.toString())
         setBalance(balance.toString())
 
@@ -562,7 +579,39 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
     const date = new Date(datetime).toDateString()
 
-    const connectWallet = async (event: any)=>{
+    const connectLedger = async () => {
+        setIsLedgerLoading(true);
+        const transport = await TransportWebUSB.create();
+        const app = new CasperApp(transport);
+        const client = new CasperServices.ClientCasper("https://node-clarity-testnet.make.services/rpc")
+
+        const wallets = []
+        try {
+            for (let i = 0; i < 5; i++) {
+                const pdAddr = await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/' + i);
+                const ledgerPbId = `02${pdAddr.publicKey.toString('hex')}`;
+                const balanceService = new CasperServices.Balance({
+                    activeKey: pdAddr.publicKey.toString('hex')
+                }, client);
+                const balance = await balanceService.fetchBalanceOfPublicKey(ledgerPbId);
+
+                wallets.push({
+                    path: i,
+                    wallet: ledgerPbId,
+                    balance, balance
+                })
+                setLedgerWallets(wallets)
+            }
+        } catch (e) {
+            openNotification('Ledger connection error', 'Please open Casper app on ledger and check if ledger connected to this site and not to other.')
+
+        }
+
+        setIsLedgerLoading(false);
+
+    };
+
+    const connectWallet = async (event: any) => {
 
 
         const isValid = await form.validateFields();
@@ -571,7 +620,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
         const app = new CasperApp(transport);
         const pdAddr = await app.getAddressAndPubKey('m/44\'/506\'/0\'/0/0');
-        if(!pdAddr?.publicKey){
+        if (!pdAddr?.publicKey) {
             openNotification('Please select casper app in ledger')
             return
         }
@@ -598,7 +647,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             amountStr,//"25", // amount is cspr
             to,//'01a35887f3962a6a232e8e11fa7d4567b6866d68850974aad7289ef287676825f6', //to
             "1200", // memo
-            '2' ) // ttl
+            '2') // ttl
 
 
         const deploy = transferDeployParameters.makeDeploy;
@@ -644,33 +693,40 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
     return (
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Your Balance" value={balance ? `${balance} CSPR ($${balanceUsd})` : 'Sign in Signer to get balance'} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
+                <Statistic title="Your Balance"
+                           value={balance ? `${balance} CSPR ($${balanceUsd})` : 'Sign in Signer to get balance'}
+                           prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<AreaChartOutlined />} />
+                <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined/>}/>
+            </Col>
+            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
+                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`}
+                           prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
+                <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined/>}/>
             </Col>
             {status !== 'Paid' ?
                 <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                     <Form
                         name="email"
-                        initialValues={{ remember: true }}
-                        labelCol={{ span: 0 }}
-                        wrapperCol={{ span: 12 }}
+                        initialValues={{remember: true}}
+                        labelCol={{span: 0}}
+                        wrapperCol={{span: 12}}
                         validateTrigger={'onSubmit'}
                         form={form}
                     >
                         <Form.Item
                             label="Buyer's email"
                             name="email"
-                            rules={[{ required: true, message: 'Please input your email!' }, {type: 'email',  message: 'Please enter a valid email!'}]}
+                            rules={[{required: true, message: 'Please input your email!'}, {
+                                type: 'email',
+                                message: 'Please enter a valid email!'
+                            }]}
                         >
-                            <Input name="email" style={{width: 400}} onChange={(e) => setEmail(e.target.value)} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
+                            <Input name="email" style={{width: 400}} onChange={(e) => setEmail(e.target.value)}
+                                   prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="Email"/>
                         </Form.Item>
                     </Form>
                 </Col>
@@ -682,15 +738,16 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                  * @description If there is already a completed transaction, a button is displayed that allows you to view this transaction in the casper network
                  */
                 transaction?.txHash ?
-                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction?.txHash}`}>
-                    <a target="_blank" rel="noreferrer">
-                        <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
-                            Check last transaction
-                        </Button>
-                    </a>
-                </Link>
-                : payment?.transaction?.txHash ?
-                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
+                    <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction?.txHash}`}>
+                        <a target="_blank" rel="noreferrer">
+                            <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
+                                Check last transaction
+                            </Button>
+                        </a>
+                    </Link>
+                    : payment?.transaction?.txHash ?
+                    <Link
+                        href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${payment?.transaction?.txHash}`}>
                         <a target="_blank" rel="noreferrer">
                             <Button style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}>
                                 Check last transaction
@@ -713,14 +770,43 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                 /**
                  * @description for payments with a button attached to them, you can make an infinite number of transactions. For invoices, you can make only one transaction, after which it is forbidden to make new transactions. Another transaction can be made only if the previous transaction was unsuccessful
                  */
-                type && text ?
-                <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} />
-                :
-                status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
-                    <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy} /> : null
+
+                ledgerWallets.length === 0 && (type && text ?
+                    <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy}/>
+                    :
+                    status !== 'Paid' && transaction.status !== 'processing' && transaction.status !== 'success' && !payment?.transaction?.txHash && !transactionExplorer ?
+                        <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy}/> : null)
             }
 
-            <button onClick={connectWallet}>Sign with ledger</button>
+            {ledgerWallets.length > 0 &&
+
+            <><Select onChange={item=>{
+                setCurrentLedgerPath(item)
+            }} defaultValue={ledgerWallets[0].path} style={{width: 'auto'}} loading={isLedgerLoading}
+                    size={'large'}>
+
+
+                {ledgerWallets.map(wallet => {
+                    return <Option key={wallet.wallet} value={wallet.path}>
+                        {wallet.wallet} ({wallet.balance} CSPR)
+                    </Option>
+
+                })}
+            </Select>
+                <Button style={{margin: '20px 20px 0 20px'}} type="primary" size={'large'} onClick={connectWallet}>Sign with
+                    ledger</Button>
+            </>
+            }
+
+
+
+
+            {ledgerWallets.length === 0 &&
+            <Button isLoading={isLedgerLoading} style={{margin: '20px 20px 0 0'}} type="primary" size={'large'}
+                    onClick={connectLedger}>
+                {isLedgerLoading ? 'Loading..' : 'Connect ledger'}
+            </Button>
+            }
 
         </>
     );
