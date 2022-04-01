@@ -155,10 +155,10 @@ const Bill = () => {
     }, [])
     useEffect(() => {
         if (billInfo?.store?.id) {
-            /**
-             * @description receiving the store that owns the payment
-             */
-            dispatch(getStore(billInfo?.store?.id))
+            // /**
+            //  * @description receiving the store that owns the payment
+            //  */
+            // dispatch(getStore(billInfo?.store?.id))
             /**
              * @description receiving the last transaction made for this payment
              */
@@ -166,15 +166,12 @@ const Bill = () => {
         }
     }, [billInfo])
     if (isFake) {
-        return <WithPageExist error={billInfoError} data={store}>
-            <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch}
-                      router={router}/>
+
+        return <WithPageExist error={billInfoError} data={billInfo} >
+            <FakeBill billInfo={billInfo} store={store} transaction={transaction} course={course} dispatch={dispatch} router={router}/>
         </WithPageExist>
     }
-    return <WithPageExist error={billInfoError} data={store}><CasperBill billInfo={billInfo} course={course}
-                                                                         store={store} transaction={transaction}
-                                                                         dispatch={dispatch}
-                                                                         router={router}/></WithPageExist>
+    return <WithPageExist error={billInfoError} data={billInfo}><CasperBill billInfo={billInfo} course={course} store={billInfo} transaction={transaction} dispatch={dispatch} router={router}/></WithPageExist>
 }
 /**
  * @description fake component. Used if you need to test applications without the ability to establish a connection with the signer
@@ -372,6 +369,7 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
  * @description A component that allows you to work with casper signer
  */
 const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) => {
+  console.log(store);
 
     const [balance, setBalance] = useState('')
     const [ledgerWallets, setLedgerWallets] = useState([]);
@@ -451,8 +449,9 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
      * @const gasPrice {num} - transaction fee
      * @const id {num} - transaction id in the casper network
      */
-    const deploy = async () => {
-        const to = store.wallet;
+
+    const deploy = async ()=> {
+        const to = store.store.wallet;
         const amountStr = amount.toString()
         const amountNum = amount;
         const id = 287821;
