@@ -631,7 +631,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         const balance = await balanceService.fetchBalanceOfPublicKey(ledgerPbId);
 
 
-        const to = store.wallet;
+        const to = store.store.wallet;
         const amountStr = amount.toString()
         const id = 287821;
 
@@ -648,11 +648,11 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             "1200", // memo
             '2') // ttl
 
-
+        debugger
         const deploy = transferDeployParameters.makeDeploy;
         const deploySigned = await CS.LedgerSigner.sign(deploy, {
             app: app,
-            publicKey: '020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657',
+            publicKey: ledgerPbId,//'020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657',
             keyPath: '0'
         });
         const signed = await casperClient.putDeploy(deploySigned);
@@ -700,7 +700,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`}
+                <Statistic title="Amount" value={`${amount / 1000000000} CSPR ($${CSPRtoUSD(amount, course)})`}
                            prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
@@ -777,7 +777,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy}/> : null)
             }
 
-            {ledgerWallets.length > 0 &&
+            {ledgerWallets.length > 0 && status !== 'Paid' &&
 
             <><Select onChange={item=>{
                 setCurrentLedgerPath(item)
