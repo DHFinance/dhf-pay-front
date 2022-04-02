@@ -172,7 +172,7 @@ const Payment = ({isButtons}) => {
                                                             Store: {store?.name}
                                                         </p>
                                                         <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
-                                                            Amount: {amount} CSPR (${CSPRtoUSD(amount, course)})
+                                                            Amount: {amount / 100000000} CSPR (${CSPRtoUSD(amount, course)})
                                                         </p>
                                                         <p style={{fontFamily: 'sans-serif', fontSize: '14px', fontWeight: 'normal', margin: 0, marginBottom: '15px'}}>
                                                             Comment: {comment}
@@ -213,7 +213,7 @@ const Payment = ({isButtons}) => {
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<AreaChartOutlined />} />
+                <Statistic title="Amount" value={`${amount / 100000000} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Status" value={status?.replace('_', ' ') || 'none'} prefix={<AreaChartOutlined />} />
