@@ -12,7 +12,7 @@ let nextConfig = {
     return [
       {
         source: '/rpc/:path*',
-        destination: 'https://node-clarity-mainnet.make.services/rpc/:path*' // Proxy to Backend
+        destination: 'http://135.125.98.178:7777/rpc/:path*' // Proxy to Backend
       }
     ]
   }

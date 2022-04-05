@@ -480,7 +480,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                      */
                     const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
                     const publicKey = CLPublicKey.fromHex(publicKeyHex)
-                    let deployParams = new DeployUtil.DeployParams(publicKey, "casper-test", gasPrice, ttl);
+                    let deployParams = new DeployUtil.DeployParams(publicKey, process.env.NEXT_PUBLIC_CASPER_CHAIN_NAME, gasPrice, ttl);
                     const toPublicKey = CLPublicKey.fromHex(to);
                     const session = DeployUtil.ExecutableDeployItem.newTransfer(amountStr, toPublicKey, null, id);
                     const payment = DeployUtil.standardPayment(amountNum);
@@ -643,7 +643,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
         const transferDeployParameters = new CasperServices.TransferDeployParameters(
             ledgerPbId, //'020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657', //from
-            "casper-test", //network
+            process.env.NEXT_PUBLIC_CASPER_CHAIN_NAME,//network
             amountStr,//"25", // amount is cspr
             to,//'01a35887f3962a6a232e8e11fa7d4567b6866d68850974aad7289ef287676825f6', //to
             "1200", // memo
