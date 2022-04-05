@@ -374,6 +374,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
     const [balance, setBalance] = useState('')
     const [ledgerWallets, setLedgerWallets] = useState([]);
     const [currentLedgerPath, setCurrentLedgerPath] = useState(-1);
+    const [isTimeToConfirmOnLedger, setIsTimeToConfirmOnLedger] = useState(false)
     const [isLedgerLoading, setIsLedgerLoading] = useState(false);
     const [balanceUsd, setBalanceUsd] = useState('')
     const [transactionExplorer, setTransactionExplorer] = useState('')
@@ -511,7 +512,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                             payment: billInfo,
                             sender: publicKeyHex
                         }))
-                        await dispatch(ge)
+                        // await dispatch(ge)
                     } catch (e) {
                         showError('Transaction aborted')
                     }
@@ -582,7 +583,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         setIsLedgerLoading(true);
         const transport = await TransportWebUSB.create();
         const app = new CasperApp(transport);
-        const client = new CasperServices.ClientCasper("https://node-clarity-testnet.make.services/rpc")
+        const client = new CasperServices.ClientCasper(process.env.NEXT_PUBLIC_CASPER_NODE)
 
         const wallets = []
         try {
@@ -624,7 +625,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             return
         }
         const ledgerPbId = `02${pdAddr.publicKey.toString('hex')}`;
-        const client = new CasperServices.ClientCasper("https://node-clarity-testnet.make.services/rpc")
+        const client = new CasperServices.ClientCasper(process.env.NEXT_PUBLIC_CASPER_NODE)
         const balanceService = new CasperServices.Balance({
             activeKey: pdAddr.publicKey.toString('hex')
         }, client);
@@ -632,7 +633,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
 
         const to = store.store.wallet;
-        const amountStr = amount.toString()
+        const amountStr = (amount / 1000000000).toString()
         const id = 287821;
 
 
@@ -648,15 +649,17 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             "1200", // memo
             '2') // ttl
 
-        debugger
         const deploy = transferDeployParameters.makeDeploy;
+        setIsTimeToConfirmOnLedger(true)
         const deploySigned = await CS.LedgerSigner.sign(deploy, {
             app: app,
             publicKey: ledgerPbId,//'020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657',
             keyPath: '0'
         });
         const signed = await casperClient.putDeploy(deploySigned);
-        console.log(signed)
+        console.log("signed", signed)
+
+        setIsTimeToConfirmOnLedger(false)
 
         if (signed) {
             openNotification('Transaction completed', 'The transaction will be processed as soon as possible')
@@ -679,8 +682,11 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                 payment: billInfo,
                 sender: publicKeyHex
             }))
-            await dispatch(ge)
+            // await dispatch(ge)
         } catch (e) {
+
+            console.log(e)
+            console.log(e.message)
             showError('Transaction aborted')
         }
         setTransactionExplorer(signed || '')
@@ -777,7 +783,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
                         <StatusButtonPay balance={balance} click={singInSigner} deploy={deploy}/> : null)
             }
 
-            {ledgerWallets.length > 0 && status !== 'Paid' &&
+            {transactionExplorer === '' && ledgerWallets.length > 0 && status !== 'Paid' &&
 
             <><Select onChange={item=>{
                 setCurrentLedgerPath(item)
@@ -792,8 +798,8 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
 
                 })}
             </Select>
-                <Button style={{margin: '20px 20px 0 20px'}} type="primary" size={'large'} onClick={connectWallet}>Sign with
-                    ledger</Button>
+                <Button style={{margin: '20px 20px 0 20px'}} disabled={isTimeToConfirmOnLedger} type="primary" size={'large'}
+                        onClick={connectWallet}>{isTimeToConfirmOnLedger ? 'Confirm transaction on ledger' : 'Sign with ledger'}</Button>
             </>
             }
 

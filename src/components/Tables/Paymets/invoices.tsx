@@ -42,7 +42,7 @@ const PaymentsInvoices = ({currentTable, onRow}) => {
         <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable.map(item=>{
             return {
                 ...item,
-                amount: item.amount / 100000000
+                amount: item.amount / 1000000000
             }
         })} />
     );
