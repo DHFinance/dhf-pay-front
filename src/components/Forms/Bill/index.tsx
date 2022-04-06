@@ -26,6 +26,9 @@ const initialState = {
 }
 
 
+
+const USD_CSPR_API = 'https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd'
+
 /**
  * @description List of known bugs
  * @message {string} - the string or part of a string returned by the signer extension. It is searched in an array
@@ -549,12 +552,17 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
             latestBlock.block.header.state_root_hash,
             balanceUref
         );
-        const course = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd')
-        const CSPRtoUSD = ((balance / 1000000000) * course.data['casper-network'].usd).toFixed(2)
-        setBalanceUsd(CSPRtoUSD.toString())
-        setBalance(balance.toString())
+        try{
+            const course = await axios.get(USD_CSPR_API)
+            const CSPRtoUSD = ((balance / 1000000000) * course.data['casper-network'].usd).toFixed(2)
+            setBalanceUsd(CSPRtoUSD.toString())
+            setBalance(balance.toString())
 
-        dispatch(setCasperData({usd: CSPRtoUSD, cspr: balance.toString(), hash, public: publicKeyHex}))
+            dispatch(setCasperData({usd: CSPRtoUSD, cspr: balance.toString(), hash, public: publicKeyHex}))
+        } catch (e) {
+          console.log('cant get casper price')
+        }
+
     };
 
     /**
