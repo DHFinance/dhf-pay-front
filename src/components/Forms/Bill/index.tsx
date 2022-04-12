@@ -372,7 +372,6 @@ const FakeBill = ({billInfo, transaction, dispatch, course}) => {
  * @description A component that allows you to work with casper signer
  */
 const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) => {
-  console.log(store);
 
     const [balance, setBalance] = useState('')
     const [ledgerWallets, setLedgerWallets] = useState([]);
@@ -707,7 +706,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
         <>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Your Balance"
-                           value={balance ? `${balance} CSPR ($${balanceUsd})` : 'Sign in Signer to get balance'}
+                           value={balance ? `${balance / 1000000000} CSPR ($${balanceUsd})` : 'Sign in Signer to get balance'}
                            prefix={<AreaChartOutlined/>}/>
             </Col>
             <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>

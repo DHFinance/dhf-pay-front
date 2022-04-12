@@ -48,7 +48,12 @@ const PaymentsButton = ({currentTable, onRow}) => {
         return item.type && item.text;
     })
     return (
-        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable} />
+        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable.map(item=>{
+          return {
+            ...item,
+            amount: item.amount / 1000000000
+          }
+        })} />
     );
 };
 
