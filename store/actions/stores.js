@@ -40,7 +40,7 @@ export const getStores = () => async (dispatch, getState) => {
 export const getUserStores = (userId) => async (dispatch, getState) => {
   const token = getState().auth?.data?.token
   dispatch(getStoresStart());
-  await get(`/store/tx/${token}`, {headers: {"Authorization": `Bearer ${token}`}}).then((result) => {
+  await get(`/store`, {headers: {"Authorization": `Bearer ${token}`}}).then((result) => {
     dispatch(getStoresSuccess(result.data));
   }).catch((e) => dispatch(getStoresFailed(e)));
 };

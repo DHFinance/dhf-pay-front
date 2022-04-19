@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {getStores, getUserStores} from "../../../../store/actions/stores";
-import {blockStore, editStore, getStore} from "../../../../store/actions/store";
+import {blockStore, editStore, getStore, unblockStore} from "../../../../store/actions/store";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {addPayment} from "../../../../store/actions/payment";
 import {getPayments} from "../../../../store/actions/payments";
@@ -114,8 +114,12 @@ const Store = () => {
         setEdit(false);
     };
 
-    const onChangeBlock = (block) => () => {
-        dispatch(blockStore(id, block))
+    const unblockStoreButton = () => {
+      dispatch(unblockStore(id))
+    }
+
+    const blockStoreButton = () => {
+        dispatch(blockStore(id))
     }
 
     useEffect(() => {
@@ -243,11 +247,11 @@ const Store = () => {
             {
                 user?.role === 'admin' && <>
                     {blocked ?
-                        <Button type="primary" onClick={onChangeBlock(false)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
+                        <Button type="primary" onClick={unblockStoreButton} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Unblock
                         </Button>
                         :
-                        <Button danger type="primary" onClick={onChangeBlock(true)} style={{margin: '20px 20px 0 0'}} className="login-form-button">
+                        <Button danger type="primary" onClick={blockStoreButton} style={{margin: '20px 20px 0 0'}} className="login-form-button">
                             Block
                         </Button>
                     }

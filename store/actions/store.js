@@ -123,14 +123,27 @@ const blockStoreFailed = (error) => ({
  * @param blocked - true|false state
  * @returns {(function(*, *): Promise<void>)|*}
  */
-export const blockStore = (id, blocked) => async (dispatch, getState) => {
+export const blockStore = (id) => async (dispatch, getState) => {
   const loading = getState().storeData.isLoading
   if (!loading) {
     const token = getState().auth?.data?.token
     dispatch(blockStoreStart());
     await post(`/store/block`, {
-      id,
-      blocked
+      id
     }, {headers: {"Authorization": `Bearer ${token}`}}).then(result => dispatch(blockStoreSuccess(result.data))).catch(e => dispatch(blockStoreFailed(e)));
   }
 };
+
+export const unblockStore = (id) => async (dispatch, getState) => {
+  const loading = getState().storeData.isLoading
+  if (!loading) {
+    const token = getState().auth?.data?.token
+    dispatch(blockStoreStart());
+    try {
+      const result = await post('/store/unblock', {id}, {headers: {"Authorization": `Bearer ${token}`}})
+      dispatch(blockStoreSuccess(result.data));
+    } catch (e) {
+      dispatch(blockStoreFailed(e));
+    }
+  }
+}
