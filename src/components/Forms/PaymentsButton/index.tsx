@@ -85,6 +85,13 @@ const Buttons = () => {
         }
     };
 
+    const validateName = (rule: any, value: any, callback: any) => {
+      if (value.trim().length !== 0) {
+        callback()
+      }
+      callback("Name cant be empty")
+    }
+
     const validateKind = (rule: any, value: any, callback: any) => {
       if (choosenButton === 0) {
           callback("Please select a button style");
@@ -183,7 +190,7 @@ const Buttons = () => {
             <Form.Item
                 label="Name"
                 name="text"
-                rules={[{ required: true, message: 'Please input button name!' }]}
+                rules={[{ required: true, message: 'Please input button name!' }, { validator: validateName }]}
             >
                 <Input type="text" onChange={onChangePayment('text')}/>
             </Form.Item>
