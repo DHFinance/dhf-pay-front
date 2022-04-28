@@ -6,7 +6,7 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {useDispatch, useSelector} from "react-redux";
 import WithLoadingData from "../../../../hoc/withLoadingData";
 import {getUserStores} from "../../../../store/actions/stores";
-import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {CSPRtoUsd, CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {getCourse} from "../../../../store/actions/course";
 const { Option } = Select;
 /** @description initial state of a payment object */
@@ -74,7 +74,6 @@ const InvoicesBuilder = () => {
     const onChangePayment = (field: string) => (e: any) => {
         let value = e.target.value;
         /** @description for property amount convert into the right shape */
-        if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
             [field]: value,
@@ -149,7 +148,7 @@ const InvoicesBuilder = () => {
                         <Form.Item
                             label="Amount USD"
                         >
-                            {CSPRtoUSD(payment.amount, course)}$
+                            {CSPRtoUsd(payment.amount, course)}$
                         </Form.Item>
                         <Form.Item
                             label="Comment"
