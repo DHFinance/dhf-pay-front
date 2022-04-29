@@ -12,13 +12,14 @@ import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import Link from "next/link";
-import {getPayment, sendMailBill} from "../../../../store/actions/payment";
+import {cancelPayment, getPayment, sendMailBill} from "../../../../store/actions/payment";
 import WithPageExist from "../../../../hoc/withPageExist";
 import {getUserTransactions} from "../../../../store/actions/transacrions";
 import axios from "axios";
 import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {buttons} from "../../../data/buttonsBuilder";
 import {getCourse} from "../../../../store/actions/course";
+import Title from "antd/lib/typography/Title";
 
 const Payment = ({isButtons}) => {
     const [htmlCode, setHtmlCode] = useState("");
@@ -56,7 +57,7 @@ const Payment = ({isButtons}) => {
         text,
     } = payments
 
-    const filterTransactions = transactions.filter((transaction) => transaction.payment.id === id);
+    const filterTransactions = transactions.filter((transaction) => transaction.payment?.id === id);
     const router = useRouter();
 
     const domain = location.host;
@@ -150,7 +151,12 @@ const Payment = ({isButtons}) => {
     }
 
     const receiverEmail = userData.email
-    return (
+
+  function cancelCurrentPayment() {
+    dispatch(cancelPayment(payments.id));
+  }
+
+  return (
         <WithPageExist error={paymentsError} data={payments}>
             <Modal title="Create a letter" visible={isModalVisible} onOk={onSubmit} onCancel={handleCancel}>
                 <table border="0" cellPadding="0" cellSpacing="0" className="body">
@@ -209,6 +215,11 @@ const Payment = ({isButtons}) => {
                     </Form.Item>
                 </Form>
             </Modal>
+          {payments.cancelled ?
+            <Title style={{width: '100%', textAlign: 'center', color: 'red'}}>Canceled</Title>
+            :
+            null
+          }
             <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
                 <Statistic title="Datetime" value={date} prefix={<ClockCircleOutlined />} />
             </Col>
@@ -321,6 +332,10 @@ const Payment = ({isButtons}) => {
                             <Button onClick={()=>copyLink("link")} style={{margin: '0px 20px 0 0'}} type="primary">
                                 Copy link
                             </Button>
+                          {!payments.cancelled ?
+                            <Button onClick={cancelCurrentPayment} style={{margin: '0px 20px 0 0'}} type="primary">
+                            Cancel
+                          </Button> : null}
                         </div>
 
                 }
