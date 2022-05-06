@@ -82,7 +82,7 @@ const Transaction = () => {
                 <Statistic title="Sender" value={sender} prefix={<AreaChartOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<CommentOutlined />} />
+                <Statistic title="Amount" value={`${amount / 1000000000} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<CommentOutlined />} />
             </Col>
             <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
                 <Statistic title="Status" value={status} prefix={<CommentOutlined />} />

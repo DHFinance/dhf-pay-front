@@ -1,4 +1,5 @@
-import {get, post} from "../../api"
+import { get, post, put } from '../../api'
+import { log } from 'util';
 
 export const GET_PAYMENT_START = 'GET_PAYMENT_START';
 export const GET_PAYMENT_SUCCESS = 'GET_PAYMENT_SUCCESS';
@@ -6,6 +7,7 @@ export const GET_PAYMENT_FAILED = 'GET_PAYMENT_FAILED';
 export const ADD_PAYMENT_START = 'ADD_PAYMENT_START';
 export const ADD_PAYMENT_SUCCESS = 'ADD_PAYMENT_SUCCESS';
 export const ADD_PAYMENT_FAILED = 'ADD_PAYMENT_FAILED';
+export const CANCEL_PAYMENT_SUCCESS = 'CANCEL_PAYMENT_SUCCESS';
 
 const getPaymentStart = () => ({
   type: GET_PAYMENT_START,
@@ -16,10 +18,26 @@ const getPaymentSuccess = (data) => ({
   payload: data
 });
 
+const cancelPaymentSuccess = (data) => ({
+  type: CANCEL_PAYMENT_SUCCESS,
+  payload: data
+})
+
 const getPaymentFailed = (error) => ({
   type: GET_PAYMENT_FAILED,
   payload: error.message
 });
+
+export const cancelPayment = (id) => async (dispatch, getState) => {
+  const token = getState().auth?.data?.token
+  const result = await put(`payment/cancel/${id}`, {},{headers: {"Authorization": `Bearer ${token}`}}).catch(e => console.log(e))
+  try {
+    dispatch(cancelPaymentSuccess(result.data));
+    return result
+  } catch (e) {
+    console.log(e)
+  }
+};
 
 /**
  * @description Receiving a payment by a specific id. Occurs on the store token, after which the success|failed method is called

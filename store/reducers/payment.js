@@ -3,7 +3,8 @@ import {
   GET_PAYMENT_SUCCESS,
   GET_PAYMENT_FAILED,
   ADD_PAYMENT_START,
-  ADD_PAYMENT_SUCCESS, ADD_PAYMENT_FAILED
+  ADD_PAYMENT_SUCCESS, ADD_PAYMENT_FAILED,
+  CANCEL_PAYMENT_SUCCESS
 } from '../actions/payment';
 import {CLEAR_STORE, POST_LOGOUT_SUCCESS} from "../actions/auth";
 
@@ -34,6 +35,13 @@ const reducer = (state = initialState, action) => {
         isLoading: true,
         isChanged: true
       };
+    case CANCEL_PAYMENT_SUCCESS:
+      return {
+        data: action.payload,
+        start: false,
+        isLoading: false,
+        isChanged: true
+      }
     case  GET_PAYMENT_SUCCESS:
       return {
         ...state,

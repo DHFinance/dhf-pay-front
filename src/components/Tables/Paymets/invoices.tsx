@@ -17,7 +17,7 @@ const columns = [
         dataIndex: 'datetime',
     },
     {
-        title: 'Amount',
+        title: 'Amount (CSPR)',
         dataIndex: 'amount',
         key: 'amount',
     },
@@ -37,8 +37,14 @@ const PaymentsInvoices = ({currentTable, onRow}) => {
     const filterTable = currentTable.filter((item)=>{
         return !item.type && !item.text;
     });
+    // console.log("filterTable", filterTable)
     return (
-        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable} />
+        <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable.map(item=>{
+            return {
+                ...item,
+                amount: item.amount / 1000000000
+            }
+        })} />
     );
 };
 

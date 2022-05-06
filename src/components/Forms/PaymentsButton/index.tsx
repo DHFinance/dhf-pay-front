@@ -9,7 +9,7 @@ import {getPayments, getUserPayments} from "../../../../store/actions/payments";
 import {CheckOutlined} from "@ant-design/icons";
 import {addPayment} from "../../../../store/actions/payment";
 import {buttons} from "../../../data/buttonsBuilder";
-import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
+import {CSPRtoUsd, CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
 import {getCourse} from "../../../../store/actions/course";
 
 const initialState = {
@@ -85,6 +85,13 @@ const Buttons = () => {
         }
     };
 
+    const validateName = (rule: any, value: any, callback: any) => {
+      if (value.trim().length !== 0) {
+        callback()
+      }
+      callback("Name cant be empty")
+    }
+
     const validateKind = (rule: any, value: any, callback: any) => {
       if (choosenButton === 0) {
           callback("Please select a button style");
@@ -127,7 +134,6 @@ const Buttons = () => {
     const onChangePayment = (field: string) => (e: any) => {
         let value = e.target.value;
         /** @description for property amount convert into the right shape */
-        if (field === "amount") value = value * 1000000000;
         setPayment({
             ...payment,
             [field]: value,
@@ -183,7 +189,7 @@ const Buttons = () => {
             <Form.Item
                 label="Name"
                 name="text"
-                rules={[{ required: true, message: 'Please input button name!' }]}
+                rules={[{ required: true, message: 'Please input button name!' }, { validator: validateName }]}
             >
                 <Input type="text" onChange={onChangePayment('text')}/>
             </Form.Item>
@@ -197,7 +203,7 @@ const Buttons = () => {
             <Form.Item
                 label="Amount USD"
             >
-                {CSPRtoUSD(payment.amount, course)}$
+                {CSPRtoUsd(payment.amount, course)}$
             </Form.Item>
             {
                 !!activeStores.length && <Form.Item
