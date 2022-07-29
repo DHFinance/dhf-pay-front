@@ -7,6 +7,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {clearAuth, clearAuthError, postLogin, postRegistration, postVerify} from "../../../../store/actions/auth";
 import {useRouter} from "next/router";
 import {getFormFields} from "../../../../utils/getFormFields";
+import {ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
+import {setCaptchaToken} from "../../../../store/actions/user";
 
 interface IUserData {
     name: string,
@@ -24,12 +26,14 @@ const initialState = {
     company: '',
     password: '',
     passwordConf: '',
+    captchaToken: '',
 }
 
 const CreateUserForm = ({auth, setEmail}) => {
 
     const dispatch = useDispatch();
     const [form] = Form.useForm();
+    const captchaToken = useSelector((state) => state.user.captchaToken);
 
     const [userData, setUserData] = useState<IUserData>(initialState)
 
@@ -52,6 +56,14 @@ const CreateUserForm = ({auth, setEmail}) => {
      * @param {any} value - value password
      * @param {function} callback - executed after successful validation of the password field
      */
+    const validatePasswordCharter = (rule: any, value: any, callback: any) => {
+        if (typeof fieldError === 'object' && fieldError.join('').length > 40) {
+            callback(fieldError[0]);
+        } else {
+            callback();
+        }
+    }
+
     const validatePassword = (rule: any, value: any, callback: any) => {
         /** @description if password field hasn't empty, but does not match the first password return a callback with an error  */
         if (value && value !== userData.password) {
@@ -70,8 +82,16 @@ const CreateUserForm = ({auth, setEmail}) => {
     useEffect(() => {
         if (fieldError) {
             form.validateFields(["email"])
+            form.validateFields(['password'])
         }
     }, [fieldError])
+
+    useEffect(() => {
+        setUserData({
+            ...userData,
+            captchaToken: captchaToken
+        })
+    }, [captchaToken]);
 
     /**
      * @description validations of email
@@ -99,6 +119,7 @@ const CreateUserForm = ({auth, setEmail}) => {
                 try {
                     await dispatch(postRegistration(userData))
                     setEmail(userData.email)
+                    dispatch(setCaptchaToken(''));
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
@@ -149,7 +170,7 @@ const CreateUserForm = ({auth, setEmail}) => {
         <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please enter password!' }]}
+            rules={[{ required: true, message: 'Please enter password!' }, {validator: validatePasswordCharter}]}
         >
             <Input.Password type="password" onChange={onUpdateData('password')}/>
         </Form.Item>
@@ -161,8 +182,12 @@ const CreateUserForm = ({auth, setEmail}) => {
             <Input.Password onChange={onUpdateData('passwordConf')}/>
         </Form.Item>
 
+        <Form.Item wrapperCol={{offset: 6, span: 12}}>
+            <ReCaptchaComponent />
+        </Form.Item>
+
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" disabled={!captchaToken}>
                 Submit
             </Button>
         </Form.Item>

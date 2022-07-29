@@ -7,16 +7,19 @@ import {useDispatch, useSelector} from "react-redux";
 import {clearAuth, postLogin, postRestoreStepEmail} from "../../../../store/actions/auth";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import {ReCaptcha, ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
 
 interface IUserData {
     email: string,
     password: string,
+    captchaToken: string,
 }
 
 /** @description initial state of a user object */
 const initialState = {
     email: '',
     password: '',
+    captchaToken: '',
 }
 
 const Login = () => {
@@ -30,6 +33,7 @@ const Login = () => {
     const [userData, setUserData] = useState<IUserData>(initialState)
 
     const auth = useSelector((state) => state.auth);
+    const captchaToken = useSelector((state) => state.user.captchaToken);
 
     const fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
@@ -65,7 +69,7 @@ const Login = () => {
      */
     const validatePassword = (rule: any, value: any, callback: any) => {
         /** @description if password field has error return error message */
-        if (fieldError === 'password') {
+        if (fieldError === 'email or password') {
             callback(errorMessage);
             dispatch(clearAuth())
         } else {
@@ -80,8 +84,7 @@ const Login = () => {
      * @param {function} callback - executed after successful validation of the email field
      */
     const validateEmail = (rule: any, value: any, callback: any) => {
-        console.log(rule, value, callback);
-        if (fieldError === 'email') {
+        if (fieldError === 'email or password') {
             callback(errorMessage);
             dispatch(clearAuth())
         } else {
@@ -104,6 +107,13 @@ const Login = () => {
             })
             .catch(async (err) => console.log(err))
     }
+
+    useEffect(() => {
+        setUserData({
+            ...userData,
+            captchaToken: captchaToken
+        })
+    }, [captchaToken]);
 
     const [form] = Form.useForm();
 
@@ -144,8 +154,12 @@ const Login = () => {
                 </Link>
             </Form.Item>
 
+            <Form.Item wrapperCol={{offset: 6, span: 12}}>
+                <ReCaptchaComponent />
+            </Form.Item>
+
             <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-                <Button type="primary" htmlType="submit" className="login-form-button">
+                <Button type="primary" htmlType="submit" className="login-form-button" disabled={!captchaToken}>
                     Log in
                 </Button>
                 <span style={{ padding: '0 10px'}}>or</span>

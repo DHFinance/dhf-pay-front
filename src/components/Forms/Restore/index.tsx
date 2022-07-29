@@ -12,9 +12,11 @@ import {
 } from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
+import {ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
 
 interface IRestoreDataEmail {
     email: string,
+    captchaToken: string,
 }
 
 interface IRestoreDataCode {
@@ -47,7 +49,7 @@ enum EnumForms {
 }
 
 const EmailForm = ({auth}: any) => {
-
+    const captchaToken = useSelector((state) => state.user.captchaToken);
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
     const dispatch = useDispatch();
 
@@ -94,6 +96,13 @@ const EmailForm = ({auth}: any) => {
         }
     };
 
+    useEffect(() => {
+        setUserData({
+            ...userData,
+            captchaToken: captchaToken
+        })
+    }, [captchaToken]);
+
     /**
      * @description send email of user
      */
@@ -128,9 +137,12 @@ const EmailForm = ({auth}: any) => {
         >
             <Input name="email" onChange={onUpdateData}/>
         </Form.Item>
+        <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
+            <ReCaptchaComponent />
+        </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
+            <Button disabled={!captchaToken} type="primary" htmlType="submit">
                 Submit
             </Button>
         </Form.Item>
@@ -234,6 +246,9 @@ const PasswordForm = ({auth}: any) => {
         router.push('/')
     }
 
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
+
     const dispatch = useDispatch();
     const [form] = Form.useForm();
 
@@ -265,6 +280,14 @@ const PasswordForm = ({auth}: any) => {
             })
             .catch(async (err) => console.log(err))
     }
+    const validatePasswordCharter = (rule: any, value: any, callback: any) => {
+        if (typeof fieldError === 'object' && fieldError.join('').length > 40) {
+            callback(fieldError[0]);
+        } else {
+            callback();
+        }
+    }
+
     /**
      * @description checking that the entered two passwords match
      * @param {object} rule - object field password
@@ -294,7 +317,7 @@ const PasswordForm = ({auth}: any) => {
         <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please enter password!' }]}
+            rules={[{ required: true, message: 'Please enter password!' }, {validator: validatePasswordCharter}]}
         >
             <Input.Password name="password" onChange={onUpdateData}/>
         </Form.Item>
