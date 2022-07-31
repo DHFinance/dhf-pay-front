@@ -89,8 +89,8 @@ const EmailForm = ({auth}: any) => {
     const validateEmail = (rule: any, value: any, callback: any) => {
           /** @description if email field has error return error message */
         if (fieldError === 'email') {
-            callback(errorMessage);
-            dispatch(clearAuth())
+            callback();
+            //dispatch(clearAuth())
         } else {
             callback();
         }
@@ -240,6 +240,7 @@ const CodeForm = ({auth}: any) => {
 
 const PasswordForm = ({auth}: any) => {
 
+    const regExpPass = new RegExp('(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}')
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
     const router = useRouter();
     const goStartPage = () => {
@@ -281,8 +282,8 @@ const PasswordForm = ({auth}: any) => {
             .catch(async (err) => console.log(err))
     }
     const validatePasswordCharter = (rule: any, value: any, callback: any) => {
-        if (typeof fieldError === 'object' && fieldError.join('').length > 40) {
-            callback(fieldError[0]);
+        if (!regExpPass.test(userData.password)) {
+            callback('The password must contain at least 8 characters, 1 special character, 1 uppercase character')
         } else {
             callback();
         }

@@ -2,6 +2,7 @@ import {get, post} from "../../api"
 import initStore from '../store';
 import {Router} from "next/router";
 import axios from "axios";
+import { setCaptchaToken } from "./user";
 
 export const POST_REGISTRATION_START = 'POST_REGISTRATION_START';
 export const POST_REGISTRATION_SUCCESS = 'POST_REGISTRATION_SUCCESS';
@@ -59,7 +60,9 @@ export const postRegistration = (data) => async (dispatch, getState) => {
     dispatch(postRegistrationStart());
     await post(`/auth/register`, {...data, blocked: false}).then((result) => {
       dispatch(postRegistrationSuccess());
+      dispatch(setCaptchaToken(''));
     }).catch(e => {
+      dispatch(postRegistrationSuccess());
       dispatch(postRegistrationFailed(e));
     });
   }
@@ -215,8 +218,13 @@ export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
         email: data.email
       }));
     }).catch(e => {
+      dispatch(postRestoreSuccess({
+        email: data.email,
+        code: ''
+      }))
       dispatch(postRestoreFailed(e));
     });
+    dispatch(setCaptchaToken(''))
   }
 };
 

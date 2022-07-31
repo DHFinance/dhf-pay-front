@@ -31,6 +31,7 @@ const initialState = {
 
 const CreateUserForm = ({auth, setEmail}) => {
 
+    const regExpPass = new RegExp('(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}')
     const dispatch = useDispatch();
     const [form] = Form.useForm();
     const captchaToken = useSelector((state) => state.user.captchaToken);
@@ -57,6 +58,9 @@ const CreateUserForm = ({auth, setEmail}) => {
      * @param {function} callback - executed after successful validation of the password field
      */
     const validatePasswordCharter = (rule: any, value: any, callback: any) => {
+        if (!regExpPass.test(userData.password)) {
+            callback('The password must contain at least 8 characters, 1 special character, 1 uppercase character')
+        }
         if (typeof fieldError === 'object' && fieldError.join('').length > 40) {
             callback(fieldError[0]);
         } else {
@@ -73,7 +77,7 @@ const CreateUserForm = ({auth, setEmail}) => {
         }
     };
 
-    const fieldError = auth?.error?.response?.data?.message
+    let fieldError = auth?.error?.response?.data?.message
     const errorMessage = auth?.error?.response?.data?.error
 
     /**
@@ -84,7 +88,13 @@ const CreateUserForm = ({auth, setEmail}) => {
             form.validateFields(["email"])
             form.validateFields(['password'])
         }
-    }, [fieldError])
+    }, [fieldError, userData.password])
+
+    useEffect(() => {
+        if (fieldError) {
+            fieldError = ''
+        }
+    }, [userData.password])
 
     useEffect(() => {
         setUserData({
@@ -102,8 +112,8 @@ const CreateUserForm = ({auth, setEmail}) => {
     const validateEmail = (rule: any, value: any, callback: any) => {
          /** @description if email field has error return error message */
         if (fieldError === 'email') {
-            callback(errorMessage);
-            dispatch(clearAuth())
+            callback();
+            //dispatch(clearAuth())
         } else {
             callback();
         }
@@ -119,12 +129,13 @@ const CreateUserForm = ({auth, setEmail}) => {
                 try {
                     await dispatch(postRegistration(userData))
                     setEmail(userData.email)
-                    dispatch(setCaptchaToken(''));
                 } catch (e) {
                     console.log(e, 'registration error')
                 }
             })
-            .catch(async (err) => console.log(err))
+            .catch(async (err) => {
+                console.log(err);
+            })
     }
 
     return <Form
