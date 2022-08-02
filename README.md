@@ -30,6 +30,7 @@ NEXT_PUBLIC_API_HOST=http://localhost:3001
 NEXT_PUBLIC_FAKE_TRANSACTION=0
 NEXT_PUBLIC_CASPER_NODE = https://node-clarity-testnet.make.services/rpc
 NEXT_PUBLIC_CASPER_NETWORK = testnet.cspr.live
+NEXT_PUBLIC_CAPTCHA_KEY = googleCaptcha key
 ```
 
 ## Run

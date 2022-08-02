@@ -12,9 +12,11 @@ import {
 } from "../../../../store/actions/auth";
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
+import {ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
 
 interface IRestoreDataEmail {
     email: string,
+    captchaToken: string,
 }
 
 interface IRestoreDataCode {
@@ -47,7 +49,7 @@ enum EnumForms {
 }
 
 const EmailForm = ({auth}: any) => {
-
+    const captchaToken = useSelector((state) => state.user.captchaToken);
     const [userData, setUserData] = useState<IRestoreDataEmail>(initialStateEmail)
     const dispatch = useDispatch();
 
@@ -87,12 +89,19 @@ const EmailForm = ({auth}: any) => {
     const validateEmail = (rule: any, value: any, callback: any) => {
           /** @description if email field has error return error message */
         if (fieldError === 'email') {
-            callback(errorMessage);
-            dispatch(clearAuth())
+            callback();
+            //dispatch(clearAuth())
         } else {
             callback();
         }
     };
+
+    useEffect(() => {
+        setUserData({
+            ...userData,
+            captchaToken: captchaToken
+        })
+    }, [captchaToken]);
 
     /**
      * @description send email of user
@@ -128,9 +137,12 @@ const EmailForm = ({auth}: any) => {
         >
             <Input name="email" onChange={onUpdateData}/>
         </Form.Item>
+        <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
+            <ReCaptchaComponent />
+        </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
+            <Button disabled={!captchaToken} type="primary" htmlType="submit">
                 Submit
             </Button>
         </Form.Item>
@@ -228,11 +240,15 @@ const CodeForm = ({auth}: any) => {
 
 const PasswordForm = ({auth}: any) => {
 
+    const regExpPass = new RegExp('(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}')
     const [userData, setUserData] = useState<IRestoreDataPassword>(initialStatePassword)
     const router = useRouter();
     const goStartPage = () => {
         router.push('/')
     }
+
+    const fieldError = auth?.error?.response?.data?.message
+    const errorMessage = auth?.error?.response?.data?.error
 
     const dispatch = useDispatch();
     const [form] = Form.useForm();
@@ -265,6 +281,14 @@ const PasswordForm = ({auth}: any) => {
             })
             .catch(async (err) => console.log(err))
     }
+    const validatePasswordCharter = (rule: any, value: any, callback: any) => {
+        if (!regExpPass.test(userData.password)) {
+            callback('The password must contain at least 8 characters, 1 special character, 1 uppercase character')
+        } else {
+            callback();
+        }
+    }
+
     /**
      * @description checking that the entered two passwords match
      * @param {object} rule - object field password
@@ -294,7 +318,7 @@ const PasswordForm = ({auth}: any) => {
         <Form.Item
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please enter password!' }]}
+            rules={[{ required: true, message: 'Please enter password!' }, {validator: validatePasswordCharter}]}
         >
             <Input.Password name="password" onChange={onUpdateData}/>
         </Form.Item>

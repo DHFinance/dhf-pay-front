@@ -1,6 +1,8 @@
 import {get, post} from "../../api"
 import initStore from '../store';
 import {Router} from "next/router";
+import axios from "axios";
+import { setCaptchaToken } from "./user";
 
 export const POST_REGISTRATION_START = 'POST_REGISTRATION_START';
 export const POST_REGISTRATION_SUCCESS = 'POST_REGISTRATION_SUCCESS';
@@ -58,7 +60,9 @@ export const postRegistration = (data) => async (dispatch, getState) => {
     dispatch(postRegistrationStart());
     await post(`/auth/register`, {...data, blocked: false}).then((result) => {
       dispatch(postRegistrationSuccess());
+      dispatch(setCaptchaToken(''));
     }).catch(e => {
+      dispatch(postRegistrationSuccess());
       dispatch(postRegistrationFailed(e));
     });
   }
@@ -121,7 +125,8 @@ const postLoginFailed = (error) => {
  */
 export const reAuth = (token) => async (dispatch, getState) => {
   dispatch(postLoginStart());
-  await get(`auth/reAuth?token=${token}`).then((result) => {
+  const data = {token: token}
+  await post(`auth/reAuth`, data).then((result) => {
     dispatch(postLoginSuccess(result.data));
   }).catch(e => {
     dispatch(postLoginFailed(e));
@@ -167,10 +172,15 @@ const postLogoutFailed = (error) => ({
  * @returns {(function(*, *): Promise<void>)|*}
  */
 export const postLogout = (goLoginPage) => async (dispatch, getState) => {
-  const loading = getState().auth.isLoading
-  if (!loading) {
+  const user = getState().auth
+  const data = {
+    email: user.data.email,
+    token: user.data.token
+  }
+  if (!user.isLoading) {
     dispatch(postLogoutStart());
     try {
+      await post('/auth/logout', data);
       dispatch(postLogoutSuccess());
       goLoginPage()
     } catch (e) {
@@ -208,8 +218,13 @@ export const postRestoreStepEmail = (data) => async (dispatch, getState) => {
         email: data.email
       }));
     }).catch(e => {
+      dispatch(postRestoreSuccess({
+        email: data.email,
+        code: ''
+      }))
       dispatch(postRestoreFailed(e));
     });
+    dispatch(setCaptchaToken(''))
   }
 };
 
