@@ -8,7 +8,7 @@ import {clearAuth, clearAuthError, postLogin, postRegistration, postVerify} from
 import {useRouter} from "next/router";
 import {getFormFields} from "../../../../utils/getFormFields";
 import {ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
-import {setCaptchaToken} from "../../../../store/actions/user";
+import {setCaptchaToken, setCaptchaUpdate} from "../../../../store/actions/user";
 
 interface IUserData {
     name: string,
@@ -128,12 +128,15 @@ const CreateUserForm = ({auth, setEmail}) => {
             .then(async (res) => {
                 try {
                     await dispatch(postRegistration(userData))
+                    dispatch(setCaptchaUpdate(`register ${Math.floor(100000 + Math.random() * 900000)}`));
                     setEmail(userData.email)
                 } catch (e) {
+                    dispatch(setCaptchaUpdate(`register ${Math.floor(100000 + Math.random() * 900000)}`));
                     console.log(e, 'registration error')
                 }
             })
             .catch(async (err) => {
+                dispatch(setCaptchaUpdate(`register ${Math.floor(100000 + Math.random() * 900000)}`));
                 console.log(err);
             })
     }
@@ -208,6 +211,7 @@ const CreateUserForm = ({auth, setEmail}) => {
 const VerifyForm = ({email}) => {
 
     const auth = useSelector((state) => state.auth);
+    const captcha = useSelector((state) => state.user.captchaToken);
     const dispatch = useDispatch();
     const [form] = Form.useForm();
     const router = useRouter();
@@ -230,8 +234,10 @@ const VerifyForm = ({email}) => {
                 try {
                     /** @description after successful verification go to the home page */
                     await dispatch(postVerify(email, code, goStartPage))
+                    dispatch(setCaptchaUpdate(`verify user ${Math.floor(100000 + Math.random() * 900000)}`));
                 } catch (e) {
                     console.log(e, 'registration error')
+                    dispatch(setCaptchaUpdate(`verify user ${Math.floor(100000 + Math.random() * 900000)}`));
                 }
             })
             .catch(async (err) => console.log(err))
@@ -258,7 +264,7 @@ const VerifyForm = ({email}) => {
          /** @description if code field has error return error message */
         if (fieldError === 'code') {
             callback(errorMessage);
-            dispatch(clearAuthError())
+            dispatch(clearAuthError());
         } else {
             callback();
         }
@@ -283,8 +289,12 @@ const VerifyForm = ({email}) => {
             <Input name="code" onChange={onChangeCode}/>
         </Form.Item>
 
+      <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
+        <ReCaptchaComponent />
+      </Form.Item>
+
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
+            <Button disabled={!captcha} type="primary" htmlType="submit">
                 Submit
             </Button>
         </Form.Item>

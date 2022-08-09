@@ -8,6 +8,7 @@ import {clearAuth, postLogin, postRestoreStepEmail} from "../../../../store/acti
 import Link from "next/link";
 import {useRouter} from "next/router";
 import {ReCaptcha, ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
+import {setCaptchaToken, setCaptchaUpdate} from "../../../../store/actions/user";
 
 interface IUserData {
     email: string,
@@ -101,11 +102,12 @@ const Login = () => {
                 try {
                     /** @description after successful authorization go to the home page */
                     await dispatch(postLogin(userData, goStartPage))
+                    dispatch(setCaptchaUpdate(`login ${Math.floor(100000 + Math.random() * 900000)}`));
                 } catch (e) {
-                    console.log(e, 'registration error')
+                    dispatch(setCaptchaUpdate(`login ${Math.floor(100000 + Math.random() * 900000)}`));
                 }
             })
-            .catch(async (err) => console.log(err))
+            .catch(async (err) => {dispatch(setCaptchaUpdate(`login ${Math.floor(100000 + Math.random() * 900000)}`));})
     }
 
     useEffect(() => {

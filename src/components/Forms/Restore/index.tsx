@@ -13,6 +13,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {useRouter} from "next/router";
 import {ReCaptchaComponent} from "../../ReCaptcha/ReCaptcha";
+import {setCaptchaToken, setCaptchaUpdate} from "../../../../store/actions/user";
 
 interface IRestoreDataEmail {
     email: string,
@@ -112,7 +113,9 @@ const EmailForm = ({auth}: any) => {
             .then(async (res) => {
                 try {
                     await dispatch(postRestoreStepEmail(userData))
+                    dispatch(setCaptchaUpdate(`restore email ${Math.floor(100000 + Math.random() * 900000)}`));
                 } catch (e) {
+                    dispatch(setCaptchaUpdate(`restore email ${Math.floor(100000 + Math.random() * 900000)}`));
                     console.log(e, 'registration error')
                 }
             })
@@ -151,6 +154,7 @@ const EmailForm = ({auth}: any) => {
 
 const CodeForm = ({auth}: any) => {
 
+    const captcha = useSelector((state) => state.user.captchaToken);
     const [userData, setUserData] = useState<IRestoreDataCode>(initialStateCode)
     const dispatch = useDispatch();
 
@@ -204,9 +208,11 @@ const CodeForm = ({auth}: any) => {
         await form.validateFields()
             .then(async (res) => {
                 try {
-                    await dispatch(postRestoreStepCode({...userData, email: auth.data.email}))
+                    await dispatch(postRestoreStepCode({...userData, email: auth.data.email, captchaToken: captcha}));
+                    dispatch(setCaptchaUpdate(`restore code ${Math.floor(100000 + Math.random() * 900000)}`));
                 } catch (e) {
                     console.log(e, 'registration error: Code step')
+                    dispatch(setCaptchaUpdate(`restore code ${Math.floor(100000 + Math.random() * 900000)}`));
                 }
             })
             .catch(async (err) => console.log(err))
@@ -231,7 +237,11 @@ const CodeForm = ({auth}: any) => {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-            <Button type="primary" htmlType="submit">
+          <ReCaptchaComponent />
+        </Form.Item>
+
+        <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
+            <Button disabled={!captcha} type="primary" htmlType="submit">
                 Submit
             </Button>
         </Form.Item>
