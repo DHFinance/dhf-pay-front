@@ -7,6 +7,7 @@ export const BLOCK_USER_START = 'BLOCK_USER_START';
 export const BLOCK_USER_SUCCESS = 'BLOCK_USER_SUCCESS';
 export const BLOCK_USER_FAILED = 'BLOCK_USER_FAILED';
 export const SET_CAPTCHA_TOKEN = 'SET_CAPTCHA_TOKEN';
+export const SET_UPDATE_CAPTCHA = 'SET_UPDATE_CAPTCHA';
 
 const getUserStart = () => ({
   type: GET_USER_START
@@ -26,6 +27,11 @@ export const setCaptchaToken = (token) => ({
   type: SET_CAPTCHA_TOKEN,
   payload: token
 })
+
+export const setCaptchaUpdate = (payload) => ({
+  type: SET_UPDATE_CAPTCHA,
+  payload: payload
+});
 
 /**
  * @description Getting a user by id

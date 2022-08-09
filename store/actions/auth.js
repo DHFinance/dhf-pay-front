@@ -86,14 +86,15 @@ const postVerifyFailed = (error) => ({
  * @description User registration, stage 2. receives the confirmation code, compares it with what is written on the back. If the code is correct, you can log in to this user
  * @param email - user email
  * @param code - confirmation code
+ * @param captcha - captcha
  * @param goStartPage - callback to go to the main page of the site
  * @returns {(function(*, *): Promise<void>)|*}
  */
-export const postVerify = (email, code, goStartPage) => async (dispatch, getState) => {
+export const postVerify = (email, code, captcha, goStartPage) => async (dispatch, getState) => {
   const loading = getState().auth.isLoading
   if (!loading) {
     dispatch(postVerifyStart());
-    await post(`/auth/verify`, {email, code}).then((result) => {
+    await post(`/auth/verify`, {email, code, captcha}).then((result) => {
       dispatch(postVerifySuccess(result.data));
       goStartPage()
     }).catch(e => {

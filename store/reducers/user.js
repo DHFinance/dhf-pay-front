@@ -1,4 +1,4 @@
-import {  GET_USER_FAILED, GET_USER_SUCCESS, GET_USER_START, SET_CAPTCHA_TOKEN, BLOCK_USER_SUCCESS, BLOCK_USER_START, BLOCK_USER_FAILED }  from '../actions/user';
+import { SET_UPDATE_CAPTCHA, GET_USER_FAILED, GET_USER_SUCCESS, GET_USER_START, SET_CAPTCHA_TOKEN, BLOCK_USER_SUCCESS, BLOCK_USER_START, BLOCK_USER_FAILED }  from '../actions/user';
 import {CLEAR_STORE} from "../actions/auth";
 
 const initialState = {
@@ -7,6 +7,7 @@ const initialState = {
   error: '',
   isChanged: false,
   captchaToken: '',
+  update: '',
 };
 
 /**
@@ -25,6 +26,11 @@ export default function reducer(state = initialState, action) {
         isLoading: true,
         isChanged: true
       };
+    case SET_UPDATE_CAPTCHA:
+      return {
+        ...state,
+        update: action.payload
+      }
     case SET_CAPTCHA_TOKEN:
       return {
         ...state,
