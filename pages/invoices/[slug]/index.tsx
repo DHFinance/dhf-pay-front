@@ -1,17 +1,20 @@
-// @ts-nocheck
-import React from "react";
-import {wrapper} from "../../../store/store";
-// @ts-ignore
-import Payment from "../../../src/components/Info/Payment";
-import WithAuth from "../../../hoc/withAuth";
-import SliderContainer from "../../../src/components/Layout/SliderContainer";
-import {useRouter} from "next/router";
-
+import { useRouter } from 'next/router';
+import React from 'react';
+import WithAuth from '../../../hoc/withAuth';
+import Payment from '../../../src/components/Info/Payment';
+import SliderContainer from '../../../src/components/Layout/SliderContainer';
+import { wrapper } from '../../../src/store/store';
 
 const PaymentPage = () => {
-    const history = useRouter();
-    const slug = history.query.slug;
-    return <WithAuth><SliderContainer title={`Invoice ${slug}`}><Payment/></SliderContainer></WithAuth>
-}
+  const history = useRouter();
+  const slug = history.query.slug;
+  return (
+    <WithAuth>
+      <SliderContainer title={`Invoice ${slug}`}>
+        <Payment isButtons={false} />
+      </SliderContainer>
+    </WithAuth>
+  );
+};
 
-export default wrapper.withRedux(PaymentPage)
+export default wrapper.withRedux(PaymentPage);

@@ -1,60 +1,45 @@
-// @ts-nocheck
-import React, {useEffect} from "react";
-import { Table, Tag, Space } from 'antd';
-import "antd/dist/antd.css";
-import {useDispatch, useSelector} from "react-redux";
-import {getUsers} from "../../../../store/actions/users";
-import {getPayments} from "../../../../store/actions/payments";
-import WithLoadingData from "../../../../hoc/withLoadingData";
-import {useRouter} from "next/router";
+import { Table } from 'antd';
+import 'antd/dist/antd.css';
+import React, { useEffect } from 'react';
+import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { User } from '../../../interfaces/user.interface';
+import { getUsers } from '../../../store/slices/users/asyncThunks/getUsers';
+import { Loader } from '../../Loader';
+import { userColumns } from './usersColumns';
 
-const columns = [
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'Last Name',
-        dataIndex: 'lastName',
-        key: 'lastName',
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-    },
-    {
-        title: 'Company',
-        dataIndex: 'company',
-        key: 'company',
-    },
-
-];
-
+/**
+ * @description handling every row,applying styles and a click event handler to it
+ * @param {object} record - element of array entity
+ */
+const onRow = (record: User) => {
+  return {
+    style: { cursor: 'pointer' },
+    onClick: () => window.location.replace(`users/${record.id}`),
+  };
+};
 
 const Users = () => {
-    const dispatch = useDispatch()
-    const router = useRouter()
+  const users = useTypedSelector((state) => state.users.data);
+  const usersStatus = useTypedSelector((state) => state.users.status);
 
-    useEffect(() => {
-        dispatch(getUsers())
-    }, [])
+  const dispatch = useTypedDispatch();
 
-    /**
-     * @description handling every row,applying styles and a click event handler to it
-     * @param {object} record - element of array entity
-     * @param rowIndex
-     */
-    const onRow=(record, rowIndex) => {
-        return {
-            style: {cursor: "pointer"},
-            onClick: event => router.push(`users/${record.id}`),
-        };
-    }
+  useEffect(() => {
+    dispatch(getUsers());
+  }, []);
 
-    const users = useSelector((state) => state.users.data);
-    return <WithLoadingData data={users}><Table columns={columns} onRow={onRow}  dataSource={users.reverse()} /></WithLoadingData>
-}
+  if (usersStatus.error) {
+    return <p>Server error</p>;
+  }
 
-export default Users
+  if (users === null || usersStatus.isLoading) {
+    return <Loader />;
+  }
+
+  return (
+    <Table columns={userColumns} onRow={onRow} dataSource={[...users].reverse()} />
+  );
+};
+
+export default Users;

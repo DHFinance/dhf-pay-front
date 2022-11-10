@@ -1,108 +1,111 @@
-// @ts-nocheck
-import { Statistic, Row, Col, Button } from 'antd';
-import {AreaChartOutlined, ClockCircleOutlined, CommentOutlined, LikeOutlined} from '@ant-design/icons';
-import {useDispatch, useSelector} from "react-redux";
-import {get} from "../../../../api"
-import {useRouter} from "next/router";
-import {CasperClient,CasperServiceByJsonRPC, PublicKey, DeployUtil } from "casper-js-sdk";
-const casperClientSDK = require("casper-js-sdk");
-import React, {useEffect, useState} from "react";
-import {wrapper} from "../../../../store/store";
-import {getPayments} from "../../../../store/actions/payments";
-import Link from "next/link";
-import {getPayment} from "../../../../store/actions/payment";
-import {getTransaction} from "../../../../store/actions/transaction";
-import WithPageExist from "../../../../hoc/withPageExist";
-import {CSPRtoUSD} from "../../../../utils/CSPRtoUSD";
-import axios from "axios";
-import {getCourse} from "../../../../store/actions/course";
+import {
+  AreaChartOutlined,
+  ClockCircleOutlined,
+  CommentOutlined,
+} from '@ant-design/icons';
+import { Button, Col, Statistic } from 'antd';
 
-interface IUserData {
-    name: string,
-    lastName: string,
-    email: string,
-    company: string,
-    password: string,
-    passwordConf: string,
-}
-
-const initialState = {
-    txHash: '',
-    status: '',
-    updated: '',
-    wallet: '',
-}
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect } from 'react';
+import { CSPRtoUSD } from '../../../../utils/CSPRtoUSD';
+import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
+import { getTransaction } from '../../../store/slices/transaction/asyncThunks/getTransaction';
+import { Loader } from '../../Loader';
 
 const Transaction = () => {
+  const transaction = useTypedSelector((state) => state.transaction.data);
+  const transactionStatus = useTypedSelector(
+    (state) => state.transaction.status,
+  );
+  const course = useTypedSelector((state) => state.course.data.usd);
+  const courseStatus = useTypedSelector((state) => state.course.status);
 
-    const dispatch = useDispatch();
-    const router = useRouter();
+  const dispatch = useTypedDispatch();
+  const router = useRouter();
 
-    const transaction = useSelector((state) => state.transaction.data);
-    const transactionError = useSelector((state) => state.transaction.error);
-    const course = useSelector((state) => state.course.data.usd);
+  useEffect(() => {
+    if (router.query.slug) {
+      dispatch(getTransaction(router.query.slug as string));
+    }
+    dispatch(getCourse());
+  }, []);
 
-    /**
-     * @description load data
-     */
-    useEffect(() => {
-         /** @description if is query id, then get transaction by id */
-        if (router.query.slug) {
-            dispatch(getTransaction(router.query.slug))
-        }
-        /**
-         * @description usd to cspr exchange rate
-         */
-        dispatch(getCourse())
-    }, [])
+  const date = new Date(transaction?.updated || 0).toDateString();
+  
+  if (transactionStatus.error || courseStatus.error) {
+    router.push('/');
+  }
+  
+  if (transactionStatus.isLoading || transaction === null || courseStatus.isLoading || course === null) {
+    return <Loader />;
+  }
 
-    const {
-        txHash,
-        status,
-        updated,
-        sender,
-        receiver,
-        amount,
-    } = transaction
-
-    const date = new Date(updated).toDateString()
-
-    return (
-        <WithPageExist error={transactionError} data={transaction}>
-            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="TxHash" value={txHash} prefix={<CommentOutlined />} />
-            </Col>
-            <Col  span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Updated" value={date} prefix={<ClockCircleOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Receiver" value={receiver} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 0 20px', background: 'white'}}>
-                <Statistic title="Sender" value={sender} prefix={<AreaChartOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 0px 20px', background: 'white'}}>
-                <Statistic title="Amount" value={`${amount / 1000000000} CSPR ($${CSPRtoUSD(amount, course)})`} prefix={<CommentOutlined />} />
-            </Col>
-            <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
-                <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
-            </Col>
-            {txHash ?
-                <Link href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${txHash}`}>
-                    <a target="_blank" rel="noreferrer">
-                        <Button style={{margin: '20px 20px 0 0'}} type="primary">
-                            Check transaction
-                        </Button>
-                    </a>
-                </Link>
-                : null
-            }
-            <Button onClick={() => router.back()} style={{margin: '20px 0 0 0'}} type="primary">
-                Back
+  return (
+    <>
+      <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
+        <Statistic title="TxHash" value={transaction!.txHash} prefix={<CommentOutlined />} />
+      </Col>
+      <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
+        <Statistic
+          title="Updated"
+          value={date}
+          prefix={<ClockCircleOutlined />}
+        />
+      </Col>
+      <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
+        <Statistic
+          title="Receiver"
+          value={transaction.receiver}
+          prefix={<AreaChartOutlined />}
+        />
+      </Col>
+      <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
+        <Statistic
+          title="Sender"
+          value={transaction.sender}
+          prefix={<AreaChartOutlined />}
+        />
+      </Col>
+      <Col
+        span={24}
+        style={{ padding: '20px 0 0px 20px', background: 'white' }}
+      >
+        <Statistic
+          title="Amount"
+          value={`${+transaction.amount / 1000000000} CSPR ($${CSPRtoUSD(+transaction.amount, course)})`}
+          prefix={<CommentOutlined />}
+        />
+      </Col>
+      <Col
+        span={24}
+        style={{ padding: '20px 0 20px 20px', background: 'white' }}
+      >
+        <Statistic title="Status" value={status} prefix={<CommentOutlined />} />
+      </Col>
+      {transaction.txHash ? (
+        <Link
+          href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${transaction.txHash}`}
+        >
+          <a target="_blank" rel="noreferrer">
+            <Button style={{ margin: '20px 20px 0 0' }} type="primary">
+              Check transaction
             </Button>
-        </WithPageExist>
-    );
+          </a>
+        </Link>
+      ) : null}
+      <Button
+        onClick={() => router.back()}
+        style={{ margin: '20px 0 0 0' }}
+        type="primary"
+      >
+        Back
+      </Button>
+    </>
+  );
 };
 
 
-export default Transaction
+export default Transaction;

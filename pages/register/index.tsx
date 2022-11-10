@@ -1,14 +1,17 @@
-import React from "react";
-import Register from "../../src/components/Forms/Register";
-import SliderContainer from "../../src/components/Layout/SliderContainer";
-import WithoutAuth from "../../hoc/withoutAuth";
-import {wrapper} from "../../store/store";
-
+import React from 'react';
+import WithoutAuth from '../../hoc/withoutAuth';
+import Register from '../../src/components/Forms/Register';
+import SliderContainer from '../../src/components/Layout/SliderContainer';
+import { wrapper } from '../../src/store/store';
 
 const RegisterPage = () => {
-    return <WithoutAuth><SliderContainer title={"Register"}>
-        <Register/>
-    </SliderContainer></WithoutAuth>
-}
+  return (
+    <WithoutAuth>
+      <SliderContainer title={'Register'}>
+        <Register />
+      </SliderContainer>
+    </WithoutAuth>
+  );
+};
 
-export default wrapper.withRedux(RegisterPage)
+export default wrapper.withRedux(RegisterPage);

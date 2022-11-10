@@ -1,16 +1,17 @@
-import React from "react";
-import SliderContainer from "../../src/components/Layout/SliderContainer";
-import {wrapper} from "../../store/store";
-import WithAuth from "../../hoc/withAuth";
-import Stores from "../../src/components/Tables/Stores";
-
+import React from 'react';
+import WithAuth from '../../hoc/withAuth';
+import SliderContainer from '../../src/components/Layout/SliderContainer';
+import Stores from '../../src/components/Tables/Stores';
+import { wrapper } from '../../src/store/store';
 
 const StoresPage = () => {
-    return <WithAuth>
-        <SliderContainer title={`Stores`}>
-            <Stores/>
-        </SliderContainer>
+  return (
+    <WithAuth>
+      <SliderContainer title={'Stores'}>
+        <Stores />
+      </SliderContainer>
     </WithAuth>
-}
+  );
+};
 
-export default wrapper.withRedux(StoresPage)
+export default wrapper.withRedux(StoresPage);
