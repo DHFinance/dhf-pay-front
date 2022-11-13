@@ -62,7 +62,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
     if (router.query.slug) {
       dispatch(getPayment(router.query.slug as string));
     }
-    dispatch(getCourse());
+    dispatch(getCourse('casper-network'));
   }, []);
   
   useEffect(() => {
