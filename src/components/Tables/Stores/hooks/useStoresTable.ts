@@ -1,7 +1,9 @@
 import { Form } from 'antd';
 import { CLPublicKey } from 'casper-js-sdk';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { CurrencyType } from '../../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import { AddStore } from '../../../../interfaces/addStore.interface';
@@ -11,11 +13,26 @@ import { addStore } from '../../../../store/slices/store/asynkThunks/addStore';
 import { getStores } from '../../../../store/slices/stores/asyncThunks/getStores';
 import { getUserStores } from '../../../../store/slices/stores/asyncThunks/getUserStores';
 
+interface StoreWallet {
+  currency: CurrencyType;
+  value: string;
+  id?: string;
+}
+
+const currenciesToString = Object.values(CurrencyType);
+
 function useStoresTable() {
   const user = useTypedSelector((state) => state.auth.data);
 
   const [store, setStore] = useState<Store | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [wallets, setWallets] = useState<StoreWallet[]>([]);
+  const [currentWallet, setCurrentWallet] = useState<StoreWallet>({
+    currency: currenciesToString[0],
+    value: '',
+  });
+  const [availableCurrencies, setAvailableCurrencies] =
+    useState(currenciesToString);
 
   const router = useRouter();
   const [form] = Form.useForm();
@@ -99,12 +116,8 @@ function useStoresTable() {
   const showModal = () => {
     setIsModalVisible(true);
   };
-
-  /**
-   * @description add new the store
-   */
-  const handleOk = async () => {
-    /** @description validations of fields form */
+  
+  async function handleOk() {
     try {
       await form.validateFields();
       try {
@@ -129,7 +142,33 @@ function useStoresTable() {
     } catch (error) {
       console.log(error);
     }
-  };
+  }
+
+  function addWallet() {
+    setWallets((prev) => [...prev, { ...currentWallet, id: uuidv4() }]);
+    const filteredCurrency = availableCurrencies.filter((currency) => currency !== currentWallet.currency);
+    setAvailableCurrencies(filteredCurrency);
+    setCurrentWallet((prev) => ({ ...prev, currency: filteredCurrency[0] }));
+  }
+
+  function removeWallet(walletId: string) {
+    const walletToDelete = wallets.find((wallet) => wallet.id === walletId);
+    setAvailableCurrencies((prev) => [...prev, walletToDelete!.currency]);
+    const filteredWallets = wallets.filter((wallet) => wallet.id !== walletId);
+    setWallets(filteredWallets);
+  }
+
+  function changeWalletValue(event: ChangeEvent<HTMLInputElement>) {
+    setCurrentWallet((prev) => ({ ...prev, value: event.target.value }));
+  }
+
+  function changeCurrency(event: CurrencyType) {
+    setCurrentWallet((prev) => ({ ...prev, currency: event }));
+  }
+  
+  function validateCurrentWallet() {
+    
+  }
 
   return {
     handleCancel,
@@ -143,6 +182,13 @@ function useStoresTable() {
     showModal,
     onChangeStore,
     form,
+    wallets,
+    addWallet,
+    removeWallet,
+    changeCurrency,
+    changeWalletValue,
+    availableCurrencies,
+    currentWallet,
   };
 }
 

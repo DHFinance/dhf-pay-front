@@ -37,7 +37,8 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-google-recaptcha": "^2.1.0",
-    "react-redux": "^7.2.6"
+    "react-redux": "^7.2.6",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.16.8",
@@ -47,6 +48,7 @@
     "@types/node": "16.11.7",
     "@types/react": "17.0.34",
     "@types/redux-mock-store": "^1.0.3",
+    "@types/uuid": "^8.3.4",
     "axios-mock-adapter": "^1.20.0",
     "eslint": "7",
     "eslint-config-airbnb-typescript": "^17.0.0",

@@ -35,7 +35,7 @@ const courseSlice = createSlice({
     });
     builder.addCase(getCourse.fulfilled, (state, { payload }) => {
       state.status = FULFILLED_FETCH_STATUS;
-      state.data.usd = payload['casper-network'].usd;
+      state.data.usd = payload.usd;
     });
   },
 });

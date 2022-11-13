@@ -1,17 +1,16 @@
 import { Button, Form, Input, message, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { CreatePayment } from '../../../interfaces/createPayment.interface';
-import { Store } from '../../../interfaces/store.interface';
-import { CSPRtoUsd } from '../../../../utils/CSPRtoUSD';
+import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
-import { UserRole } from '../../../modules/user/enums/userRole.enum';
-import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
+import { CreatePayment } from '../../../interfaces/createPayment.interface';
+import { Store } from '../../../interfaces/store.interface';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
-import { getPayments } from '../../../store/slices/payments/asyncThunks/getPayments';
 import { getUserPayments } from '../../../store/slices/payments/asyncThunks/getUserPayments';
 import { getUserStores } from '../../../store/slices/stores/asyncThunks/getUserStores';
 import { Loader } from '../../Loader';
+
 const { Option } = Select;
 
 const createPaymentInitialState: CreatePayment = {
@@ -32,20 +31,15 @@ const InvoicesBuilder = () => {
   const [form] = Form.useForm();
   const dispatch = useTypedDispatch();
 
-  const activeStores = stores?.filter((store) => store.apiKey && !store.blocked) || [];
+  const activeStores =
+    stores?.filter((store) => store.apiKey && !store.blocked) || [];
 
   useEffect(() => {
-    if (user?.role === UserRole.Admin) {
-      dispatch(getPayments());
-    }
-    if (user?.role === UserRole.Customer) {
-      dispatch(getUserStores(user.id));
-    }
-    dispatch(getCourse());
+    dispatch(getUserStores(user.id));
   }, []);
 
   useEffect(() => {
-    if (stores?.length && user.role !== UserRole.Admin && activeStores[0]?.apiKey) {
+    if (stores?.length && activeStores[0]?.apiKey) {
       dispatch(getUserPayments(activeStores[0]?.apiKey));
     }
   }, [stores?.length]);
@@ -81,13 +75,10 @@ const InvoicesBuilder = () => {
     try {
       await form.validateFields();
       try {
-        await dispatch(addPayment({ data: payment, apiKey: currentStore!.apiKey }));
-        if (user?.role === UserRole.Admin) {
-          dispatch(getPayments());
-        }
-        if (user?.role === UserRole.Customer) {
-          dispatch(getUserPayments(currentStore!.apiKey));
-        }
+        await dispatch(
+          addPayment({ data: payment, apiKey: currentStore!.apiKey }),
+        );
+        dispatch(getUserPayments(currentStore!.apiKey));
         setPayment(createPaymentInitialState);
         message.success('Payment was added');
         form.resetFields();
@@ -99,6 +90,12 @@ const InvoicesBuilder = () => {
     }
   }
 
+  function handleChangeCurrency(event: CurrencyType) {
+    const fabric = new CurrencyFabric();
+    const currency = fabric.create(event);
+    currency.getCourse();
+  }
+
   /**
    * @description set current store and get payments of a selected store
    */
@@ -108,25 +105,22 @@ const InvoicesBuilder = () => {
     dispatch(getUserPayments(value));
     validate('store');
   }
-  
-  if (courseStatus.error || storesStatus.error) {
+
+  if (storesStatus.error) {
     return <p>Error</p>;
   }
-  
+
   if (stores === null || storesStatus.isLoading) {
     return <Loader />;
   }
-
-  if (course === null || courseStatus.isLoading) {
-    return <Loader />;
-  }
+  
+  const availableCurrencies = (Object.values(CurrencyType)).filter((el) => currentStore?.wallets.find((wallet) => wallet.currency === el));
 
   return (
     <>
-      {!activeStores.length && user.role !== UserRole.Admin ? (
+      {activeStores.length === 0 ? (
         <p>Create a store to be able to create payments</p>
-      ) : null}
-      {user.role !== UserRole.Admin && activeStores.length ? (
+      ) : (
         <>
           <Form
             style={{ padding: '0 50px', marginTop: 64 }}
@@ -148,8 +142,14 @@ const InvoicesBuilder = () => {
             >
               <Input type="number" onChange={onChangePayment('amount')} />
             </Form.Item>
+            <Form.Item label="Currency">
+              <Select options={Object.values(CurrencyType).map((currency) => ({
+                value: currency,
+                label: currency,
+              }))} onChange={handleChangeCurrency} style={{ width: '100px' }} />
+            </Form.Item>
             <Form.Item label="Amount USD">
-              {CSPRtoUsd(+payment.amount, course)}$
+              {courseStatus.isLoading ? 'Loading' : courseStatus.error ? 'Error' : (course! * +payment.amount).toFixed(2)}
             </Form.Item>
             <Form.Item label="Comment" name="comment">
               <Input.TextArea autoSize onChange={onChangePayment('comment')} />
@@ -178,7 +178,7 @@ const InvoicesBuilder = () => {
             </Form.Item>
           </Form>
         </>
-      ) : null}
+      )}
     </>
   );
 };
