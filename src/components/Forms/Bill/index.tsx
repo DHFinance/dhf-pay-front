@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
-import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Transaction } from '../../../interfaces/transaction.interface';
-import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { getLastTransaction } from '../../../store/slices/transaction/asyncThunks/getLastTransaction';
 import { Loader } from '../../Loader';
+import { EthereumBill } from './components/EthereumBill';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
+import { CurrencyType } from '../../../enums/currency.enum';
+import { DAppProvider } from '@usedapp/core';
+import { configDapp } from '../../../../ethConfig/config';
 import CasperBill from './components/CasperBill';
 
 /**
@@ -26,8 +29,15 @@ const Bill = () => {
     const pathname = window.location.pathname.split('/');
     const id = pathname && pathname[pathname.length - 1];
     dispatch(getPayment(id));
-    dispatch(getCourse('bitcoin'));
   }, []);
+
+  useEffect(() => {
+    if (!payment) {
+      return;
+    }
+    const currency = CurrencyFabric.create(CurrencyType.Ethereum);
+    currency.getCourse();
+  }, [payment]);
 
   useEffect(() => {
     if (payment?.store?.id) {
@@ -42,14 +52,48 @@ const Bill = () => {
   if (paymentStatus.isLoading || payment === null || courseStatus.isLoading || course === null || transactionStatus.isLoading) {
     return <Loader />;
   }
+  
+  function getBill() {
+    switch (payment?.currency) {
+      case 'Ethereum': {
+        return (
+          <DAppProvider config={configDapp}>
+            <EthereumBill
+              billInfo={payment}
+              course={course}
+              payment={payment}
+              transaction={transaction as Transaction}
+            />
+          </DAppProvider>
+        );
+        break;
+      }
+      case 'CSPR': {
+        return (
+          <CasperBill
+            billInfo={payment}
+            course={course}
+            payment={payment}
+            transaction={transaction as Transaction}
+          />
+        );
+        break;
+      }
+      default: {
+        return (
+          <CasperBill
+            billInfo={payment}
+            course={course}
+            payment={payment}
+            transaction={transaction as Transaction}
+          />
+        );
+      }
+    }
+  }
 
   return (
-    <CasperBill
-      billInfo={payment}
-      course={course}
-      payment={payment}
-      transaction={transaction as Transaction}
-    />
+    getBill()
   );
 };
 

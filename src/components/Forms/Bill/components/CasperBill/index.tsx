@@ -29,7 +29,6 @@ import {
 import { Deploy } from 'casper-js-sdk/dist/lib/DeployUtil';
 import Link from 'next/link';
 import React, { FC, useState } from 'react';
-import { CSPRtoUSD } from '../../../../../../utils/CSPRtoUSD';
 import { signerErrors } from '../../../../../errors/signerErrors';
 import { useTypedDispatch } from '../../../../../hooks/useTypedDispatch';
 import { Payment } from '../../../../../interfaces/payment.interface';
@@ -184,7 +183,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
    * @const id {num} - transaction id in the casper network
    */
   const deploy = async () => {
-    const to = payment.store.wallet;
+    const to = payment.store?.wallet;
     const amountStr = billInfo.amount.toString();
     const amountNum = billInfo.amount;
     const id = 287821;
@@ -345,7 +344,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
     );
     await balanceService.fetchBalanceOfPublicKey(ledgerPbId);
 
-    const to = payment.store.wallet;
+    const to = payment.store?.wallet;
     const amountStr = (billInfo.amount / 1000000000).toString();
 
     const publicKeyHex = pdAddr.publicKey.toString('hex');
@@ -456,11 +455,11 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
       >
         <Statistic
           title="Comment"
-          value={billInfo.comment || 'none'}
+          value={billInfo?.comment || 'none'}
           prefix={<CommentOutlined />}
         />
       </Col>
-      {billInfo.status !== 'Paid' ? (
+      {billInfo?.status !== 'Paid' ? (
         <Col
           span={24}
           style={{ padding: '20px 0 20px 20px', background: 'white' }}
@@ -514,9 +513,9 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
               </Button>
             </a>
           </Link>
-        ) : billInfo.payment?.transaction?.txHash ? (
+        ) : billInfo?.payment?.transaction?.txHash ? (
           <Link
-            href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${billInfo.payment?.transaction?.txHash}`}
+            href={`https://${process.env.NEXT_PUBLIC_CASPER_NETWORK}/deploy/${billInfo?.payment?.transaction?.txHash}`}
           >
             <a target="_blank" rel="noreferrer">
               <Button
@@ -545,22 +544,22 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
         ) : null
       }
 
-      {!billInfo.cancelled &&
+      {!billInfo?.cancelled &&
       /**
          * @description for payments with a button attached to them, you can make an infinite number of transactions. For invoices, you can make only one transaction, after which it is forbidden to make new transactions. Another transaction can be made only if the previous transaction was unsuccessful
          */
 
         ledgerWallets.length === 0 &&
-        (billInfo.type && billInfo.text ? (
+        (billInfo?.type && billInfo?.text ? (
           <StatusButtonPay
             balance={balance}
             click={singInSigner}
             deploy={deploy}
           />
-        ) : billInfo.status !== 'Paid' &&
+        ) : billInfo?.status !== 'Paid' &&
           transaction?.status !== 'processing' &&
           transaction?.status !== 'success' &&
-          !billInfo.payment?.transaction?.txHash &&
+          !billInfo?.payment?.transaction?.txHash &&
           !transactionExplorer ? (
           <StatusButtonPay
             balance={balance}
@@ -570,8 +569,8 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
           ) : null)}
       {transactionExplorer === '' &&
         ledgerWallets.length > 0 &&
-        billInfo.status !== 'Paid' &&
-        !billInfo.cancelled && (
+        billInfo?.status !== 'Paid' &&
+        !billInfo?.cancelled && (
           <>
             <Select
               defaultValue={ledgerWallets[0].path}
@@ -601,7 +600,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
           </>
       )}
 
-      {ledgerWallets.length === 0 && !billInfo.cancelled && (
+      {ledgerWallets.length === 0 && !billInfo?.cancelled && (
         <Button
           loading={isLedgerLoading}
           style={{ margin: '20px 20px 0 0' }}
