@@ -11,12 +11,10 @@ const addStore = createAsyncThunk(
   async (data: AddStore, { rejectWithValue, getState }) => {
     try {
       const token = (getState() as RootState).auth?.data?.token;
-      console.log(data);
       const result = await post(
         '/store',
         {
           ...data,
-          blocked: false,
         },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -29,5 +27,5 @@ const addStore = createAsyncThunk(
     }
   },
 );
-
+  
 export { addStore };

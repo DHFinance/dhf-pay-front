@@ -1,7 +1,7 @@
 abstract class BaseCurrency {
   abstract getCourse(): void;
 
-  abstract validate(): void;
+  abstract validateWallet(wallet: string): boolean;
 }
 
 export { BaseCurrency };

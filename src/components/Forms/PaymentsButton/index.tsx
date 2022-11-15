@@ -1,13 +1,13 @@
 import { CheckOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { CSPRtoUsd } from '../../../../utils/CSPRtoUSD';
 import { buttons } from '../../../data/buttonsBuilder';
+import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Store } from '../../../interfaces/store.interface';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
-import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
 import { getPayments } from '../../../store/slices/payments/asyncThunks/getPayments';
 import { getUserPayments } from '../../../store/slices/payments/asyncThunks/getUserPayments';
@@ -37,6 +37,9 @@ const Buttons = () => {
   const [visibleHtmlCode, setVisibleHtmlCode] = useState(false);
   const [paymentId, setPaymentId] = useState(false);
   const [payment, setPayment] = useState(initialState);
+  const [availableCurrencies, setAvailableCurrencies] = useState<
+  CurrencyType[]
+  >([]);
 
   const dispatch = useTypedDispatch();
 
@@ -44,7 +47,6 @@ const Buttons = () => {
     if (user?.role === UserRole.Customer) {
       dispatch(getUserStores(user.id));
     }
-    dispatch(getCourse());
   }, []);
 
   /** @description name of current domain */
@@ -66,6 +68,11 @@ const Buttons = () => {
     setCurrentStore(current);
     dispatch(getUserPayments(value));
     validate('store');
+    setAvailableCurrencies(
+      Object.values(CurrencyType).filter((el) =>
+        current.wallets.find((wallet) => wallet.currency === el),
+      ),
+    );
   }
 
   /**
@@ -115,9 +122,18 @@ const Buttons = () => {
   const handleOk = async () => {
     try {
       await form.validateFields();
+      if (!(form.getFieldValue('currency') in Object.values(CurrencyType))) {
+        form.setFields([
+          { name: 'currency', errors: ['Please select currency!'] },
+        ]);
+        return;
+      }
       try {
         await dispatch(
-          addPayment({ data: payment, apiKey: currentStore!.apiKey }),
+          addPayment({
+            data: { ...payment, currency: form.getFieldValue('currency') },
+            apiKey: currentStore!.apiKey,
+          }),
         );
         if (user?.role === UserRole.Admin) {
           await dispatch(getPayments());
@@ -162,6 +178,14 @@ const Buttons = () => {
     form.setFieldsValue({ kind: itemButton.id });
   };
 
+  function handleChangeCurrency(event: CurrencyType) {
+    const currency = CurrencyFabric.create(event);
+    currency.getCourse();
+    form.setFields([
+      { name: 'currency', errors: [] },
+    ]);
+  }
+
   const handleResetForm = (event: any) => {
     event.preventDefault();
     form.resetFields();
@@ -170,12 +194,15 @@ const Buttons = () => {
     setChosenButton(0);
   };
 
-  if (courseStatus.error || storesStatus.error) {
-    return <p>Error</p>;
-  }
+  useEffect(() => {
+    form.setFieldValue(
+      'currency',
+      availableCurrencies[0] ?? 'No available currencies',
+    );
+  }, [availableCurrencies]);
 
-  if (courseStatus.isLoading || course === null) {
-    return <Loader />;
+  if (storesStatus.error) {
+    return <p>Error</p>;
   }
 
   if (storesStatus.isLoading || stores === null) {
@@ -219,8 +246,24 @@ const Buttons = () => {
           >
             <Input type="number" onChange={onChangePayment('amount')} />
           </Form.Item>
+          <Form.Item label="Currency" name="currency">
+            <Select
+              options={Object.values(CurrencyType).map((currency) => ({
+                value: currency,
+                label: currency,
+                key: currency,
+              }))}
+              onChange={handleChangeCurrency}
+              style={{ width: '100px' }}
+              defaultValue={'Please select store' as CurrencyType}
+            />
+          </Form.Item>
           <Form.Item label="Amount USD">
-            {CSPRtoUsd(+payment.amount, course)}$
+            {courseStatus.isLoading
+              ? 'Loading'
+              : courseStatus.error
+                ? 'Error'
+                : (course! * +payment.amount).toFixed(2)}
           </Form.Item>
           {!!activeStores.length && (
             <Form.Item
@@ -276,9 +319,7 @@ const Buttons = () => {
                       margin: '0 0 20px 0',
                       color: '#52C41A',
                       fontWeight: '900',
-                      display: `${
-                        chosenButton === item.id ? 'block' : 'none'
-                      }`,
+                      display: `${chosenButton === item.id ? 'block' : 'none'}`,
                     }}
                   />
                 </div>

@@ -1,12 +1,12 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Typography } from 'antd';
 import 'antd/dist/antd.css';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { postLogin } from '../../../store/slices/auth/asyncThunks/postLogin';
-import { clearAuth } from '../../../store/slices/auth/auth.slice';
+import { clearAuthError } from '../../../store/slices/auth/auth.slice';
 import { setUpdateCaptcha } from '../../../store/slices/user/user.slice';
 import { ReCaptchaComponent } from '../../ReCaptcha/ReCaptcha';
 
@@ -24,68 +24,26 @@ const initialState = {
 };
 
 const Login = () => {
-  const dispatch = useTypedDispatch();
-
-  const [userData, setUserData] = useState<IUserData>(initialState);
-  const [form] = Form.useForm();
-
-  const auth = useTypedSelector((state) => state.auth);
+  const authStatus = useTypedSelector((state) => state.auth.status);
   const captchaToken = useTypedSelector((state) => state.user.captchaToken);
 
-  const fieldError = auth.status.error;
+  const [userData, setUserData] = useState<IUserData>(initialState);
+
+  const dispatch = useTypedDispatch();
+  const [form] = Form.useForm();
 
   /**
    * @description set data into user object
    * @param {object} e - event
    */
   const onUpdateData = (e: any) => {
+    dispatch(clearAuthError());
     const value = e.target.value;
     const field = e.target.name;
     setUserData({
       ...userData,
       [field]: value,
     });
-  };
-
-  /**
-   * @description validations elements of form
-   */
-  useEffect(() => {
-    /** @description if have no authorization errors and the form fields aren't empty */
-    if (fieldError && userData.email !== '' && userData.password !== '') {
-      form.validateFields(['email', 'password']);
-    }
-  }, [fieldError]);
-
-  /**
-   * @description validations of password
-   * @param {object} rule - object field password
-   * @param {any} value - value password
-   * @param {function} callback - executed after successful validation of the password field
-   */
-  const validatePassword = (rule: any, value: any, callback: any) => {
-    /** @description if password field has error return error message */
-    if (fieldError === 'email or password') {
-      callback(fieldError);
-      dispatch(clearAuth());
-    } else {
-      callback();
-    }
-  };
-
-  /**
-   * @description validations of email
-   * @param {object} rule - object field email
-   * @param {any} value - value email
-   * @param {function} callback - executed after successful validation of the email field
-   */
-  const validateEmail = (rule: any, value: any, callback: any) => {
-    if (fieldError === 'email or password') {
-      callback(fieldError);
-      dispatch(clearAuth());
-    } else {
-      callback();
-    }
   };
 
   /**
@@ -116,6 +74,10 @@ const Login = () => {
       captchaToken: captchaToken,
     });
   }, [captchaToken]);
+  
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, []);
 
   return (
     <Form
@@ -128,6 +90,10 @@ const Login = () => {
       validateTrigger={'onSubmit'}
       form={form}
     >
+      <Typography style={{ fontSize: '20px', textAlign: 'center', margin: '20px', color: 'red' }}>{authStatus.error === 'email or' +
+      ' password' ? 'Wrong email' +
+        ' or' +
+        ' password' : authStatus.error}</Typography>
       <Form.Item
         label="Email"
         name="email"
@@ -137,7 +103,6 @@ const Login = () => {
             type: 'email',
             message: 'Please enter a valid email!',
           },
-          { validator: validateEmail },
         ]}
       >
         <Input
@@ -151,10 +116,7 @@ const Login = () => {
       <Form.Item
         label="Password"
         name="password"
-        rules={[
-          { required: true, message: 'Please input your Password!' },
-          { validator: validatePassword },
-        ]}
+        rules={[{ required: true, message: 'Please input your Password!' }]}
       >
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
@@ -167,17 +129,15 @@ const Login = () => {
       <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
         <Link href={'/restore'}>Forgot password</Link>
       </Form.Item>
-
       <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
         <ReCaptchaComponent />
       </Form.Item>
-
       <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
         <Button
           type="primary"
           htmlType="submit"
           className="login-form-button"
-          disabled={!captchaToken}
+          disabled={!captchaToken || authStatus.isLoading}
         >
           Log in
         </Button>

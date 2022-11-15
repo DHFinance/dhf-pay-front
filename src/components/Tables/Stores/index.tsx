@@ -32,10 +32,9 @@ const columns = [
     dataIndex: 'user',
   },
   {
-    title: 'Wallet',
-    key: 'wallet',
-    dataIndex: 'wallet',
-    cursor: 'pointer',
+    title: 'Available currencies',
+    key: 'availableCurrencies',
+    dataIndex: 'availableCurrencies',
   },
 ];
 
@@ -49,6 +48,7 @@ const Stores = () => {
     onRow,
     showModal,
     isModalVisible,
+    setIsModalVisible,
   } = useStoresTable();
 
   /**
@@ -74,14 +74,14 @@ const Stores = () => {
 
   return (
     <>
-      <AddStoreModal isModalVisible={isModalVisible} />
+      <AddStoreModal isModalVisible={isModalVisible} setParentModalVisible={setIsModalVisible} />
       {user.role !== UserRole.Admin ? (
         <Button
           onClick={showModal}
-          type="primary"
+          type='primary'
           style={{ margin: '0 0 20px 0' }}
-          htmlType="submit"
-          className="login-form-button"
+          htmlType='submit'
+          className='login-form-button'
         >
           Add Store
         </Button>
@@ -90,7 +90,7 @@ const Stores = () => {
         columns={columns}
         scroll={{ x: 0 }}
         onRow={onRow}
-        dataSource={storesTable}
+        dataSource={storesTable?.map((store) => ({ ...store, availableCurrencies: store.wallets.map((wallet) => wallet.currency).join(', ') })) || []}
       />
     </>
   );

@@ -13,9 +13,14 @@ const columns = [
     dataIndex: 'datetime',
   },
   {
-    title: 'Amount (CSPR)',
+    title: 'Amount',
     dataIndex: 'amount',
     key: 'amount',
+  },
+  {
+    title: 'Currency',
+    dataIndex: 'currency',
+    key: 'currency',
   },
   {
     title: 'Comment',

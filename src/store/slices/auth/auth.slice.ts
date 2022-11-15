@@ -99,6 +99,9 @@ const authSlice = createSlice({
     });
     builder.addCase(postVerify.rejected, (state, { payload: error }) => {
       state.status = REJECT_FETCH_STATUS(error as string);
+      if (!error || error === 'code') {
+        state.status.error = 'Wrong code';
+      }
     });
     builder.addCase(postVerify.fulfilled, (state, { payload }: any) => {
       if (payload.token) {

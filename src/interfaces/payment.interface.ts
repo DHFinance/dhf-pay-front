@@ -1,3 +1,4 @@
+import { CurrencyType } from '../enums/currency.enum';
 import { Store } from './store.interface';
 
 interface Payment {
@@ -6,6 +7,7 @@ interface Payment {
   amount: string;
   status: string;
   comment: string;
+  currency: CurrencyType;
   type: number | null;
   text: string | null;
   cancelled: boolean;

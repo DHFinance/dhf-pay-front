@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
-import { CreatePayment } from '../../../interfaces/createPayment.interface';
 import { Store } from '../../../interfaces/store.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
@@ -13,7 +12,7 @@ import { Loader } from '../../Loader';
 
 const { Option } = Select;
 
-const createPaymentInitialState: CreatePayment = {
+const createPaymentInitialState = {
   amount: '',
   comment: '',
 };
@@ -27,6 +26,9 @@ const InvoicesBuilder = () => {
 
   const [payment, setPayment] = useState(createPaymentInitialState);
   const [currentStore, setCurrentStore] = useState<Store | null>(null);
+  const [availableCurrencies, setAvailableCurrencies] = useState<
+    CurrencyType[]
+  >([]);
 
   const [form] = Form.useForm();
   const dispatch = useTypedDispatch();
@@ -74,9 +76,18 @@ const InvoicesBuilder = () => {
   async function handleOk() {
     try {
       await form.validateFields();
+      if (!(form.getFieldValue('currency') in Object.values(CurrencyType))) {
+        form.setFields([
+          { name: 'currency', errors: ['Please select currency!'] },
+        ]);
+        return;
+      }
       try {
         await dispatch(
-          addPayment({ data: payment, apiKey: currentStore!.apiKey }),
+          addPayment({
+            data: { ...payment, currency: form.getFieldValue('currency') },
+            apiKey: currentStore!.apiKey,
+          }),
         );
         dispatch(getUserPayments(currentStore!.apiKey));
         setPayment(createPaymentInitialState);
@@ -91,9 +102,11 @@ const InvoicesBuilder = () => {
   }
 
   function handleChangeCurrency(event: CurrencyType) {
-    const fabric = new CurrencyFabric();
-    const currency = fabric.create(event);
+    const currency = CurrencyFabric.create(event);
     currency.getCourse();
+    form.setFields([
+      { name: 'currency', errors: [] },
+    ]);
   }
 
   /**
@@ -104,7 +117,19 @@ const InvoicesBuilder = () => {
     setCurrentStore(current);
     dispatch(getUserPayments(value));
     validate('store');
+    setAvailableCurrencies(
+      Object.values(CurrencyType).filter((el) =>
+        current.wallets.find((wallet) => wallet.currency === el),
+      ),
+    );
   }
+
+  useEffect(() => {
+    form.setFieldValue(
+      'currency',
+      availableCurrencies[0] ?? 'No available currencies',
+    );
+  }, [availableCurrencies]);
 
   if (storesStatus.error) {
     return <p>Error</p>;
@@ -113,9 +138,8 @@ const InvoicesBuilder = () => {
   if (stores === null || storesStatus.isLoading) {
     return <Loader />;
   }
-  
-  const availableCurrencies = (Object.values(CurrencyType)).filter((el) => currentStore?.wallets.find((wallet) => wallet.currency === el));
 
+  // @ts-ignore
   return (
     <>
       {activeStores.length === 0 ? (
@@ -142,14 +166,24 @@ const InvoicesBuilder = () => {
             >
               <Input type="number" onChange={onChangePayment('amount')} />
             </Form.Item>
-            <Form.Item label="Currency">
-              <Select options={Object.values(CurrencyType).map((currency) => ({
-                value: currency,
-                label: currency,
-              }))} onChange={handleChangeCurrency} style={{ width: '100px' }} />
+            <Form.Item label="Currency" name="currency">
+              <Select
+                options={availableCurrencies.map((currency) => ({
+                  value: currency,
+                  label: currency,
+                  key: currency,
+                }))}
+                onChange={handleChangeCurrency}
+                style={{ width: '170px' }}
+                defaultValue={'Please select store' as CurrencyType}
+              />
             </Form.Item>
             <Form.Item label="Amount USD">
-              {courseStatus.isLoading ? 'Loading' : courseStatus.error ? 'Error' : (course! * +payment.amount).toFixed(2)}
+              {courseStatus.isLoading
+                ? 'Loading'
+                : courseStatus.error
+                  ? 'Error'
+                  : (course! * +payment.amount).toFixed(2)}
             </Form.Item>
             <Form.Item label="Comment" name="comment">
               <Input.TextArea autoSize onChange={onChangePayment('comment')} />

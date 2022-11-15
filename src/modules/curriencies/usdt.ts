@@ -12,7 +12,9 @@ class USDT extends BaseCurrency {
     );
   }
 
-  validate(): void {}
+  validateWallet(wallet: string): boolean {
+    return /^0x[a-fA-F0-9]{40}$/.test(wallet);
+  }
 }
 
 export { USDT };

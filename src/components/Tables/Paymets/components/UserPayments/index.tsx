@@ -89,6 +89,8 @@ const UserPayments: FC<Props> = ({ entity }) => {
     return <Loader />;
   }
 
+  console.log(paymentsTable);
+
   return (
     <>
       {!activeStores.length ? (

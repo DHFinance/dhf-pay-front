@@ -446,7 +446,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
       <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
         <Statistic
           title="Amount"
-          value={`${+billInfo.amount / 1000000000} CSPR ($${CSPRtoUSD(+billInfo.amount, course)})`}
+          value={`${+billInfo.amount / 1000000000} ${payment.currency} ($${CSPRtoUSD(+billInfo.amount, course)})`}
           prefix={<AreaChartOutlined />}
         />
       </Col>
@@ -558,8 +558,8 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
             deploy={deploy}
           />
         ) : billInfo.status !== 'Paid' &&
-          transaction.status !== 'processing' &&
-          transaction.status !== 'success' &&
+          transaction?.status !== 'processing' &&
+          transaction?.status !== 'success' &&
           !billInfo.payment?.transaction?.txHash &&
           !transactionExplorer ? (
           <StatusButtonPay

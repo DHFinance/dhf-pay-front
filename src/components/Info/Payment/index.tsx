@@ -10,16 +10,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import React, { FC, useEffect, useState } from 'react';
-import { CSPRtoUSD } from '../../../../utils/CSPRtoUSD';
+import { getUsdFromCrypto } from '../../../../utils/getUsdFromCrypto';
 import { buttons } from '../../../data/buttonsBuilder';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
-import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
 import { cancelPayment } from '../../../store/slices/payment/asyncThunks/cancelPayment';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { sendMailBill } from '../../../store/slices/payment/asyncThunks/sendmailBill';
 import { getUserTransactions } from '../../../store/slices/transactions/asyncThunks/getUserTransactions';
+import { Loader } from '../../Loader';
 
 interface Props {
   isButtons: boolean;
@@ -27,6 +28,7 @@ interface Props {
 
 const Payment: FC<Props> = ({ isButtons }) => {
   const payment = useTypedSelector((state) => state.payment.data);
+  const paymentStatus = useTypedSelector((state) => state.payment.status);
   const transactions = useTypedSelector((state) => state.transactions.data);
   const user = useTypedSelector((state) => state.auth.data);
   const course = useTypedSelector((state) => state.course.data.usd);
@@ -57,14 +59,22 @@ const Payment: FC<Props> = ({ isButtons }) => {
     transactions?.filter((transaction) => transaction.payment?.id === id) || [];
 
   const domain = location.host;
-  
+
   useEffect(() => {
     if (router.query.slug) {
       dispatch(getPayment(router.query.slug as string));
     }
-    dispatch(getCourse());
   }, []);
-  
+
+  useEffect(() => {
+    if (!payment) {
+      return;
+    }
+    
+    const newCurrency = CurrencyFabric.create(payment.currency);
+    newCurrency.getCourse();
+  }, [payment]);
+
   useEffect(() => {
     if (payment?.store) {
       dispatch(getUserTransactions(payment.store.apiKey));
@@ -147,6 +157,14 @@ const Payment: FC<Props> = ({ isButtons }) => {
   function cancelCurrentPayment() {
     dispatch(cancelPayment(id as number));
   }
+  
+  if (paymentStatus.error) {
+    return <p>Error</p>;
+  }
+  
+  if (paymentStatus.isLoading || payment === null) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -209,8 +227,9 @@ const Payment: FC<Props> = ({ isButtons }) => {
                                 marginBottom: '15px',
                               }}
                             >
-                              Amount: {+(amount as string) / 1000000000} CSPR ($
-                              {CSPRtoUSD(+(amount as string), course as number)})
+                              Amount: {+amount! / 1000000000} {payment.currency} ($
+                              {course ? getUsdFromCrypto(+amount!, course) : '...'}
+                              )
                             </p>
                             <p
                               style={{
@@ -288,10 +307,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
       <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
         <Statistic
           title="Amount"
-          value={`${+(amount as string) / 1000000000} CSPR ($${CSPRtoUSD(
-            +(amount as string),
-            course as number,
-          )})`}
+          value={`${+amount! / 1000000000} ${payment.currency} ($${course ? getUsdFromCrypto(+amount!, course) : '...'})`}
           prefix={<AreaChartOutlined />}
         />
       </Col>

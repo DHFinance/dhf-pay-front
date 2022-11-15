@@ -11,7 +11,7 @@ const editStore = createAsyncThunk(
   async (
     payload: {
       id: string;
-      data: Store;
+      data: any;
     },
     { rejectWithValue, getState },
   ) => {

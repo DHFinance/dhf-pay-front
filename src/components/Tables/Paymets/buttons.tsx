@@ -18,6 +18,11 @@ const columns = [
     key: 'amount',
   },
   {
+    title: 'Currency',
+    dataIndex: 'currency',
+    key: 'currency',
+  },
+  {
     title: 'Text',
     dataIndex: 'text',
     key: 'text',
@@ -45,16 +50,13 @@ interface Props {
 }
 
 const PaymentsButton: FC<Props> = ({ currentTable, onRow }) => {
-  const filterTable = currentTable?.filter((item: any) => {
-    return item.type && item.text;
-  }) || [];
   return (
-    <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={filterTable.map((item: any) => {
+    <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={currentTable?.map((item: any) => {
       return {
         ...item,
         amount: item.amount / 1000000000,
       };
-    })} />
+    }) || []} />
   );
 };
 

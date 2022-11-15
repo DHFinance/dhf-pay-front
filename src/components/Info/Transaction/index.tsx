@@ -8,9 +8,10 @@ import { Button, Col, Statistic } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import { CSPRtoUSD } from '../../../../utils/CSPRtoUSD';
+import { getUsdFromCrypto } from '../../../../utils/getUsdFromCrypto';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
 import { getTransaction } from '../../../store/slices/transaction/asyncThunks/getTransaction';
 import { Loader } from '../../Loader';
@@ -30,8 +31,16 @@ const Transaction = () => {
     if (router.query.slug) {
       dispatch(getTransaction(router.query.slug as string));
     }
-    dispatch(getCourse());
   }, []);
+  
+  useEffect(() => {
+    if (!transaction) {
+      return;
+    }
+    
+    const newCurrency = CurrencyFabric.create(transaction.payment.currency);
+    newCurrency.getCourse();
+  }, [transaction]);
 
   const date = new Date(transaction?.updated || 0).toDateString();
   
@@ -75,7 +84,7 @@ const Transaction = () => {
       >
         <Statistic
           title="Amount"
-          value={`${+transaction.amount / 1000000000} CSPR ($${CSPRtoUSD(+transaction.amount, course)})`}
+          value={`${+transaction.amount / 1000000000} ${transaction.payment.currency} ($${getUsdFromCrypto(+transaction.amount, course)})`}
           prefix={<CommentOutlined />}
         />
       </Col>

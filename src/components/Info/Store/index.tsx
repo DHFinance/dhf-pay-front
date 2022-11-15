@@ -3,20 +3,41 @@ import {
   ClockCircleOutlined,
   CommentOutlined,
 } from '@ant-design/icons';
-import { Button, Col, Form, Input, Modal, Spin, Statistic } from 'antd';
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Spin,
+  Statistic,
+} from 'antd';
 import Title from 'antd/lib/typography/Title';
-import { CLPublicKey } from 'casper-js-sdk';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Store as IStore } from '../../../interfaces/store.interface';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
 import { blockStore } from '../../../store/slices/store/asynkThunks/blockStore';
 import { editStore } from '../../../store/slices/store/asynkThunks/editStore';
 import { getStore } from '../../../store/slices/store/asynkThunks/getStore';
 import { unblockStore } from '../../../store/slices/store/asynkThunks/unblockStore';
 import { getUserStores } from '../../../store/slices/stores/asyncThunks/getUserStores';
+import styles from '../../Tables/Stores/stores.module.css';
+
+interface StoreWallet {
+  currency: CurrencyType;
+  value: string;
+  id?: string;
+}
+
+const currenciesToString = Object.values(CurrencyType);
 
 const Store = () => {
   const store = useTypedSelector((state) => state.store.data);
@@ -28,10 +49,23 @@ const Store = () => {
 
   const [edit, setEdit] = useState(false);
   const [storeEdit, setStoreEdit] = useState(store);
+  const [wallets, setWallets] = useState<StoreWallet[]>([]);
+  const [currentWallet, setCurrentWallet] = useState<StoreWallet>({
+    currency: currenciesToString[0],
+    value: '',
+  });
+  const [availableCurrencies, setAvailableCurrencies] =
+    useState(currenciesToString);
 
   const dispatch = useTypedDispatch();
   const router = useRouter();
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (store) {
+      setWallets(store.wallets);
+    }
+  }, [store]);
 
   /**
    * @description generating store key
@@ -97,11 +131,27 @@ const Store = () => {
    * @description get store
    */
   const handleOk = async () => {
+    if (wallets.length === 0) {
+      form.setFields([
+        { name: 'wallets', errors: ['Please add at least 1 wallet!'] },
+      ]);
+      return;
+    }
+
     try {
       await form.validateFields();
       try {
         await dispatch(
-          editStore({ id: router.query.slug as string, data: storeEdit as IStore }),
+          editStore({
+            id: router.query.slug as string,
+            data: {
+              ...storeEdit,
+              wallets: wallets.map((wallet) => ({
+                value: wallet.value,
+                currency: wallet.currency,
+              })),
+            },
+          }),
         );
         form.resetFields();
         setEdit(false);
@@ -131,28 +181,36 @@ const Store = () => {
     setStoreEdit(store);
   }, [store]);
 
-  /**
-   * @description wallet validation. Occurs with the help of the CLPublicKey.fromHex function, which returns an error if the wallet is not valid
-   * @param {object} rule - object field wallet
-   * @param {any} value - value wallet
-   * @param {function} callback - executed after successful validation of the wallet field
-   */
-  const validateWallet = (rule: any, value: any, callback: any) => {
-    /** @description if value isn't empty, then verify wallet */
-    if (value) {
-      try {
-        CLPublicKey.fromHex(value);
-        callback();
-      } catch (e) {
-        callback('This wallet not exist!');
-      }
-    } else {
-      callback();
+  function addWallet() {
+    const newCurrency = CurrencyFabric.create(currentWallet.currency);
+    const isValid = newCurrency.validateWallet(currentWallet.value);
+    if (!isValid) {
+      form.setFields([{ name: 'wallets', errors: ['Wallet is not valid!'] }]);
+      return;
     }
-  };
+    setWallets((prev) => [...prev, { ...currentWallet, id: uuidv4() }]);
+    const filteredCurrency = availableCurrencies.filter(
+      (currency) => currency !== currentWallet.currency,
+    );
+    setAvailableCurrencies(filteredCurrency);
+    setCurrentWallet((prev) => ({ ...prev, currency: filteredCurrency[0] }));
+  }
 
-  if (storeError) {
-    router.push('/');
+  function removeWallet(walletId: string) {
+    const walletToDelete = wallets.find((wallet) => wallet.id === walletId);
+    setAvailableCurrencies((prev) => [...prev, walletToDelete!.currency]);
+    const filteredWallets = wallets.filter((wallet) => wallet.id !== walletId);
+    setWallets(filteredWallets);
+  }
+
+  function changeWalletValue(event: ChangeEvent<HTMLInputElement>) {
+    setCurrentWallet((prev) => ({ ...prev, value: event.target.value }));
+    form.setFields([{ name: 'wallets', errors: [] }]);
+  }
+
+  function changeCurrency(event: CurrencyType) {
+    form.setFields([{ name: 'wallets', errors: [] }]);
+    setCurrentWallet((prev) => ({ ...prev, currency: event }));
   }
 
   if (isStoreLoading || store === null || storeEdit === null) {
@@ -174,8 +232,8 @@ const Store = () => {
       <Modal
         title="Edit store"
         visible={edit}
-        onOk={handleOk}
         onCancel={handleCancel}
+        onOk={form.submit}
       >
         <Form
           name="basic"
@@ -185,6 +243,7 @@ const Store = () => {
           autoComplete="off"
           validateTrigger={'onSubmit'}
           form={form}
+          onFinish={handleOk}
         >
           <Form.Item
             label="Name"
@@ -202,16 +261,43 @@ const Store = () => {
           >
             <Input value={storeEdit!.url} onChange={onChangeStore('url')} />
           </Form.Item>
-          <Form.Item
-            label="Wallet"
-            name="wallet"
-            initialValue={storeEdit!.wallet}
-            rules={[
-              { required: true, message: 'Please input wallet!' },
-              { validator: validateWallet },
-            ]}
-          >
-            <Input onChange={onChangeStore('wallet')} />
+          <div className={styles.wallets}>
+            {wallets.map((wallet) => (
+              <div className={styles.wallet} key={wallet.id}>
+                <p className={styles.value}>{wallet.value}</p>
+                <p className={styles.currency}>{wallet.currency}</p>
+                <Button
+                  style={{ width: 90 }}
+                  type="primary"
+                  danger
+                  onClick={() => removeWallet(wallet.id as string)}
+                >
+                  Delete
+                </Button>
+              </div>
+            ))}
+          </div>
+          <Form.Item label="Wallets" name="wallets">
+            <Space.Compact block>
+              <Input onChange={changeWalletValue} />
+              <Select
+                options={availableCurrencies.map((currency) => ({
+                  value: currency,
+                  label: currency,
+                }))}
+                onChange={changeCurrency}
+                value={currentWallet.currency}
+              />
+              {availableCurrencies.length > 0 ? (
+                <Button
+                  style={{ width: 90 }}
+                  type="primary"
+                  onClick={addWallet}
+                >
+                  Add wallet
+                </Button>
+              ) : null}
+            </Space.Compact>
           </Form.Item>
           <Form.Item label="ApiKey" name="apiKey">
             <Input.Group compact>

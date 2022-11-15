@@ -1,4 +1,4 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Typography } from 'antd';
 import 'antd/dist/antd.css';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
@@ -10,15 +10,16 @@ import { ReCaptchaComponent } from '../../ReCaptcha/ReCaptcha';
 import { CreateUserForm } from './components/CreateUserForm';
 
 const VerifyForm = ({ email }: { email: string }) => {
-  const auth = useTypedSelector((state) => state.auth);
+  const authStatus = useTypedSelector((state) => state.auth.status);
   const captcha = useTypedSelector((state) => state.user.captchaToken);
-
+  const [code, setCode] = useState('');
+  
   const dispatch = useTypedDispatch();
   const [form] = Form.useForm();
 
-  const fieldError = auth?.status.error;
-
-  const [code, setCode] = useState('');
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, []);
 
   /**
    * @description verification of user by code
@@ -54,31 +55,6 @@ const VerifyForm = ({ email }: { email: string }) => {
   const onChangeCode = (e: ChangeEvent<HTMLInputElement>) =>
     setCode(e.target.value);
 
-  /**
-   * @description validations field code
-   */
-  useEffect(() => {
-    if (fieldError) {
-      form.validateFields(['code']);
-    }
-  }, [auth]);
-
-  /**
-   * @description validations of email
-   * @param {object} rule - object field code
-   * @param {any} value - value code
-   * @param {function} callback - executed after successful validation of the code field
-   */
-  const validateCode = (rule: any, value: any, callback: any) => {
-    /** @description if code field has error return error message */
-    if (fieldError === 'code') {
-      callback(fieldError);
-      dispatch(clearAuthError());
-    } else {
-      callback();
-    }
-  };
-
   return (
     <Form
       style={{ padding: '0 50px', marginTop: 64 }}
@@ -91,6 +67,16 @@ const VerifyForm = ({ email }: { email: string }) => {
       validateTrigger={'onSubmit'}
       autoComplete="off"
     >
+      <Typography
+        style={{
+          fontSize: '20px',
+          textAlign: 'center',
+          margin: '20px',
+          color: 'red',
+        }}
+      >
+        {authStatus.error}
+      </Typography>
       <Form.Item
         label="Code"
         name="code"
@@ -101,7 +87,6 @@ const VerifyForm = ({ email }: { email: string }) => {
             max: 8,
             message: 'The code must be 8 digits!',
           },
-          { validator: validateCode },
         ]}
       >
         <Input name="code" onChange={onChangeCode} />
@@ -110,7 +95,11 @@ const VerifyForm = ({ email }: { email: string }) => {
         <ReCaptchaComponent />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 12 }}>
-        <Button disabled={!captcha} type="primary" htmlType="submit">
+        <Button
+          disabled={!captcha || authStatus.isLoading}
+          type="primary"
+          htmlType="submit"
+        >
           Submit
         </Button>
       </Form.Item>
@@ -121,6 +110,12 @@ const VerifyForm = ({ email }: { email: string }) => {
 const Register = () => {
   const auth = useTypedSelector((state) => state.auth);
   const [email, setEmail] = useState('');
+
+  const dispatch = useTypedDispatch();
+
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, []);
 
   if (!auth.verify) {
     return <CreateUserForm setEmail={setEmail} />;

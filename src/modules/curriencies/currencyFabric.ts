@@ -7,7 +7,7 @@ import { Ethereum } from './ethereum';
 import { USDT } from './usdt';
 
 class CurrencyFabric {
-  create(currency: CurrencyType): BaseCurrency {
+  static create(currency: CurrencyType): BaseCurrency {
     switch (currency) {
       case CurrencyType.Bitcoin: {
         return new Bitcoin();

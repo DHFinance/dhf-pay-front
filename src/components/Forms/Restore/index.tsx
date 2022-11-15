@@ -6,7 +6,6 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { postRestoreStepCode } from '../../../store/slices/auth/asyncThunks/postRestoreStepCode';
 import { postRestoreStepEmail } from '../../../store/slices/auth/asyncThunks/postRestoreStepEmail';
 import { postRestoreStepPassword } from '../../../store/slices/auth/asyncThunks/postRestoreStepPassword';
-import { clearAuthError } from '../../../store/slices/auth/auth.slice';
 import { setUpdateCaptcha } from '../../../store/slices/user/user.slice';
 import { ReCaptchaComponent } from '../../ReCaptcha/ReCaptcha';
 
@@ -184,35 +183,7 @@ const CodeForm = () => {
     });
   };
 
-  const fieldError = auth?.status.error;
-  const errorMessage = auth?.status.error;
-
   const [form] = Form.useForm();
-
-  /**
-   * @description validation of field code
-   */
-  useEffect(() => {
-    if (fieldError) {
-      form.validateFields(['code']);
-    }
-  }, [auth]);
-
-  /**
-   * @description validation of code
-   * @param {object} rule - object field code
-   * @param {any} value - value code
-   * @param {function} callback - executed after successful validation of the code field
-   */
-  const validateCode = (rule: any, value: any, callback: any) => {
-    /** @description if code field has error return error message */
-    if (fieldError === 'code') {
-      callback(errorMessage);
-      dispatch(clearAuthError());
-    } else {
-      callback();
-    }
-  };
 
   /**
    * @description sending code for change password
@@ -267,7 +238,6 @@ const CodeForm = () => {
             max: 8,
             message: 'The code must be 8 digits!',
           },
-          { validator: validateCode },
         ]}
       >
         <Input name="code" onChange={onUpdateData} />

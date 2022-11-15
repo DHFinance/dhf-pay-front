@@ -8,6 +8,7 @@ import { useTypedDispatch } from '../../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import { AddStore } from '../../../../interfaces/addStore.interface';
 import { Store } from '../../../../interfaces/store.interface';
+import { CurrencyFabric } from '../../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../../modules/user/enums/userRole.enum';
 import { addStore } from '../../../../store/slices/store/asynkThunks/addStore';
 import { getStores } from '../../../../store/slices/stores/asyncThunks/getStores';
@@ -116,37 +117,48 @@ function useStoresTable() {
   const showModal = () => {
     setIsModalVisible(true);
   };
-  
+
   async function handleOk() {
-    try {
-      await form.validateFields();
-      try {
-        await dispatch(
-          addStore({
-            ...store,
-            user,
-          } as unknown as AddStore),
-        );
-        if (user.role === UserRole.Admin) {
-          dispatch(getStores());
-        }
-        if (user.role === UserRole.Customer) {
-          dispatch(getUserStores(user.id));
-        }
-        setStore(null);
-        form.resetFields();
-        setIsModalVisible(false);
-      } catch (e) {
-        console.log(e, 'store creating error');
-      }
-    } catch (error) {
-      console.log(error);
+    if (wallets.length === 0) {
+      form.setFields([
+        { name: 'wallets', errors: ['Please add at least 1 wallet!'] },
+      ]);
+      return;
     }
+
+    await dispatch(
+      addStore({
+        ...store,
+        wallets: wallets.map((wallet) => ({
+          value: wallet.value,
+          currency: wallet.currency,
+        })),
+      } as unknown as AddStore),
+    );
+    if (user.role === UserRole.Admin) {
+      dispatch(getStores());
+    }
+    if (user.role === UserRole.Customer) {
+      dispatch(getUserStores(user.id));
+    }
+    setStore(null);
+    form.resetFields();
+    setIsModalVisible(false);
   }
 
   function addWallet() {
+    const newCurrency = CurrencyFabric.create(currentWallet.currency);
+    const isValid = newCurrency.validateWallet(currentWallet.value);
+    if (!isValid) {
+      form.setFields([
+        { name: 'wallets', errors: ['Wallet is not valid!'] },
+      ]);
+      return;
+    }
     setWallets((prev) => [...prev, { ...currentWallet, id: uuidv4() }]);
-    const filteredCurrency = availableCurrencies.filter((currency) => currency !== currentWallet.currency);
+    const filteredCurrency = availableCurrencies.filter(
+      (currency) => currency !== currentWallet.currency,
+    );
     setAvailableCurrencies(filteredCurrency);
     setCurrentWallet((prev) => ({ ...prev, currency: filteredCurrency[0] }));
   }
@@ -160,14 +172,16 @@ function useStoresTable() {
 
   function changeWalletValue(event: ChangeEvent<HTMLInputElement>) {
     setCurrentWallet((prev) => ({ ...prev, value: event.target.value }));
+    form.setFields([
+      { name: 'wallets', errors: [] },
+    ]);
   }
 
   function changeCurrency(event: CurrencyType) {
+    form.setFields([
+      { name: 'wallets', errors: [] },
+    ]);
     setCurrentWallet((prev) => ({ ...prev, currency: event }));
-  }
-  
-  function validateCurrentWallet() {
-    
   }
 
   return {
@@ -189,6 +203,7 @@ function useStoresTable() {
     changeWalletValue,
     availableCurrencies,
     currentWallet,
+    setIsModalVisible,
   };
 }
 

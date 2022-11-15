@@ -1,18 +1,17 @@
 import { Button, Form, Input, Modal, Select, Space } from 'antd';
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useStoresTable } from '../../../../components/Tables/Stores/hooks/useStoresTable';
 import styles from '../../../../components/Tables/Stores/stores.module.css';
 
 interface Props {
   isModalVisible: boolean;
+  setParentModalVisible: any;
 }
 
-const AddStoreModal: FC<Props> = ({ isModalVisible }) => {
+const AddStoreModal: FC<Props> = ({ isModalVisible: visible, setParentModalVisible }) => {
   const {
     form,
     store,
-    handleCancel,
-    handleOk, 
     deleteKey,
     generateKey,
     onChangeStore,
@@ -23,14 +22,26 @@ const AddStoreModal: FC<Props> = ({ isModalVisible }) => {
     changeCurrency,
     availableCurrencies,
     currentWallet,
+    isModalVisible,
+    handleOk,
+    handleCancel,
+    setIsModalVisible,
   } = useStoresTable();
+  
+  useEffect(() => {
+    setIsModalVisible(visible);
+  }, [visible]);
+  
+  useEffect(() => {
+    setParentModalVisible(isModalVisible);
+  }, [isModalVisible]);
   
   return (
     <Modal
       title="Add store"
       open={isModalVisible}
-      onOk={handleOk}
       onCancel={handleCancel}
+      onOk={form.submit}
     >
       <Form
         name="basic"
@@ -40,6 +51,7 @@ const AddStoreModal: FC<Props> = ({ isModalVisible }) => {
         autoComplete="off"
         validateTrigger={'onSubmit'}
         form={form}
+        onFinish={handleOk}
       >
         <Form.Item
           label="Name"
@@ -72,8 +84,8 @@ const AddStoreModal: FC<Props> = ({ isModalVisible }) => {
           ))}
         </div>
         <Form.Item
-          label="Wallet"
-          name="wallet"
+          label="Wallets"
+          name="wallets"
         >
           <Space.Compact block>
             <Input onChange={changeWalletValue} />
