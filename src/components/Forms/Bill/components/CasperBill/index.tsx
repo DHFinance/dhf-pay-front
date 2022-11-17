@@ -29,6 +29,7 @@ import {
 import { Deploy } from 'casper-js-sdk/dist/lib/DeployUtil';
 import Link from 'next/link';
 import React, { FC, useState } from 'react';
+import { getUsdFromCrypto } from '../../../../../../utils/getUsdFromCrypto';
 import { signerErrors } from '../../../../../errors/signerErrors';
 import { useTypedDispatch } from '../../../../../hooks/useTypedDispatch';
 import { Payment } from '../../../../../interfaces/payment.interface';
@@ -183,7 +184,12 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
    * @const id {num} - transaction id in the casper network
    */
   const deploy = async () => {
-    const to = payment.store?.wallet;
+    const to = payment.store?.wallets.find((wallet) => wallet.currency === billInfo.currency);
+    
+    if (!to) {
+      return;
+    }
+    
     const amountStr = billInfo.amount.toString();
     const amountNum = billInfo.amount;
     const id = 287821;
@@ -217,7 +223,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
           gasPrice,
           ttl,
         );
-        const toPublicKey = CLPublicKey.fromHex(to);
+        const toPublicKey = CLPublicKey.fromHex(to.value);
         const session = DeployUtil.ExecutableDeployItem.newTransfer(
           amountStr,
           toPublicKey,
@@ -230,7 +236,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
         const signature = await window.casperlabsHelper.sign(
           json,
           publicKeyHex,
-          to,
+          to.value,
         );
         const deployObject = DeployUtil.deployFromJson(signature);
         
@@ -249,24 +255,16 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
           );
         }
         try {
-          /**
-           * @description after a successful transaction, a record about it is created in the database
-           * @param txHash {string} - transaction hash. You can track the transaction on it.
-           * @param status {string} - payment status. Always processing. It is set on the front, since only the front knows which bill mode is enabled (casper or fake)
-           * @param email {string} - payer's email address
-           * @param payment {payment || id} - data on the payment for which the transaction took place
-           * @param sender {string} - payer's public key
-           */
           await dispatch(
             pay({
               txHash: signed,
-              status: 'processing',
               email,
-              payment: billInfo,
+              payment: {
+                id: billInfo.id,
+              },
               sender: publicKeyHex,
             }),
           );
-          // await dispatch(ge)
         } catch (e) {
           showError('Transaction aborted');
         }
@@ -344,7 +342,12 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
     );
     await balanceService.fetchBalanceOfPublicKey(ledgerPbId);
 
-    const to = payment.store?.wallet;
+    const to = payment.store?.wallets.find((wallet) => wallet.currency === billInfo.currency);
+    
+    if (!to) {
+      return;
+    }
+    
     const amountStr = (billInfo.amount / 1000000000).toString();
 
     const publicKeyHex = pdAddr.publicKey.toString('hex');
@@ -356,7 +359,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
         ledgerPbId, //'020235d1b81cd76096cd490af1fcff5ea23d2bf96e78e7fa0de3aca8bee8021ef657', //from
         process.env.NEXT_PUBLIC_CASPER_CHAIN_NAME, //network
         amountStr, //"25", // amount is cspr
-        to, //'01a35887f3962a6a232e8e11fa7d4567b6866d68850974aad7289ef287676825f6', //to
+        to.value, //'01a35887f3962a6a232e8e11fa7d4567b6866d68850974aad7289ef287676825f6', //to
         '1200', // memo
         '2',
       ); // ttl
@@ -384,20 +387,13 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
       );
     }
     try {
-      /**
-       * @description after a successful transaction, a record about it is created in the database
-       * @param txHash {string} - transaction hash. You can track the transaction on it.
-       * @param status {string} - payment status. Always processing. It is set on the front, since only the front knows which bill mode is enabled (casper or fake)
-       * @param email {string} - payer's email address
-       * @param payment {payment || id} - data on the payment for which the transaction took place
-       * @param sender {string} - payer's public key
-       */
       await dispatch(
         pay({
           txHash: signed,
-          status: 'processing',
           email,
-          payment: billInfo,
+          payment: {
+            id: billInfo.id,
+          },
           sender: publicKeyHex,
         }),
       );
@@ -445,7 +441,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
       <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
         <Statistic
           title="Amount"
-          value={`${+billInfo.amount / 1000000000} ${payment.currency} ($${CSPRtoUSD(+billInfo.amount, course)})`}
+          value={`${+billInfo.amount / 1000000000} ${payment.currency} ($${getUsdFromCrypto(+billInfo.amount, course)})`}
           prefix={<AreaChartOutlined />}
         />
       </Col>

@@ -1,34 +1,60 @@
+import {
+  AreaChartOutlined,
+  ClockCircleOutlined,
+  CommentOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import { useEtherBalance, useEthers, useSendTransaction } from '@usedapp/core';
 import { Button, Col, Form, Input, Statistic } from 'antd';
-import { AreaChartOutlined, ClockCircleOutlined, CommentOutlined, UserOutlined } from '@ant-design/icons';
-import { CSPRtoUSD } from '../../../../../../utils/CSPRtoUSD';
+import { utils } from 'ethers';
+import { formatEther } from 'ethers/lib/utils';
 import Link from 'next/link';
 import React, { FC, useEffect, useState } from 'react';
-import { useEtherBalance, useEthers, useSendTransaction } from '@usedapp/core';
-import { formatEther } from 'ethers/lib/utils';
-import { utils } from 'ethers';
-import { RINKEBY_SCAN_URL } from '../../../../../../ethConfig/config';
+import { SEPOLIA_SCAN_URL } from '../../../../../../ethConfig/config';
+import { getUsdFromCrypto } from '../../../../../../utils/getUsdFromCrypto';
+import { useTypedDispatch } from '../../../../../hooks/useTypedDispatch';
+import { Payment } from '../../../../../interfaces/payment.interface';
+import { Transaction } from '../../../../../interfaces/transaction.interface';
+import { pay } from '../../../../../store/slices/pay/asyncThunks/pay';
 
 interface EthereumBillProps {
-  billInfo: any;
+  billInfo: Payment;
   date: any;
   course: any;
-  transaction: any;
-  transactionExplorer: any;
+  transaction: Transaction;
 }
 
-const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transaction, transactionExplorer }) => {
+const EthereumBill: FC<EthereumBillProps> = ({
+  billInfo,
+  date,
+  course,
+  transaction,
+}) => {
   const [balance, setBalance] = useState('');
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { activateBrowserWallet, account } = useEthers();
-  const { sendTransaction, state } = useSendTransaction({ transactionName: 'Send Ethereum' });
+  const { sendTransaction, state } = useSendTransaction({
+    transactionName: 'Send Ethereum',
+  });
+  const [transactionHash, setTransactionHash] = useState<string | undefined>(transaction?.txHash);
   const etherBalance = useEtherBalance(account);
   const [form] = Form.useForm();
   const sendEth = async () => {
-    await sendTransaction({ to: billInfo.store?.wallet, value: utils.parseEther(`${billInfo.amount}`), gasLimit: 21048 });
+    const to = billInfo.store.wallets.find(
+      (wallet) => wallet.currency === billInfo.currency,
+    );
+    if (to) {
+      await sendTransaction({
+        to: to.value,
+        value: utils.parseEther(`${+billInfo.amount / 1_000_000_000}`),
+        gasLimit: 21048,
+      });
+    }
   };
+  const dispatch = useTypedDispatch();
 
   useEffect(() => {
     if (etherBalance) {
@@ -44,7 +70,18 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
           break;
         }
         case 'Success': {
+          setTransactionHash(state.transaction?.hash);
           setSuccess(true);
+          dispatch(
+            pay({
+              txHash: state.transaction?.hash,
+              email,
+              payment: {
+                id: billInfo.id,
+              },
+              sender: state.transaction?.from,
+            }),
+          );
           break;
         }
         case 'Exception': {
@@ -78,7 +115,9 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
           title="Your Balance"
           value={
             etherBalance
-              ? `${formatEther(etherBalance).substring(0, 8)} ETH (${(+balance * course).toFixed(2)}$)`
+              ? `${formatEther(etherBalance).substring(0, 8)} ${billInfo.currency} (${(
+                +balance * course
+              ).toFixed(2)}$)`
               : 'Sign in MetaMask to get balance'
           }
           prefix={<AreaChartOutlined />}
@@ -94,7 +133,9 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
       <Col span={24} style={{ padding: '20px 0 0 20px', background: 'white' }}>
         <Statistic
           title="Amount"
-          value={`${+billInfo.amount} ETH ($${CSPRtoUSD(+billInfo.amount, course)})`}
+          value={`${+billInfo.amount / 1_000_000_000} ${
+            billInfo.currency
+          } ($${getUsdFromCrypto(+billInfo.amount, course)})`}
           prefix={<AreaChartOutlined />}
         />
       </Col>
@@ -140,13 +181,9 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
             />
           </Form.Item>
         </Form>
-        {error &&
-          <div>
-            {error}
-          </div>
-        }
+        {error && <div>{error}</div>}
       </Col>
-      {!etherBalance ?
+      {!etherBalance ? (
         <Button
           style={{ margin: '20px 20px 0 0' }}
           type="primary"
@@ -154,7 +191,8 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
           onClick={activateBrowserWallet}
         >
           Connect to metamask
-        </Button> :
+        </Button>
+      ) : success ? null : (
         <Button
           style={{ margin: '20px 20px 0 0' }}
           type="primary"
@@ -164,11 +202,9 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
         >
           Pay
         </Button>
-      }
-      {success &&
-        <Link
-          href={`https://${RINKEBY_SCAN_URL}/tx/${transactionExplorer}`}
-        >
+      )}
+      {success && (
+        <Link href={`${SEPOLIA_SCAN_URL}/tx/${transactionHash}`}>
           <a target="_blank" rel="noreferrer">
             <Button
               style={{ margin: '20px 20px 0 0' }}
@@ -179,7 +215,7 @@ const EthereumBill: FC<EthereumBillProps> = ({ billInfo, date, course, transacti
             </Button>
           </a>
         </Link>
-      }
+      )}
     </>
   );
 };

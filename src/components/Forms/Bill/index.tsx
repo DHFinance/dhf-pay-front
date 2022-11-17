@@ -1,16 +1,16 @@
+import { DAppProvider } from '@usedapp/core';
 import React, { useEffect } from 'react';
+import { configDapp } from '../../../../ethConfig/config';
+import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Transaction } from '../../../interfaces/transaction.interface';
+import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { getLastTransaction } from '../../../store/slices/transaction/asyncThunks/getLastTransaction';
 import { Loader } from '../../Loader';
-import { EthereumBill } from './components/EthereumBill';
-import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
-import { CurrencyType } from '../../../enums/currency.enum';
-import { DAppProvider } from '@usedapp/core';
-import { configDapp } from '../../../../ethConfig/config';
 import CasperBill from './components/CasperBill';
+import { EthereumBill } from './components/EthereumBill';
 
 /**
  *
@@ -22,7 +22,9 @@ const Bill = () => {
   const payment = useTypedSelector((state) => state.payment.data);
   const paymentStatus = useTypedSelector((state) => state.payment.status);
   const transaction = useTypedSelector((state) => state.transaction.data);
-  const transactionStatus = useTypedSelector((state) => state.transaction.status);
+  const transactionStatus = useTypedSelector(
+    (state) => state.transaction.status,
+  );
   const dispatch = useTypedDispatch();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const Bill = () => {
   }, []);
 
   useEffect(() => {
-    if (!payment) {
+    if (!payment || !payment.currency) {
       return;
     }
     const currency = CurrencyFabric.create(CurrencyType.Ethereum);
@@ -44,57 +46,52 @@ const Bill = () => {
       dispatch(getLastTransaction(payment?.id));
     }
   }, [payment]);
-  
+
   if (paymentStatus.error || courseStatus.error) {
     return <p>Error</p>;
   }
-  
-  if (paymentStatus.isLoading || payment === null || courseStatus.isLoading || course === null || transactionStatus.isLoading) {
+
+  if (
+    paymentStatus.isLoading ||
+    payment === null ||
+    courseStatus.isLoading ||
+    course === null ||
+    transactionStatus.isLoading
+  ) {
     return <Loader />;
   }
-  
+
   function getBill() {
     switch (payment?.currency) {
-      case 'Ethereum': {
+      case CurrencyType.Ethereum: {
         return (
           <DAppProvider config={configDapp}>
             <EthereumBill
               billInfo={payment}
               course={course}
-              payment={payment}
               transaction={transaction as Transaction}
+              date={new Date()}
             />
           </DAppProvider>
         );
-        break;
       }
-      case 'CSPR': {
+      case CurrencyType.Casper: {
         return (
           <CasperBill
             billInfo={payment}
-            course={course}
+            course={course as number}
             payment={payment}
             transaction={transaction as Transaction}
           />
         );
-        break;
       }
       default: {
-        return (
-          <CasperBill
-            billInfo={payment}
-            course={course}
-            payment={payment}
-            transaction={transaction as Transaction}
-          />
-        );
+        return null;
       }
     }
   }
 
-  return (
-    getBill()
-  );
+  return getBill();
 };
 
 export default Bill;

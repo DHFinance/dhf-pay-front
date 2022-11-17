@@ -51,8 +51,8 @@ const InvoicesBuilder = () => {
   };
 
   const validateAmount = (rule: any, value: any, callback: any) => {
-    if (value < 2.5) {
-      callback('Must be at least 2.5 cspr');
+    if (value < 0) {
+      callback('Must be at least 0');
     } else {
       callback();
     }
@@ -76,7 +76,7 @@ const InvoicesBuilder = () => {
   async function handleOk() {
     try {
       await form.validateFields();
-      if (!(form.getFieldValue('currency') in Object.values(CurrencyType))) {
+      if (!(Object.values(CurrencyType).includes(form.getFieldValue('currency')))) {
         form.setFields([
           { name: 'currency', errors: ['Please select currency!'] },
         ]);
@@ -129,6 +129,11 @@ const InvoicesBuilder = () => {
       'currency',
       availableCurrencies[0] ?? 'No available currencies',
     );
+    if (availableCurrencies[0]) {
+      handleChangeCurrency(availableCurrencies[0]);
+      const newCurrency = CurrencyFabric.create(availableCurrencies[0]);
+      newCurrency.getCourse();
+    }
   }, [availableCurrencies]);
 
   if (storesStatus.error) {
