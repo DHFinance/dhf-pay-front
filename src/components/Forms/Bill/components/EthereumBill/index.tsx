@@ -215,7 +215,7 @@ const EthereumBill: FC<EthereumBillProps> = ({
             >
               Connect to metamask
             </Button>
-          ) : success || transaction?.txHash ? null : (
+          ) : success || transaction?.txHash || loading ? null : (
             <Button
               style={{ margin: '20px 20px 0 0' }}
               type="primary"

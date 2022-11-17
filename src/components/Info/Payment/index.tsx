@@ -72,7 +72,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
     }
     
     const newCurrency = CurrencyFabric.create(payment.currency);
-    newCurrency.getCourse();
+    newCurrency?.getCourse();
   }, [payment]);
 
   useEffect(() => {
