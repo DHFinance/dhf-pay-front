@@ -4,8 +4,8 @@ import {
   CommentOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useEtherBalance, useEthers, useSendTransaction } from '@usedapp/core';
-import { Button, Col, Form, Input, Statistic } from 'antd';
+import { Sepolia, useEtherBalance, useEthers, useSendTransaction } from '@usedapp/core';
+import { Button, Col, Form, Input, Spin, Statistic } from 'antd';
 import { utils } from 'ethers';
 import { formatEther } from 'ethers/lib/utils';
 import Link from 'next/link';
@@ -25,17 +25,17 @@ interface EthereumBillProps {
 }
 
 const EthereumBill: FC<EthereumBillProps> = ({
-  billInfo,
-  date,
-  course,
-  transaction,
-}) => {
+                                               billInfo,
+                                               date,
+                                               course,
+                                               transaction,
+                                             }) => {
   const [balance, setBalance] = useState('');
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const { activateBrowserWallet, account } = useEthers();
+  const { activateBrowserWallet, account, switchNetwork, chainId } = useEthers();
   const { sendTransaction, state } = useSendTransaction({
     transactionName: 'Send Ethereum',
   });
@@ -43,6 +43,9 @@ const EthereumBill: FC<EthereumBillProps> = ({
   const etherBalance = useEtherBalance(account);
   const [form] = Form.useForm();
   const sendEth = async () => {
+    if (chainId !== Sepolia.chainId) {
+      await switchNetwork(Sepolia.chainId);
+    }
     const to = billInfo.store.wallets.find(
       (wallet) => wallet.currency === billInfo.currency,
     );
@@ -54,6 +57,13 @@ const EthereumBill: FC<EthereumBillProps> = ({
       });
     }
   };
+
+  const connectWallet = async () => {
+    if (chainId !== Sepolia.chainId) {
+      await switchNetwork(Sepolia.chainId);
+    }
+    activateBrowserWallet();
+  };
   const dispatch = useTypedDispatch();
 
   useEffect(() => {
@@ -61,6 +71,14 @@ const EthereumBill: FC<EthereumBillProps> = ({
       setBalance(formatEther(etherBalance));
     }
   }, [etherBalance]);
+
+  useEffect(() => {
+    (async () => {
+      if (chainId !== Sepolia.chainId) {
+        await switchNetwork(Sepolia.chainId);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (state.status) {
@@ -71,6 +89,7 @@ const EthereumBill: FC<EthereumBillProps> = ({
         }
         case 'Success': {
           setTransactionHash(state.transaction?.hash);
+          setLoading(false);
           setSuccess(true);
           dispatch(
             pay({
@@ -86,9 +105,11 @@ const EthereumBill: FC<EthereumBillProps> = ({
         }
         case 'Exception': {
           setError('User denied transaction signature.');
+          setLoading(false);
           break;
         }
         default: {
+          setLoading(false);
           return;
         }
       }
@@ -183,39 +204,42 @@ const EthereumBill: FC<EthereumBillProps> = ({
         </Form>
         {error && <div>{error}</div>}
       </Col>
-      {!etherBalance ? (
-        <Button
-          style={{ margin: '20px 20px 0 0' }}
-          type="primary"
-          size={'large'}
-          onClick={activateBrowserWallet}
-        >
-          Connect to metamask
-        </Button>
-      ) : success ? null : (
-        <Button
-          style={{ margin: '20px 20px 0 0' }}
-          type="primary"
-          size={'large'}
-          onClick={sendEth}
-          disabled={!email}
-        >
-          Pay
-        </Button>
-      )}
-      {success && (
-        <Link href={`${SEPOLIA_SCAN_URL}/tx/${transactionHash}`}>
-          <a target="_blank" rel="noreferrer">
+      <>
+        {loading ? <Spin /> :
+          !etherBalance ? (
             <Button
               style={{ margin: '20px 20px 0 0' }}
               type="primary"
               size={'large'}
+              onClick={connectWallet}
             >
-              Check last transaction
+              Connect to metamask
             </Button>
-          </a>
-        </Link>
-      )}
+          ) : success || transaction?.txHash ? null : (
+            <Button
+              style={{ margin: '20px 20px 0 0' }}
+              type="primary"
+              size={'large'}
+              onClick={sendEth}
+              disabled={!email}
+            >
+              Pay
+            </Button>
+          )}
+        {success || transaction?.txHash && (
+          <Link href={`${SEPOLIA_SCAN_URL}/tx/${transactionHash}`}>
+            <a target="_blank" rel="noreferrer">
+              <Button
+                style={{ margin: '20px 20px 0 0' }}
+                type="primary"
+                size={'large'}
+              >
+                Check last transaction
+              </Button>
+            </a>
+          </Link>
+        )}
+      </>
     </>
   );
 };
