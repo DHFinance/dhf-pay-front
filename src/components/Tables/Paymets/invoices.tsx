@@ -1,4 +1,4 @@
-import { Table } from 'antd';
+import { Pagination, Table } from 'antd';
 import React, { FC } from 'react';
 
 const columns = [
@@ -37,24 +37,34 @@ const columns = [
 interface Props {
   currentTable: any;
   onRow: any;
+  currentPage: number;
+  changePage: (page: number) => void;
+  totalPages: number;
 }
 
-const PaymentsInvoices: FC<Props> = ({ currentTable, onRow }) => {
-  const filterTable = currentTable?.filter((item: any) => {
-    return !item.type && !item.text;
-  }) || [];
+const PaymentsInvoices: FC<Props> = ({ currentTable, onRow, currentPage, changePage, totalPages }) => {
+  const filterTable =
+    currentTable?.filter((item: any) => {
+      return !item.type && !item.text;
+    }) || [];
   return (
-    <Table
-      columns={columns}
-      scroll={{ x: 0 }}
-      onRow={onRow}
-      dataSource={filterTable.map((item: any) => {
-        return {
-          ...item,
-          amount: item.amount / 1_000_000_000,
-        };
-      })}
-    />
+    <>
+      <Table
+        columns={columns}
+        scroll={{ x: 0 }}
+        onRow={onRow}
+        pagination={false}
+        dataSource={filterTable.map((item: any) => {
+          return {
+            ...item,
+            amount: item.amount / 1_000_000_000,
+          };
+        })}
+      />
+      <div style={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
+        <Pagination current={currentPage} onChange={changePage} total={totalPages} />
+      </div>
+    </>
   );
 };
 

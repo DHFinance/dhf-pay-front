@@ -21,7 +21,9 @@ const UserPayments: FC<Props> = ({ entity }) => {
   const stores = useTypedSelector((state) => state.stores.data);
   const payments = useTypedSelector((state) => state.payments.data);
   const storesStatus = useTypedSelector((state) => state.stores.status);
+  const totalPages = useTypedSelector((state) => state.payments.totalPages);
 
+  const [page, setPage] = useState(1);
   const [currentStore, setCurrentStore] = useState<Store | null>(null);
 
   const router = useRouter();
@@ -50,7 +52,7 @@ const UserPayments: FC<Props> = ({ entity }) => {
   useEffect(() => {
     /** @description if the stores are not empty and the user does not have the admin role, get payments */
     if (stores?.length && activeStores[0]?.apiKey) {
-      dispatch(getUserPayments(activeStores[0]?.apiKey));
+      dispatch(getUserPayments({ apiKey: activeStores[0]?.apiKey, page: 1 }));
     }
   }, [stores?.length]);
 
@@ -78,8 +80,17 @@ const UserPayments: FC<Props> = ({ entity }) => {
   function handleChange(value: string) {
     const current = stores!.filter((store) => store.apiKey === value)[0];
     setCurrentStore(current);
-    dispatch(getUserPayments(value));
+    setPage(1);
+    dispatch(getUserPayments({ apiKey: value, page }));
   }
+  
+  useEffect(() => {
+    if (!currentStore) {
+      return;
+    }
+
+    dispatch(getUserPayments({ apiKey: currentStore.apiKey, page }));
+  }, [page]);
   
   if (storesStatus.error) {
     router.push('/');
@@ -112,9 +123,9 @@ const UserPayments: FC<Props> = ({ entity }) => {
         </>
       ) : null}
       {entity === 'buttons' ? (
-        <PaymentsButton currentTable={paymentsTable} onRow={onRow} />
+        <PaymentsButton currentTable={paymentsTable} onRow={onRow} currentPage={page} changePage={(newPage) => setPage(newPage)} totalPages={totalPages} />
       ) : (
-        <PaymentsInvoices currentTable={paymentsTable} onRow={onRow} />
+        <PaymentsInvoices currentTable={paymentsTable} onRow={onRow} currentPage={page} changePage={(newPage) => setPage(newPage)} totalPages={totalPages} />
       )}
     </>
   );

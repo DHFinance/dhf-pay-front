@@ -6,10 +6,11 @@ import { get } from '../../../../../api';
  */
 const getUserPayments = createAsyncThunk(
   'getUserPayments',
-  async (apiKey: string, { rejectWithValue }) => {
+  async (payload: { apiKey: string, page: number }, { rejectWithValue }) => {
     try {
       const result = await get('/payment', {
-        headers: { Authorization: `Bearer ${apiKey}` },
+        headers: { Authorization: `Bearer ${payload.apiKey}` },
+        params: { limit: 10, page: payload.page },
       });
       return result.data;
     } catch (error: any) {

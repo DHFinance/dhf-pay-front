@@ -9,8 +9,6 @@ import { Store } from '../../../interfaces/store.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
-import { getPayments } from '../../../store/slices/payments/asyncThunks/getPayments';
-import { getUserPayments } from '../../../store/slices/payments/asyncThunks/getUserPayments';
 import { getUserStores } from '../../../store/slices/stores/asyncThunks/getUserStores';
 import { Loader } from '../../Loader';
 
@@ -66,7 +64,6 @@ const Buttons = () => {
   function handleChange(value: string) {
     const current = stores!.filter((store) => store.apiKey === value)[0];
     setCurrentStore(current);
-    dispatch(getUserPayments(value));
     validate('store');
     setAvailableCurrencies(
       Object.values(CurrencyType).filter((el) =>
@@ -122,7 +119,9 @@ const Buttons = () => {
   const handleOk = async () => {
     try {
       await form.validateFields();
-      if (!(Object.values(CurrencyType).includes(form.getFieldValue('currency')))) {
+      if (
+        !Object.values(CurrencyType).includes(form.getFieldValue('currency'))
+      ) {
         form.setFields([
           { name: 'currency', errors: ['Please select currency!'] },
         ]);
@@ -135,12 +134,6 @@ const Buttons = () => {
             apiKey: currentStore!.apiKey,
           }),
         );
-        if (user?.role === UserRole.Admin) {
-          await dispatch(getPayments());
-        }
-        if (user?.role === UserRole.Customer) {
-          await dispatch(getUserPayments(currentStore!.apiKey));
-        }
         setPaymentId(true);
         message.success('Payment was added');
         /** @description generating and showing html code of button payment */
@@ -181,9 +174,7 @@ const Buttons = () => {
   function handleChangeCurrency(event: CurrencyType) {
     const currency = CurrencyFabric.create(event);
     currency.getCourse();
-    form.setFields([
-      { name: 'currency', errors: [] },
-    ]);
+    form.setFields([{ name: 'currency', errors: [] }]);
   }
 
   const handleResetForm = (event: any) => {
@@ -264,11 +255,13 @@ const Buttons = () => {
             />
           </Form.Item>
           <Form.Item label="Amount USD">
-            {courseStatus.isLoading
-              ? 'Loading'
-              : courseStatus.error
-                ? 'Error'
-                : (course! * +payment.amount).toFixed(2)}
+            {!currentStore
+              ? 'Please select store'
+              : courseStatus.isLoading
+                ? 'Loading'
+                : courseStatus.error
+                  ? 'Error'
+                  : (course! * +payment.amount).toFixed(2)}
           </Form.Item>
           {!!activeStores.length && (
             <Form.Item

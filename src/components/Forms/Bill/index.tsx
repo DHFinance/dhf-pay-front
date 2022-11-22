@@ -4,12 +4,14 @@ import { configDapp } from '../../../../ethConfig/config';
 import { CurrencyType } from '../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { Payment } from '../../../interfaces/payment.interface';
 import { Transaction } from '../../../interfaces/transaction.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { getLastTransaction } from '../../../store/slices/transaction/asyncThunks/getLastTransaction';
 import { Loader } from '../../Loader';
 import CasperBill from './components/CasperBill';
+import { DefaultBill } from './components/DefaultBill';
 import { EthereumBill } from './components/EthereumBill';
 
 /**
@@ -86,7 +88,7 @@ const Bill = () => {
         );
       }
       default: {
-        return null;
+        return <DefaultBill billInfo={payment as Payment} course={course as number} />;
       }
     }
   }

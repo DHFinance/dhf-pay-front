@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useTypedDispatch } from '../../../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../../../hooks/useTypedSelector';
 import { getPayments } from '../../../../../store/slices/payments/asyncThunks/getPayments';
@@ -14,13 +14,16 @@ interface Props {
 const AdminPayments: FC<Props> = ({ entity }) => {
   const payments = useTypedSelector((state) => state.payments.data);
   const paymentsStatus = useTypedSelector((state) => state.payments.status);
+  const totalPages = useTypedSelector((state) => state.payments.totalPages);
+  
+  const [page, setPage] = useState(1);
 
   const router = useRouter();
   const dispatch = useTypedDispatch();
 
   useEffect(() => {
-    dispatch(getPayments());
-  }, []);
+    dispatch(getPayments(page));
+  }, [page]);
 
   const paymentsTable = payments
     ?.map((payment: any) => {
@@ -53,9 +56,9 @@ const AdminPayments: FC<Props> = ({ entity }) => {
   }
 
   return (entity === 'buttons') ? (
-    <PaymentsButton currentTable={paymentsTable} onRow={onRow} />
+    <PaymentsButton currentTable={paymentsTable} onRow={onRow} currentPage={page} changePage={(newPage) => setPage(newPage)} totalPages={totalPages} />
   ) : (
-    <PaymentsInvoices currentTable={paymentsTable} onRow={onRow} />
+    <PaymentsInvoices currentTable={paymentsTable} onRow={onRow} currentPage={page} changePage={(newPage) => setPage(newPage)} totalPages={totalPages} />
   );
 };
 

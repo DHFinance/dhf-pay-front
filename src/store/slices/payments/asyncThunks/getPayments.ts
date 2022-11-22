@@ -7,11 +7,12 @@ import { RootState } from '../../../store';
  */
 const getPayments = createAsyncThunk(
   'getPayments',
-  async (_, { rejectWithValue, getState }) => {
+  async (page: number, { rejectWithValue, getState }) => {
     try {
       const token = (getState() as RootState).auth?.data?.token;
       const result = await get('/payment', {
         headers: { Authorization: `Bearer ${token}` },
+        params: { limit: 10, page },
       });
       return result.data;
     } catch (error: any) {

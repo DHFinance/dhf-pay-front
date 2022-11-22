@@ -6,7 +6,6 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Store } from '../../../interfaces/store.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
-import { getUserPayments } from '../../../store/slices/payments/asyncThunks/getUserPayments';
 import { getUserStores } from '../../../store/slices/stores/asyncThunks/getUserStores';
 import { Loader } from '../../Loader';
 
@@ -27,7 +26,7 @@ const InvoicesBuilder = () => {
   const [payment, setPayment] = useState(createPaymentInitialState);
   const [currentStore, setCurrentStore] = useState<Store | null>(null);
   const [availableCurrencies, setAvailableCurrencies] = useState<
-    CurrencyType[]
+  CurrencyType[]
   >([]);
 
   const [form] = Form.useForm();
@@ -39,12 +38,6 @@ const InvoicesBuilder = () => {
   useEffect(() => {
     dispatch(getUserStores(user.id));
   }, []);
-
-  useEffect(() => {
-    if (stores?.length && activeStores[0]?.apiKey) {
-      dispatch(getUserPayments(activeStores[0]?.apiKey));
-    }
-  }, [stores?.length]);
 
   const validate = async (nameField: string) => {
     await form.validateFields([nameField]);
@@ -76,7 +69,9 @@ const InvoicesBuilder = () => {
   async function handleOk() {
     try {
       await form.validateFields();
-      if (!(Object.values(CurrencyType).includes(form.getFieldValue('currency')))) {
+      if (
+        !Object.values(CurrencyType).includes(form.getFieldValue('currency'))
+      ) {
         form.setFields([
           { name: 'currency', errors: ['Please select currency!'] },
         ]);
@@ -89,7 +84,6 @@ const InvoicesBuilder = () => {
             apiKey: currentStore!.apiKey,
           }),
         );
-        dispatch(getUserPayments(currentStore!.apiKey));
         setPayment(createPaymentInitialState);
         message.success('Payment was added');
         form.resetFields();
@@ -104,9 +98,7 @@ const InvoicesBuilder = () => {
   function handleChangeCurrency(event: CurrencyType) {
     const currency = CurrencyFabric.create(event);
     currency.getCourse();
-    form.setFields([
-      { name: 'currency', errors: [] },
-    ]);
+    form.setFields([{ name: 'currency', errors: [] }]);
   }
 
   /**
@@ -115,7 +107,6 @@ const InvoicesBuilder = () => {
   function handleChange(value: string) {
     const current = stores!.filter((store) => store.apiKey === value)[0];
     setCurrentStore(current);
-    dispatch(getUserPayments(value));
     validate('store');
     setAvailableCurrencies(
       Object.values(CurrencyType).filter((el) =>
@@ -184,11 +175,13 @@ const InvoicesBuilder = () => {
               />
             </Form.Item>
             <Form.Item label="Amount USD">
-              {courseStatus.isLoading
-                ? 'Loading'
-                : courseStatus.error
-                  ? 'Error'
-                  : (course! * +payment.amount).toFixed(2)}
+              {!currentStore
+                ? 'Please select store'
+                : courseStatus.isLoading
+                  ? 'Loading'
+                  : courseStatus.error
+                    ? 'Error'
+                    : (course! * +payment.amount).toFixed(2)}
             </Form.Item>
             <Form.Item label="Comment" name="comment">
               <Input.TextArea autoSize onChange={onChangePayment('comment')} />

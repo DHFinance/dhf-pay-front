@@ -1,4 +1,4 @@
-import { Table } from 'antd';
+import { Pagination, Table } from 'antd';
 import React, { FC } from 'react';
 
 const columns = [
@@ -47,16 +47,24 @@ const columns = [
 interface Props {
   currentTable: any;
   onRow: any;
+  currentPage: number;
+  changePage: (page: number) => void;
+  totalPages: number;
 }
 
-const PaymentsButton: FC<Props> = ({ currentTable, onRow }) => {
+const PaymentsButton: FC<Props> = ({ currentTable, onRow, currentPage, changePage, totalPages }) => {
   return (
-    <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} dataSource={currentTable?.map((item: any) => {
+    <>
+    <Table columns={columns} scroll={{ x: 0 }} onRow={onRow} pagination={false} dataSource={currentTable?.map((item: any) => {
       return {
         ...item,
         amount: item.amount / 1000000000,
       };
     }) || []} />
+      <div style={{ display: 'flex', flexDirection: 'row-reverse', marginTop: '5px' }}>
+        <Pagination current={currentPage} onChange={changePage} total={totalPages} />
+      </div>
+    </>
   );
 };
 

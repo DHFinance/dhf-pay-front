@@ -10,6 +10,7 @@ interface Transaction {
   amount: string;
   payment: Payment;
   receiver: string;
+  walletForTransaction: null | string;
 }
 
 export type { Transaction };
