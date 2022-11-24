@@ -41,7 +41,7 @@ const currenciesToString = Object.values(CurrencyType);
 
 const Store = () => {
   const store = useTypedSelector((state) => state.store.data);
-  const storeError = useTypedSelector((state) => state.store.status.error);
+  useTypedSelector((state) => state.store.status.error);
   const isStoreLoading = useTypedSelector(
     (state) => state.store.status.isLoading,
   );

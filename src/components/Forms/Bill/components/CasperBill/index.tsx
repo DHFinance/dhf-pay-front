@@ -124,7 +124,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
   const getBalance = async () => {
     const publicKeyHex = await window.casperlabsHelper.getActivePublicKey();
     const latestBlock = await casperService.getLatestBlockInfo();
-    const root = await casperService.getStateRootHash(latestBlock.block?.hash);
+    const root = await casperService.getStateRootHash(latestBlock.block?.hash as string);
 
     const balanceUref = await casperService.getAccountBalanceUrefByPublicKey(
       root,
@@ -135,7 +135,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
       balanceUref,
     );
     const hash = await casperService.getStateRootHash(
-      latestBlock.block?.header.state_root_hash,
+      latestBlock.block?.header.state_root_hash as string,
     );
 
     try {

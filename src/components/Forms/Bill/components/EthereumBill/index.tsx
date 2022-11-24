@@ -25,11 +25,11 @@ interface EthereumBillProps {
 }
 
 const EthereumBill: FC<EthereumBillProps> = ({
-                                               billInfo,
-                                               date,
-                                               course,
-                                               transaction,
-                                             }) => {
+  billInfo,
+  date,
+  course,
+  transaction,
+}) => {
   const [balance, setBalance] = useState('');
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
