@@ -8,6 +8,7 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Store } from '../../../interfaces/store.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
+import { clearCourse } from '../../../store/slices/course/course.slice';
 import { addPayment } from '../../../store/slices/payment/asyncThunks/addPayment';
 import { getUserStores } from '../../../store/slices/stores/asyncThunks/getUserStores';
 import { Loader } from '../../Loader';
@@ -83,11 +84,22 @@ const Buttons = () => {
   };
 
   const validateAmount = (rule: any, value: any, callback: any) => {
-    if (value < 0) {
-      callback('Must be at least 0');
-    } else {
+    if (!course || !form.getFieldValue('currency')) {
       callback();
     }
+
+    if (form.getFieldValue('currency') === CurrencyType.Casper) {
+      if (value < 2.5) {
+        return callback('Must be at least 2.5');
+      }
+      return callback();
+    }
+
+    if (course! * value < 0.1) {
+      return callback('Must be at least 0.1$');
+    }
+
+    callback();
   };
 
   const validateName = (rule: any, value: any, callback: any) => {
@@ -172,9 +184,11 @@ const Buttons = () => {
   };
 
   function handleChangeCurrency(event: CurrencyType) {
+    dispatch(clearCourse());
     const currency = CurrencyFabric.create(event);
     currency.getCourse();
     form.setFields([{ name: 'currency', errors: [] }]);
+    form.setFields([{ name: 'amount', errors: [] }]);
   }
 
   const handleResetForm = (event: any) => {
@@ -186,6 +200,7 @@ const Buttons = () => {
   };
 
   useEffect(() => {
+    dispatch(clearCourse());
     form.setFieldValue(
       'currency',
       availableCurrencies[0] ?? 'No available currencies',

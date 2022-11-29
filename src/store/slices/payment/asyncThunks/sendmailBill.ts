@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { put } from '../../../../../api';
+import { post } from '../../../../../api';
 import { RootState } from '../../../store';
 
 /**
@@ -17,7 +17,7 @@ const sendMailBill = createAsyncThunk(
   ) => {
     try {
       const token = (getState() as RootState).auth?.data?.token;
-      const result = await put(
+      const result = await post(
         'payment/send-mail-bill',
         { id: payload.id, billUrl: payload.billUrl, email: payload.email },
         { headers: { Authorization: `Bearer ${token}` } },

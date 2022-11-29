@@ -117,6 +117,14 @@ const CreateUserForm: FC<Props> = ({ setEmail }) => {
     }
   };
 
+  const validateName = (rule: any, value: any, callback: any) => {
+    if (value.trim().length === 0) {
+      callback("Can't be empty");
+    } else {
+      callback();
+    }
+  };
+
   /**
    * @description registration of user
    */
@@ -165,15 +173,14 @@ const CreateUserForm: FC<Props> = ({ setEmail }) => {
       <Form.Item
         label="Name"
         name="name"
-        rules={[{ required: true, message: 'Please input your name!' }]}
+        rules={[{ required: true, message: 'Please input your name!' }, { validator: validateName }]}
       >
         <Input onChange={onUpdateData('name')} />
       </Form.Item>
-
       <Form.Item
         label="Last name"
         name="lastName"
-        rules={[{ required: true, message: 'Please input your last name!' }]}
+        rules={[{ required: true, message: 'Please input your last name!' }, { validator: validateName }]}
       >
         <Input onChange={onUpdateData('lastName')} />
       </Form.Item>

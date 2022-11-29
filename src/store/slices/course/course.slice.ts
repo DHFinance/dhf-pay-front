@@ -25,7 +25,11 @@ const initialState: InitialState = {
 const courseSlice = createSlice({
   name: 'course',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCourse(state) {
+      state.data.usd = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getCourse.pending, (state) => {
       state.status = START_FETCH_STATUS;
@@ -41,3 +45,4 @@ const courseSlice = createSlice({
 });
 
 export default courseSlice.reducer;
+export const { clearCourse } = courseSlice.actions;

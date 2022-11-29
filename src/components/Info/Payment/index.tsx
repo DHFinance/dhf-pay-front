@@ -16,6 +16,7 @@ import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
 import { UserRole } from '../../../modules/user/enums/userRole.enum';
+import { clearCourse } from '../../../store/slices/course/course.slice';
 import { cancelPayment } from '../../../store/slices/payment/asyncThunks/cancelPayment';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { sendMailBill } from '../../../store/slices/payment/asyncThunks/sendmailBill';
@@ -59,6 +60,10 @@ const Payment: FC<Props> = ({ isButtons }) => {
     transactions?.filter((transaction) => transaction.payment?.id === id) || [];
 
   const domain = location.host;
+  
+  useEffect(() => {
+    dispatch(clearCourse());
+  }, []);
 
   useEffect(() => {
     if (router.query.slug) {
