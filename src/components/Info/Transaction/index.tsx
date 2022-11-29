@@ -12,7 +12,6 @@ import { getUsdFromCrypto } from '../../../../utils/getUsdFromCrypto';
 import { useTypedDispatch } from '../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
-import { getCourse } from '../../../store/slices/course/asyncThunks/getCourse';
 import { getTransaction } from '../../../store/slices/transaction/asyncThunks/getTransaction';
 import { Loader } from '../../Loader';
 
