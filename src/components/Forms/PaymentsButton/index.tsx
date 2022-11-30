@@ -259,7 +259,7 @@ const Buttons = () => {
           </Form.Item>
           <Form.Item label="Currency" name="currency">
             <Select
-              options={Object.values(CurrencyType).map((currency) => ({
+              options={availableCurrencies.map((currency) => ({
                 value: currency,
                 label: currency,
                 key: currency,
