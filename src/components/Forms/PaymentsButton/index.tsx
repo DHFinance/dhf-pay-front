@@ -265,7 +265,7 @@ const Buttons = () => {
                 key: currency,
               }))}
               onChange={handleChangeCurrency}
-              style={{ width: '100px' }}
+              style={{ width: '170px' }}
               defaultValue={'Please select store' as CurrencyType}
             />
           </Form.Item>

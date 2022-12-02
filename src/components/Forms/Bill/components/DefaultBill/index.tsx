@@ -6,6 +6,7 @@ import {
 import { Col, Statistic } from 'antd';
 import React, { FC, memo, useEffect } from 'react';
 import { getUsdFromCrypto } from '../../../../../../utils/getUsdFromCrypto';
+import { CurrencyType } from '../../../../../enums/currency.enum';
 import { useTypedDispatch } from '../../../../../hooks/useTypedDispatch';
 import { useTypedSelector } from '../../../../../hooks/useTypedSelector';
 import { Payment } from '../../../../../interfaces/payment.interface';
@@ -25,6 +26,9 @@ const DefaultBill: FC<Props> = memo(({ billInfo, course }) => {
   const dispatch = useTypedDispatch();
   
   useEffect(() => {
+    if (billInfo.currency === CurrencyType.USDT) {
+      return;
+    }
     dispatch(generateTransaction(billInfo.id));
   }, []);
   
@@ -32,7 +36,7 @@ const DefaultBill: FC<Props> = memo(({ billInfo, course }) => {
     return <p>Error</p>;
   }
   
-  if (transactionStatus.isLoading || !transaction?.walletForTransaction) {
+  if (transactionStatus.isLoading || (!transaction?.walletForTransaction && CurrencyType.USDT !== billInfo.currency)) {
     return <Loader />;
   }
   

@@ -7,6 +7,7 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { Payment } from '../../../interfaces/payment.interface';
 import { Transaction } from '../../../interfaces/transaction.interface';
 import { CurrencyFabric } from '../../../modules/curriencies/currencyFabric';
+import { clearCourse } from '../../../store/slices/course/course.slice';
 import { getPayment } from '../../../store/slices/payment/asyncThunks/getPayment';
 import { getLastTransaction } from '../../../store/slices/transaction/asyncThunks/getLastTransaction';
 import { Loader } from '../../Loader';
@@ -30,6 +31,7 @@ const Bill = () => {
   const dispatch = useTypedDispatch();
 
   useEffect(() => {
+    dispatch(clearCourse());
     const pathname = window.location.pathname.split('/');
     const id = pathname && pathname[pathname.length - 1];
     dispatch(getPayment(id));
@@ -39,7 +41,7 @@ const Bill = () => {
     if (!payment || !payment.currency) {
       return;
     }
-    const currency = CurrencyFabric.create(CurrencyType.Ethereum);
+    const currency = CurrencyFabric.create(payment.currency);
     currency.getCourse();
   }, [payment]);
 
