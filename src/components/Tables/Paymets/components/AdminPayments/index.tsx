@@ -33,8 +33,7 @@ const AdminPayments: FC<Props> = ({ entity }) => {
         status: payment?.status?.replace('_', ' '),
         store: payment?.store?.id,
       };
-    })
-    .reverse();
+    });
 
   /**
    * @description handling every row,applying styles and a click event handler to it

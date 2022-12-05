@@ -39,8 +39,7 @@ const UserPayments: FC<Props> = ({ entity }) => {
         status: payment?.status?.replace('_', ' '),
         store: payment?.store?.id,
       };
-    })
-    .reverse();
+    });
 
   useEffect(() => {
     dispatch(getUserStores(user.id));
@@ -99,8 +98,6 @@ const UserPayments: FC<Props> = ({ entity }) => {
   if (storesStatus.isLoading || stores === null) {
     return <Loader />;
   }
-
-  console.log(paymentsTable);
 
   return (
     <>
