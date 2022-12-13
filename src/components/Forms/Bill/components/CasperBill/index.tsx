@@ -230,8 +230,8 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
           null,
           id,
         );
-        DeployUtil.standardPayment(amountNum);
-        const localDeploy = DeployUtil.makeDeploy(deployParams, session, billInfo.payment);
+        const standardPayment = DeployUtil.standardPayment(amountNum);
+        const localDeploy = DeployUtil.makeDeploy(deployParams, session, standardPayment);
         const json = DeployUtil.deployToJson(localDeploy);
         const signature = await window.casperlabsHelper.sign(
           json,
@@ -270,6 +270,7 @@ const CasperBill: FC<Props> = ({ billInfo, transaction, payment, course }) => {
         }
         setTransactionExplorer(signed || '');
       } catch (e: any) {
+        console.log(e);
         showError(e.message);
       }
     } catch (error) {

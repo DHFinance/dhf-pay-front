@@ -41,7 +41,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
     email: '',
   });
 
-  const { id, datetime, amount, comment, status, store, type, text } =
+  const { id, datetime, amount, comment, status, store, type, text, url } =
     payment ?? {};
 
   const dispatch = useTypedDispatch();
@@ -88,7 +88,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
 
   const date = new Date(datetime ?? 0).toDateString();
 
-  const billUrl = `${domain}/bill/${id}`;
+  const billUrl = `${domain}/bill/${url}`;
 
   /**
    * @description sending email with a link billUrl
@@ -358,7 +358,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
             {(isButtons || payment?.status !== 'Paid') &&
             filterTransactions[filterTransactions.length - 1]?.status !==
               'processing' ? (
-              <Link href={`/bill/${id}`}>
+              <Link href={`/bill/${url}`}>
                 <a
                   id="link"
                   style={{
@@ -399,7 +399,7 @@ const Payment: FC<Props> = ({ isButtons }) => {
                 style={{ padding: '0px 0 20px 20px', background: 'white' }}
               >
                 <a
-                  href={`http://${domain}/bill/${id}`}
+                  href={`http://${domain}/bill/${url}`}
                   rel="noreferrer"
                   target="_blank"
                   id="resultButton"

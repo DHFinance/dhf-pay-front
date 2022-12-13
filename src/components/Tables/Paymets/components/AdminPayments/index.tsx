@@ -42,7 +42,7 @@ const AdminPayments: FC<Props> = ({ entity }) => {
   const onRow = (record: any) => {
     return {
       style: { cursor: 'pointer' },
-      onClick: () => router.push(`${entity}/${record.id}`),
+      onClick: () => router.push(`${entity}/${record.url}`),
     };
   };
 
