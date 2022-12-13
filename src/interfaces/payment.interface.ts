@@ -12,6 +12,7 @@ interface Payment {
   text: string | null;
   cancelled: boolean;
   store: Store;
+  url: string;
 }
 
 export type { Payment };
