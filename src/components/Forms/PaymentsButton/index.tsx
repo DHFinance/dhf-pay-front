@@ -343,7 +343,7 @@ const Buttons = () => {
             <Form.Item label="Result" name="description">
               <a
                 rel="noreferrer"
-                href={`http://${domain}/bill/${currentPayment?.id}`}
+                href={`http://${domain}/bill/${currentPayment?.url}`}
                 id="resultButton"
                 target="_blank"
                 style={
