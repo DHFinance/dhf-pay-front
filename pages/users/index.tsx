@@ -1,12 +1,16 @@
-// @ts-nocheck
-import React from "react";
-import Users from "../../src/components/Tables/Users";
-import SliderContainer from "../../src/components/Layout/SliderContainer";
-import WithAuth from "../../hoc/withAuth";
-
+import React from 'react';
+import WithAuth from '../../hoc/withAuth';
+import SliderContainer from '../../src/components/Layout/SliderContainer';
+import Users from '../../src/components/Tables/Users';
 
 const UsersPage = () => {
-    return <WithAuth><SliderContainer title={`Users`}><Users/></SliderContainer></WithAuth>
-}
+  return (
+    <WithAuth>
+      <SliderContainer title={'Users'}>
+        <Users />
+      </SliderContainer>
+    </WithAuth>
+  );
+};
 
-export default UsersPage
+export default UsersPage;

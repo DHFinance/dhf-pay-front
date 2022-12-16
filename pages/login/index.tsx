@@ -1,17 +1,17 @@
-import React from "react";
-import SliderContainer from "../../src/components/Layout/SliderContainer";
-import Login from "../../src/components/Forms/Login";
-import WithoutAuth from "../../hoc/withoutAuth";
-import {wrapper} from "../../store/store";
-
+import React from 'react';
+import WithoutAuth from '../../hoc/withoutAuth';
+import Login from '../../src/components/Forms/Login';
+import SliderContainer from '../../src/components/Layout/SliderContainer';
+import { wrapper } from '../../src/store/store';
 
 const AuthPage = () => {
-    return <WithoutAuth>
-        <SliderContainer title={'Login'}>
-            <Login/>
-        </SliderContainer>
+  return (
+    <WithoutAuth>
+      <SliderContainer title={'Login'}>
+        <Login />
+      </SliderContainer>
     </WithoutAuth>
+  );
+};
 
-}
-
-export default wrapper.withRedux(AuthPage)
+export default wrapper.withRedux(AuthPage);
