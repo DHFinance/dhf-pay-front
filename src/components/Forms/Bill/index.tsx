@@ -667,7 +667,6 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
       keyPath: '0'
     });
     const signed = await casperClient.putDeploy(deploySigned);
-    console.log("signed", signed)
 
     setIsTimeToConfirmOnLedger(false)
 
@@ -705,8 +704,6 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
     console.log("balance", balance)
   }
 
-  console.log('payment', payment);
-
   return (
     <>
       {billInfo?.cancelled &&
@@ -729,7 +726,7 @@ const CasperBill = ({billInfo, transaction, dispatch, router, store, course}) =>
       <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
         <Statistic title="Comment" value={comment || 'none'} prefix={<CommentOutlined />} />
       </Col>
-      {status !== 'Paid' ?
+      {status !== 'Paid' || type ?
         <Col span={24} style={{padding: '20px 0 20px 20px', background: 'white'}}>
           <Form
             name="email"
